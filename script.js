@@ -34,6 +34,8 @@ $(document).ready(function() {
 	root = path.substr(0, path.indexOf("client/") + 7);
 	apiRoot = root.replace("client", "api");
 
+	loadcss("style.css");
+
 	console.log("root: " + root);
 	console.log("apiRoot: " + apiRoot);
 
@@ -120,6 +122,10 @@ function post(url, cb) {
 
 function el(id) {
 	return $("#" + id).get(0);
+}
+
+function loadcss(filename) {
+	$('head').append($('<link rel="stylesheet" type="text/css" />').attr('href', root + filename));
 }
 
 Number.prototype.pad = function() {
