@@ -76,6 +76,10 @@ $(document).ready(function() {
 		}
 	});
 
+	$("#seekbar").click(function(e) {
+		el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
+	});
+
 	$("#button-login").click(function() {
 		$(".tab").hide();
 		$("#tab-podcasts").fadeIn("fast");
