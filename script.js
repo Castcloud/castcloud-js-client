@@ -1,6 +1,7 @@
 var token,
 	episodes = {},
-	root = "/castcloud/client/";
+	root = window.location.pathname,
+	apiRoot = root.replace("client", "api");
 
 $(document).ready(function() {
 	var Router = Backbone.Router.extend({
@@ -28,6 +29,9 @@ $(document).ready(function() {
 			$("#tab-settings").show();
 		}
 	});
+
+	console.log("root: " + root);
+	console.log("apiRoot: " + apiRoot);
 
 	var router = new Router();
 
@@ -60,7 +64,7 @@ $(document).ready(function() {
 		}
 	});
 
-	$.post("/castcloud/api/account/login", {
+	$.post(apiRoot + "account/login", {
 		username: "user",
 		password: "pass",
 		clientname: "Castcloud",
@@ -70,12 +74,12 @@ $(document).ready(function() {
 	}, function(res) {
 		token = res.token;
 
-		get("/castcloud/api/library/casts", function(res) {
+		get("library/casts", function(res) {
 			res.forEach(function(cast) {
 				var cc = cast.castcloud;
 				$("#podcasts").append('<div id="cast-' + cc.id + '" class="cast">' + cast.title + "</div>");
 				$("#cast-" + cc.id).click(function() {
-					get("/castcloud/api/library/episodes/" + cc.id, function(res) {
+					get("library/episodes/" + cc.id, function(res) {
 						$("#episodes").html("");
 						res.forEach(function(episode) {
 							$("#episodes").append('<div id="ep-' + episode.castcloud.id + '" class="cast">' + episode.title + "</div>");
@@ -103,11 +107,11 @@ function playEpisode(id) {
 }
 
 function get(url, cb) {
-	$.ajax(url, { headers: { Authorization: token }, success: cb});
+	$.ajax(apiRoot + url, { headers: { Authorization: token }, success: cb});
 }
 
 function post(url, cb) {
-	$.ajax(url, { headers: { Authorization: token }, success: cb});
+	$.ajax(apiRoot + url, { headers: { Authorization: token }, success: cb});
 }
 
 function el(id) {
