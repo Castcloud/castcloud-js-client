@@ -1,7 +1,7 @@
 var token,
 	episodes = {},
-	root = window.location.pathname,
-	apiRoot = root.replace("client", "api");
+	root,
+	apiRoot;
 
 $(document).ready(function() {
 	var Router = Backbone.Router.extend({
@@ -29,6 +29,10 @@ $(document).ready(function() {
 			$("#tab-settings").show();
 		}
 	});
+
+	var path = window.location.pathname;
+	root = path.substr(0, path.indexOf("client/") + 7);
+	apiRoot = root.replace("client", "api");
 
 	console.log("root: " + root);
 	console.log("apiRoot: " + apiRoot);
