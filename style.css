@@ -98,6 +98,64 @@ body {
 	background: #0066cc;
 }
 
+#podcast-vmenu {
+	position: fixed;
+	width: 50px;
+	height: 100%;
+	background: #222;
+}
+
+#podcast-vmenu div {
+	width: 50px;
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+	cursor: pointer;
+	font-size: 32px;
+}
+
+#podcast-vmenu div:hover {
+	background: #0066cc;
+}
+
+#input-vmenu-add {
+	display: none;
+	font: 16px "Lato";
+	height: 50px;
+	width: 100%;
+	padding: 0px 10px;
+	border: none;
+	outline: none;
+	z-index: 1;
+}
+
+#button-vmenu-add {
+	display: none;
+	width: 100px;
+	float: right;
+	margin-top: -50px;
+	height: 50px;
+	background: #0066cc;
+	color: #FFF;
+	font: bold 18px "Lato";
+	border: none;
+	cursor: pointer;
+	position: relative;
+	z-index: 2;
+}
+
+#button-vmenu-add:hover {
+	background: #0099cc;
+}
+
+#podcast-cols {
+	left: 50px;
+	right: 0;
+	height:100%;
+	position: absolute;
+	background: #000;
+}
+
 .col {
 	width: 33.333333%;
 	height: 100%;

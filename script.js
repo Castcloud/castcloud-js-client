@@ -76,7 +76,7 @@ $(document).ready(function() {
 		}
 	});
 
-	$("#seekbar").click(function(e) {
+	$("#seekbar").mousedown(function(e) {
 		el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
 	});
 
@@ -85,6 +85,11 @@ $(document).ready(function() {
 		$("#tab-podcasts").fadeIn("fast");
 		$("#playbar").slideDown("fast");
 		$("#topbar nav").fadeIn("fast");
+	});
+
+	$("#vmenu-add").click(function() {
+		$("#input-vmenu-add").toggle();
+		$("#button-vmenu-add").toggle();
 	});
 
 	$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
