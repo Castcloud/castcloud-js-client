@@ -1,0 +1,112 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	color: #FFF;
+	font-family: "Lato";
+}
+
+#topbar {
+	background: #111;
+	height: 60px;
+}
+
+#topbar h1 {
+	padding: 10px 20px;
+	color: #FFF;
+}
+
+#topbar nav {
+	position: absolute;
+	top: 0;
+	line-height: 60px;
+	left: 200px;
+}
+
+#topbar nav ul li {
+	display: inline-block;
+}
+
+#topbar nav a {
+	padding: 0px 10px;
+	height: 60px;
+	display: inline-block;
+	color: #FFF;
+	text-decoration: none;
+}
+
+#topbar nav a:hover {
+	color: #0099cc;
+}
+
+#main-container {
+	background: #222;
+	bottom: 100px;
+	top: 60px;
+	left: 0;
+	right: 0;
+	position: absolute;
+	overflow: auto;
+}
+
+.tab {
+	display: none;
+	height: 100%;
+}
+
+.col {
+	width: 33.333333%;
+	height: 100%;
+	background: #222;
+	float: left;
+}
+
+.cast {
+	padding: 10px 20px;
+	cursor: pointer;
+}
+
+.cast:hover {
+	background: #0066cc;
+}
+
+#vid {
+	display: none;
+}
+
+#episode-title {
+	margin: 5px 0px;
+}
+
+#episode-desc {
+	color: #AAA;
+}
+
+#playbar {
+	background: #111;
+	height: 100px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	position: fixed;
+	text-align: center;
+	color: #222;
+}
+
+#seekbar {
+	height: 5px;
+	background: #FFF;
+	margin-bottom: 10px;
+}
+
+#seekbar:hover {
+	cursor: pointer;
+}
+
+#seekbar div {
+	background: #0099cc;
+	height: 5px;
+	width: 0px;
+}
