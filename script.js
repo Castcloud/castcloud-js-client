@@ -1,7 +1,8 @@
 var token,
 	episodes = {},
 	root,
-	apiRoot;
+	apiRoot,
+	loggedIn = false;
 
 $(document).ready(function() {
 	var Router = Backbone.Router.extend({
@@ -14,7 +15,12 @@ $(document).ready(function() {
 
 		podcasts: function() {
 			$(".tab").hide();
-			$("#tab-podcasts").show();
+			if (!loggedIn) {
+				$("#tab-login").show();
+			}
+			else {
+				$("#tab-podcasts").show();
+			}
 		},
 
 		episode: function(id) {
@@ -70,6 +76,18 @@ $(document).ready(function() {
 		}
 	});
 
+	$("#button-login").click(function() {
+		$(".tab").hide();
+		$("#tab-podcasts").fadeIn("fast");
+		$("#playbar").slideDown("fast");
+		$("#topbar nav").fadeIn("fast");
+	});
+
+	$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
+	$(window).resize(function() {
+		$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
+	});
+
 	$.post(apiRoot + "account/login", {
 		username: "user",
 		password: "pass",
@@ -79,6 +97,7 @@ $(document).ready(function() {
 		uuid: "1881"
 	}, function(res) {
 		token = res.token;
+		loggedIn = true;
 
 		get("library/casts", function(res) {
 			res.forEach(function(cast) {
