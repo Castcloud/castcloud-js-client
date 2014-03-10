@@ -61,6 +61,7 @@ $(document).ready(function() {
 
 	$("#vid").click(function() {
 		var video = el("vid");
+		console.log("!");
 		if (video.paused) {
 			video.play();
 		}
@@ -93,7 +94,10 @@ $(document).ready(function() {
 
 	$(document).mousemove(function(e) {
 		if (seeking) {
-			el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
+			var video = el("vid");
+			video.currentTime = 1 / window.innerWidth * e.pageX * video.duration;
+			var progress = 1 / video.duration * video.currentTime;
+			$("#seekbar div").css("width", window.innerWidth * progress + "px")
 		}
 	});
 
@@ -275,6 +279,10 @@ function loadSettings() {
 		for (var key in res) {
 			var category = key.split("/")[0];
 			var setting = key.split("/")[1];
+			if (setting == null) {
+				setting = category;
+				category = "General";
+			}
 			if (settings[category] == null) {
 				settings[category] = {};
 			}
@@ -282,7 +290,7 @@ function loadSettings() {
 			
 		}
 		for (var c in settings) {
-			$("#tab-settings").append("<h2>" + c + "</h2>");
+			$("#tab-settings").append($("<h2>").text(c));
 			for (var s in settings[c]) {
 				$("#tab-settings").append("<p><label>" + s + "</label><input type=\"text\"></p>");
 			}
