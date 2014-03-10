@@ -157,6 +157,7 @@ $(document).ready(function() {
 		loggedIn = true;
 
 		loadCasts();
+		loadSettings();
 	});
 });
 
@@ -216,6 +217,21 @@ function loadCasts() {
 			$("#cast-context-menu").show();
 			e.preventDefault();
 		});
+	});
+}
+
+function loadSettings() {
+	get("account/settings", function(res) {
+		var categories = {};
+		for (var key in res) {
+			//var category = key.split("/")[0];
+			//categories[category] = {};
+			//categories[category][key.split("/")[1]] = res[key];
+			//if (!_.contains(categories, category)) {
+			//	categories.push(key);
+			//}
+		}
+		//console.log(categories.general.x);
 	});
 }
 

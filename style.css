@@ -71,7 +71,7 @@ body {
 	margin-bottom: 5px;
 }
 
-#login-container input {
+#login-container input, #tab-settings input {
 	width: 190px;
 	font: 16px "Lato";
 	padding: 10px 5px;
@@ -233,4 +233,17 @@ body {
 #cast-context-menu div:hover {
 	background: #0066cc;
 	color: #FFF;
+}
+
+#tab-settings h2 {
+	padding: 10px;
+}
+
+#tab-settings p {
+	margin: 5px 10px;
+}
+
+#tab-settings label {
+	display: inline-block;
+	width: 100px;
 }
