@@ -77,6 +77,10 @@ $(document).ready(function() {
 		}
 	});
 
+	$("#vid").dblclick(function() {
+		el("vid").webkitRequestFullScreen();
+	});
+
 	$("#seekbar").mousedown(function(e) {
 		el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
 	});
