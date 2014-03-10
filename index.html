@@ -24,7 +24,6 @@
 		</nav>
 		<div id="userinfo">
 			<p>Logged in as <span style="color: #0099cc"></span><button class="button" id="button-logout">Log out</button></p>
-			
 		</div>
 	</div>
 	<div id="main-container">
@@ -47,9 +46,15 @@
 				</div>
 				<div class="col" id="episodes"></div>
 				<div class="col" id="episodeinfo">
-					<video id="vid" width="100%" autoplay>
-		  				<source src="#" type="video/mp4">
-					</video>
+					<div id="vid-container">
+						<video id="vid" width="100%" autoplay>
+			  				<source src="#" type="video/mp4">
+						</video>
+						<div id="vid-fs-overlay">
+							<h1>TITLE</h1>
+							<button class="button">></button>
+						</div>
+					</div>
 					<h2 id="episode-title"></h1>
 					<p id="episode-desc"></p>
 				</div>
@@ -59,7 +64,9 @@
 	</div>
 	<div id="playbar">
 		<div id="seekbar"><div></div></div>
-		<h1>00:00 / 00:00</h1>
+		<h3 id="playbar-info"></h2>
+		<h2 id="time">00:00/00:00</h1>
+		<div id="playbar-controls"><button class="button button-play">||</button></div>
 	</div>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//underscorejs.org/underscore-min.js"></script>

@@ -54,34 +54,74 @@ $(document).ready(function() {
 		var dateTotal = new Date(video.duration * 1000);
 		var progress = 1 / video.duration * video.currentTime;
 
-		$("#playbar h1").html(date.getMinutes().pad() + ":" + date.getSeconds().pad() + " / " +
-			dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad());
+		$("#time").html(date.getMinutes().pad() + ":" + date.getSeconds().pad() + "/" + dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad());
 		$("#seekbar div").css("width", window.innerWidth * progress + "px")
 	});
 
 	$("#vid").click(function() {
-		var video = el("vid");
-		console.log("!");
-		if (video.paused) {
-			video.play();
-		}
-		else {
-			video.pause();
-		}
+		playPauseToggle();
 	});
 
 	$("#vid").dblclick(function() {
-		var video = el("vid");
-		if (video.requestFullscreen) {
-			video.requestFullscreen();
-		} else if (video.msRequestFullscreen){
-			video.msRequestFullscreen();
-		} else if (video.mozRequestFullScreen){
-			video.mozRequestFullScreen();
-		} else if (video.webkitRequestFullscreen){
-			video.webkitRequestFullscreen();
+		var video = el("vid-container");
+		if ($("#vid-container").hasClass("fs")) {
+			document.webkitExitFullscreen();
+			$("#vid-fs-overlay").hide();
+		}
+		else {
+			if (video.requestFullscreen) {
+				video.requestFullscreen();
+			} else if (video.msRequestFullscreen){
+				video.msRequestFullscreen();
+			} else if (video.mozRequestFullScreen){
+				video.mozRequestFullScreen();
+			} else if (video.webkitRequestFullscreen){
+				video.webkitRequestFullscreen();
+			}			
+		}
+
+		$("#vid-container").toggleClass("fs");
+	});
+
+	var id = 0;
+	var ui = false;
+	$("#vid").mousemove(function(e) {
+		if ($(this).parent().hasClass("fs") && !ui) {
+			$("#vid-fs-overlay").show();
+			clearTimeout(id);
+			id = setTimeout(function() {
+				$("#vid-fs-overlay").fadeOut();
+			}, 1000);
 		}
 	});
+
+	$("#vid-fs-overlay *").mouseover(function() {
+		if ($(this).hasClass("fs")) {
+			clearTimeout(id);
+			ui = true;
+		}		
+	});
+
+	$("#vid-fs-overlay *").mouseout(function() {
+		if ($(this).hasClass("fs")) {
+			ui = false;
+			id = setTimeout(function() {
+				$("#vid-fs-overlay").fadeOut();
+			}, 1000);
+		}
+	})
+
+	$(".button-play").click(function() {
+		playPauseToggle();
+		var video = el("vid");
+		if (video.paused) {
+			$(this).html(">");
+		}
+		else {
+			$(this).html("||");
+		}
+	});
+
 	var seeking = false;
 	$("#seekbar").mousedown(function(e) {
 		el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
@@ -200,6 +240,17 @@ function playEpisode(id) {
 	$("#vid").show();
 	$("#episode-title").html(episodes[id].title);
 	$("#episode-desc").html(episodes[id].description);
+	$("#playbar-info").html(episodes[id].title);
+}
+
+function playPauseToggle() {
+	var video = el("vid");
+	if (video.paused) {
+		video.play();
+	}
+	else {
+		video.pause();
+	}
 }
 
 function login() {
