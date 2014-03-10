@@ -40,8 +40,6 @@ $(document).ready(function() {
 	root = path.substr(0, path.indexOf("client/") + 7);
 	apiRoot = root.replace("client", "api");
 
-	loadcss("style.css");
-
 	var router = new Router();
 
 	$("a").click(function(e) {
@@ -83,9 +81,20 @@ $(document).ready(function() {
 			video.webkitRequestFullscreen();
 		}
 	});
-
+	var seeking = false;
 	$("#seekbar").mousedown(function(e) {
 		el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
+		seeking = true;
+	});
+
+	$(document).mouseup(function() {
+		seeking = false;
+	});
+
+	$(document).mousemove(function(e) {
+		if (seeking) {
+			el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
+		}
 	});
 
 	$("#button-login").click(login);
@@ -154,7 +163,6 @@ $(document).ready(function() {
 
 		$("#userinfo span").html($.cookie("username"));
 
-		//$("#tab-podcasts").show();
 		$("#playbar").show();
 		$("#topbar nav").show();
 		$("#userinfo").show();
