@@ -198,6 +198,7 @@ function loadCasts() {
 				get("library/episodes/" + cc.id, function(res) {
 					$("#episodes").html("");
 					res.forEach(function(episode) {
+						if (episode.title == null) episode.title = "N/A";
 						$("#episodes").append('<div id="ep-' + episode.castcloud.id + '" class="cast">' + episode.title + "</div>");
 						$("#ep-" + episode.castcloud.id).click(function() {
 							playEpisode(episode.castcloud.id);
@@ -222,16 +223,22 @@ function loadCasts() {
 
 function loadSettings() {
 	get("account/settings", function(res) {
-		var categories = {};
+		var settings = {};
 		for (var key in res) {
-			//var category = key.split("/")[0];
-			//categories[category] = {};
-			//categories[category][key.split("/")[1]] = res[key];
-			//if (!_.contains(categories, category)) {
-			//	categories.push(key);
-			//}
+			var category = key.split("/")[0];
+			var setting = key.split("/")[1];
+			if (settings[category] == null) {
+				settings[category] = {};
+			}
+			settings[category][setting] = res[key];
+			
 		}
-		//console.log(categories.general.x);
+		for (var c in settings) {
+			$("#tab-settings").append("<h2>" + c + "</h2>");
+			for (var s in settings[c]) {
+				$("#tab-settings").append("<p><label>" + s + "</label><input type=\"text\"></p>");
+			}
+		}
 	});
 }
 
