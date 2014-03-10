@@ -78,7 +78,17 @@ $(document).ready(function() {
 	});
 
 	$("#vid").dblclick(function() {
-		el("vid").webkitRequestFullScreen();
+		// if loops to check which fullscreen request it can use
+		var video = el("vid");
+		if (video.requestFullscreen) {
+			video.requestFullscreen();
+		} else if (video.msRequestFullscreen){
+			video.msRequestFullscreen();
+		} else if (video.mozRequestFullScreen){
+			video.mozRequestFullScreen();
+		} else if (video.webkitRequestFullscreen){
+			video.webkitRequestFullscreen();
+		}
 	});
 
 	$("#seekbar").mousedown(function(e) {
