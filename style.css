@@ -211,3 +211,26 @@ body {
 	height: 5px;
 	width: 0px;
 }
+
+#cast-context-menu {
+	display: none;
+	position: fixed;
+	width: 200px;
+	background: #FFF;
+	color: #111;
+	top: 10px;
+	left: 10px;
+	z-index: 3;
+	padding: 5px 0px;
+	border: 1px solid #AAA;
+}
+
+#cast-context-menu div {
+	padding: 5px 10px;
+	cursor: pointer;
+}
+
+#cast-context-menu div:hover {
+	background: #0066cc;
+	color: #FFF;
+}

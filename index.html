@@ -7,6 +7,9 @@
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
 </head>
 <body>
+	<div id="cast-context-menu">
+		<div id="cast-context-unsub">Unsubscribe</div>
+	</div>
 	<div id="topbar">
 		<h1>Castcloud</h1>
 		<nav>
@@ -30,12 +33,12 @@
 		<div class="tab" id="tab-podcasts">
 			<div id="podcast-vmenu">
 				<div id="vmenu-add">+</div>
-				<div>-</div>
 			</div>
 			<div id="podcast-cols">
-				<div class="col" id="podcasts">
+				<div class="col">
 					<input type="text" id="input-vmenu-add" placeholder="Feed URL">
 					<button id="button-vmenu-add">Add</button>
+					<div id="podcasts"></div>
 				</div>
 				<div class="col" id="episodes"></div>
 				<div class="col" id="episodeinfo">
@@ -52,7 +55,7 @@
 	<div id="playbar">
 		<div id="seekbar"><div></div></div>
 		<h1>00:00 / 00:00</h1>
-	</div>	
+	</div>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//underscorejs.org/underscore-min.js"></script>
 	<script src="//backbonejs.org/backbone-min.js"></script>

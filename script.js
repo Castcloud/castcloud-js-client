@@ -2,7 +2,8 @@ var token,
 	episodes = {},
 	root,
 	apiRoot,
-	loggedIn = false;
+	loggedIn = false,
+	contextCastId = 0;
 
 $(document).ready(function() {
 	var Router = Backbone.Router.extend({
@@ -90,11 +91,44 @@ $(document).ready(function() {
 	$("#vmenu-add").click(function() {
 		$("#input-vmenu-add").toggle();
 		$("#button-vmenu-add").toggle();
+		$("#input-vmenu-add").focus();
+	});
+
+	$("#button-vmenu-add").click(function() {
+		addFeed($("#input-vmenu-add").val());
+		$("#input-vmenu-add").val("");
+		$("#input-vmenu-add").toggle();
+		$("#button-vmenu-add").toggle();
+	});
+
+	$("#input-vmenu-add").keydown(function(e) {
+		if (e.which == 13) {
+			addFeed($("#input-vmenu-add").val());
+			$("#input-vmenu-add").val("");
+			$("#input-vmenu-add").toggle();
+			$("#button-vmenu-add").toggle();
+		}
 	});
 
 	$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
 	$(window).resize(function() {
 		$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
+	});
+
+	$(document).click(function() {
+		$("#cast-context-menu").hide();
+	});
+
+	$("#cast-context-unsub").click(function() {
+		$.ajax(apiRoot + "library/casts/" + contextCastId, { 
+			type: "DELETE",
+			headers: { 
+				Authorization: token 
+			}, 
+			success: function(res) {
+				loadCasts();
+			}
+		});
 	});
 
 	$.post(apiRoot + "account/login", {
@@ -108,27 +142,26 @@ $(document).ready(function() {
 		token = res.token;
 		loggedIn = true;
 
-		get("library/casts", function(res) {
-			res.forEach(function(cast) {
-				var cc = cast.castcloud;
-				$("#podcasts").append('<div id="cast-' + cc.id + '" class="cast">' + cast.title + "</div>");
-				$("#cast-" + cc.id).click(function() {
-					get("library/episodes/" + cc.id, function(res) {
-						$("#episodes").html("");
-						res.forEach(function(episode) {
-							$("#episodes").append('<div id="ep-' + episode.castcloud.id + '" class="cast">' + episode.title + "</div>");
-							$("#ep-" + episode.castcloud.id).click(function() {
-								playEpisode(episode.castcloud.id);
-							});
-
-							episodes[episode.castcloud.id] = episode;
-						});
-					});
-				});
-			});
-		});
+		loadCasts();
 	});
 });
+
+function addFeed(feedurl) {
+	$.ajax(apiRoot + "library/casts", { 
+		type: "POST",
+		data: { 
+			feedurl: feedurl 
+		}, 
+		headers: { 
+			Authorization: token 
+		}, 
+		success: function(res) {
+			console.log(res.status);
+
+			loadCasts();
+		}
+	});
+}
 
 function playEpisode(id) {
 	var video = el("vid");
@@ -140,12 +173,44 @@ function playEpisode(id) {
 	$("#episode-desc").html(episodes[id].description);
 }
 
+function loadCasts() {
+	$("#podcasts").html("");
+	get("library/casts", function(res) {
+		res.forEach(function(cast) {
+			var cc = cast.castcloud;
+			$("#podcasts").append('<div id="cast-' + cc.id + '" class="cast">' + cast.title + "</div>");
+			$("#cast-" + cc.id).click(function() {
+				get("library/episodes/" + cc.id, function(res) {
+					$("#episodes").html("");
+					res.forEach(function(episode) {
+						$("#episodes").append('<div id="ep-' + episode.castcloud.id + '" class="cast">' + episode.title + "</div>");
+						$("#ep-" + episode.castcloud.id).click(function() {
+							playEpisode(episode.castcloud.id);
+						});
+
+						episodes[episode.castcloud.id] = episode;
+					});
+				});
+			});
+		});
+
+		$(".cast").on("contextmenu", function(e) {
+			contextCastId = $(this).prop("id").split("-")[1];
+
+			$("#cast-context-menu").css("left", e.pageX + "px");
+			$("#cast-context-menu").css("top", e.pageY + "px");
+			$("#cast-context-menu").show();
+			e.preventDefault();
+		});
+	});
+}
+
 function get(url, cb) {
 	$.ajax(apiRoot + url, { headers: { Authorization: token }, success: cb});
 }
 
 function post(url, cb) {
-	$.ajax(apiRoot + url, { headers: { Authorization: token }, success: cb});
+	$.ajax(apiRoot + url, { type: "POST", headers: { Authorization: token }, success: cb});
 }
 
 function el(id) {
