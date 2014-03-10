@@ -5,7 +5,6 @@
 	<title>Castcloud</title>
 	<link rel="stylesheet" href="https://raw.github.com/necolas/normalize.css/master/normalize.css">
 	<link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 	<div id="topbar">
@@ -21,15 +20,31 @@
 		</nav>
 	</div>
 	<div id="main-container">
+		<div class="tab" id="tab-login">
+			<div id="login-container">
+				<p><input type="text" id="input-username" placeholder="Username"></p>
+				<p><input type="password" id="input-password" placeholder="Password"></p>
+				<p><button id="button-login">Log in</button></p>
+			</div>
+		</div>
 		<div class="tab" id="tab-podcasts">
-			<div class="col" id="podcasts"></div>
-			<div class="col" id="episodes"></div>
-			<div class="col" id="episodeinfo">
-				<video id="vid" width="100%" autoplay>
-	  				<source src="#" type="video/mp4">
-				</video>
-				<h2 id="episode-title"></h1>
-				<p id="episode-desc"></p>
+			<div id="podcast-vmenu">
+				<div id="vmenu-add">+</div>
+				<div>-</div>
+			</div>
+			<div id="podcast-cols">
+				<div class="col" id="podcasts">
+					<input type="text" id="input-vmenu-add" placeholder="Feed URL">
+					<button id="button-vmenu-add">Add</button>
+				</div>
+				<div class="col" id="episodes"></div>
+				<div class="col" id="episodeinfo">
+					<video id="vid" width="100%" autoplay>
+		  				<source src="#" type="video/mp4">
+					</video>
+					<h2 id="episode-title"></h1>
+					<p id="episode-desc"></p>
+				</div>
 			</div>
 		</div>
 		<div class="tab" id="tab-settings"></div>
@@ -41,6 +56,12 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//underscorejs.org/underscore-min.js"></script>
 	<script src="//backbonejs.org/backbone-min.js"></script>
-	<script src="script.js"></script>
+	<script>
+	$(document).ready(function() {
+		var path = window.location.pathname;
+		var root = path.substr(0, path.indexOf("client/") + 7);
+		$.getScript(root + "script.js");
+	});
+	</script>
 </body>
 </html>

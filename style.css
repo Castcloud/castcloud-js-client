@@ -4,6 +4,7 @@
 }
 
 body {
+	background: #222;
 	color: #FFF;
 	font-family: "Lato";
 }
@@ -29,11 +30,15 @@ body {
 	display: inline-block;
 }
 
+#topbar nav {
+	display: none;
+}
+
 #topbar nav a {
 	padding: 0px 10px;
 	height: 60px;
 	display: inline-block;
-	color: #FFF;
+	color: #AAA;
 	text-decoration: none;
 }
 
@@ -54,6 +59,101 @@ body {
 .tab {
 	display: none;
 	height: 100%;
+}
+
+#login-container {
+	width: 200px;
+	margin: 0 auto;
+	padding-top: 100px;
+}
+
+#login-container p {
+	margin-bottom: 5px;
+}
+
+#login-container input {
+	width: 190px;
+	font: 16px "Lato";
+	padding: 10px 5px;
+	border: none;
+	outline: none;
+}
+
+#login-container button {
+	font: bold 18px "Lato";
+	color: #FFF;
+	background: #0066cc;
+	border: none;
+	outline: none;
+	padding: 8px 5px;
+	width: 200px;
+	cursor: pointer;
+}
+
+#login-container button:hover {
+	background: #0099cc;
+}
+
+#login-container button:active {
+	background: #0066cc;
+}
+
+#podcast-vmenu {
+	position: fixed;
+	width: 50px;
+	height: 100%;
+	background: #222;
+}
+
+#podcast-vmenu div {
+	width: 50px;
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+	cursor: pointer;
+	font-size: 32px;
+}
+
+#podcast-vmenu div:hover {
+	background: #0066cc;
+}
+
+#input-vmenu-add {
+	display: none;
+	font: 16px "Lato";
+	height: 50px;
+	width: 100%;
+	padding: 0px 10px;
+	border: none;
+	outline: none;
+	z-index: 1;
+}
+
+#button-vmenu-add {
+	display: none;
+	width: 100px;
+	float: right;
+	margin-top: -50px;
+	height: 50px;
+	background: #0066cc;
+	color: #FFF;
+	font: bold 18px "Lato";
+	border: none;
+	cursor: pointer;
+	position: relative;
+	z-index: 2;
+}
+
+#button-vmenu-add:hover {
+	background: #0099cc;
+}
+
+#podcast-cols {
+	left: 50px;
+	right: 0;
+	height:100%;
+	position: absolute;
+	background: #000;
 }
 
 .col {
@@ -85,6 +185,7 @@ body {
 }
 
 #playbar {
+	display: none;
 	background: #111;
 	height: 100px;
 	bottom: 0;

@@ -1,7 +1,8 @@
 var token,
 	episodes = {},
 	root,
-	apiRoot;
+	apiRoot,
+	loggedIn = false;
 
 $(document).ready(function() {
 	var Router = Backbone.Router.extend({
@@ -14,7 +15,12 @@ $(document).ready(function() {
 
 		podcasts: function() {
 			$(".tab").hide();
-			$("#tab-podcasts").show();
+			if (!loggedIn) {
+				$("#tab-login").show();
+			}
+			else {
+				$("#tab-podcasts").show();
+			}
 		},
 
 		episode: function(id) {
@@ -33,6 +39,8 @@ $(document).ready(function() {
 	var path = window.location.pathname;
 	root = path.substr(0, path.indexOf("client/") + 7);
 	apiRoot = root.replace("client", "api");
+
+	loadcss("style.css");
 
 	console.log("root: " + root);
 	console.log("apiRoot: " + apiRoot);
@@ -68,6 +76,27 @@ $(document).ready(function() {
 		}
 	});
 
+	$("#seekbar").mousedown(function(e) {
+		el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
+	});
+
+	$("#button-login").click(function() {
+		$(".tab").hide();
+		$("#tab-podcasts").fadeIn("fast");
+		$("#playbar").slideDown("fast");
+		$("#topbar nav").fadeIn("fast");
+	});
+
+	$("#vmenu-add").click(function() {
+		$("#input-vmenu-add").toggle();
+		$("#button-vmenu-add").toggle();
+	});
+
+	$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
+	$(window).resize(function() {
+		$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
+	});
+
 	$.post(apiRoot + "account/login", {
 		username: "user",
 		password: "pass",
@@ -77,6 +106,7 @@ $(document).ready(function() {
 		uuid: "1881"
 	}, function(res) {
 		token = res.token;
+		loggedIn = true;
 
 		get("library/casts", function(res) {
 			res.forEach(function(cast) {
@@ -120,6 +150,10 @@ function post(url, cb) {
 
 function el(id) {
 	return $("#" + id).get(0);
+}
+
+function loadcss(filename) {
+	$('head').append($('<link rel="stylesheet" type="text/css" />').attr('href', root + filename));
 }
 
 Number.prototype.pad = function() {
