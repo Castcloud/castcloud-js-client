@@ -1,4 +1,5 @@
 var token,
+	username,
 	episodes = {},
 	root,
 	apiRoot,
@@ -10,8 +11,8 @@ $(document).ready(function() {
 		routes: {
 			"": "podcasts",
 			"podcasts": "podcasts",
-			"podcasts/:id": "episode",
-			"settings": "settings"
+			"settings": "settings",
+			"*any": "podcasts"
 		},
 
 		podcasts: function() {
@@ -24,16 +25,14 @@ $(document).ready(function() {
 			}
 		},
 
-		episode: function(id) {
-			$(".tab").hide();
-			$("#tab-podcasts").show();
-
-			playEpisode(id);
-		},
-
 		settings: function() {
 			$(".tab").hide();
-			$("#tab-settings").show();
+			if (!loggedIn) {
+				$("#tab-login").show();
+			}
+			else {
+				$("#tab-settings").show();
+			}
 		}
 	});
 
@@ -43,12 +42,7 @@ $(document).ready(function() {
 
 	loadcss("style.css");
 
-	console.log("root: " + root);
-	console.log("apiRoot: " + apiRoot);
-
 	var router = new Router();
-
-	Backbone.history.start({ pushState: true, root: root });
 
 	$("a").click(function(e) {
 		e.preventDefault();
@@ -78,7 +72,6 @@ $(document).ready(function() {
 	});
 
 	$("#vid").dblclick(function() {
-		// if loops to check which fullscreen request it can use
 		var video = el("vid");
 		if (video.requestFullscreen) {
 			video.requestFullscreen();
@@ -95,11 +88,21 @@ $(document).ready(function() {
 		el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
 	});
 
-	$("#button-login").click(function() {
+	$("#button-login").click(login);
+
+	$("#input-password").keydown(function(e) {
+		if (e.which == 13) {
+			login();
+		}
+	});
+
+	$("#button-logout").click(function() {
+		$.removeCookie("token");
+		$("#playbar").hide();
+		$("#topbar nav").hide();
+		$("#userinfo").hide();
 		$(".tab").hide();
-		$("#tab-podcasts").fadeIn("fast");
-		$("#playbar").slideDown("fast");
-		$("#topbar nav").fadeIn("fast");
+		$("#tab-login").show();
 	});
 
 	$("#vmenu-add").click(function() {
@@ -145,20 +148,19 @@ $(document).ready(function() {
 		});
 	});
 
-	$.post(apiRoot + "account/login", {
-		username: "user",
-		password: "pass",
-		clientname: "Castcloud",
-		clientdescription: "Best",
-		clientversion: "1.0",
-		uuid: "1881"
-	}, function(res) {
-		token = res.token;
-		loggedIn = true;
+	if ($.cookie("token") != null) {
+		token = $.cookie("token");
+		finishLogin();
 
-		loadCasts();
-		loadSettings();
-	});
+		$("#userinfo span").html($.cookie("username"));
+
+		//$("#tab-podcasts").show();
+		$("#playbar").show();
+		$("#topbar nav").show();
+		$("#userinfo").show();
+	}
+
+	Backbone.history.start({ pushState: true, root: root });
 });
 
 function addFeed(feedurl) {
@@ -186,6 +188,44 @@ function playEpisode(id) {
 	$("#vid").show();
 	$("#episode-title").html(episodes[id].title);
 	$("#episode-desc").html(episodes[id].description);
+}
+
+function login() {
+	var username = $("#input-username").val();
+	$.post(apiRoot + "account/login", {
+		username: username,
+		password: $("#input-password").val(),
+		clientname: "Castcloud",
+		clientdescription: "Best",
+		clientversion: "1.0",
+		uuid: "1881"
+	}, function(res) {
+		token = res.token;
+		console.log(token);
+		if (token != null) {
+			$.cookie("token", token);
+			$.cookie("username", username);
+			
+			finishLogin();
+
+			$("#tab-podcasts").fadeIn("fast");
+			$("#playbar").slideDown("fast");
+			$("#topbar nav").fadeIn("fast");
+			$("#userinfo").fadeIn("fast");
+		}
+	});
+
+	$("#input-username").val("");
+	$("#input-password").val("");
+}
+
+function finishLogin() {
+	loggedIn = true;
+
+	$(".tab").hide();
+
+	loadCasts();
+	loadSettings();
 }
 
 function loadCasts() {

@@ -38,7 +38,7 @@ body {
 	padding: 0px 10px;
 	height: 60px;
 	display: inline-block;
-	color: #AAA;
+	color: #FFF;
 	text-decoration: none;
 }
 
@@ -88,6 +88,39 @@ body {
 	padding: 8px 5px;
 	width: 200px;
 	cursor: pointer;
+}
+
+#userinfo {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 60px;
+	display: none;
+}
+
+#userinfo span {
+	margin-right: 20px;
+}
+
+.button {
+	font: bold 18px "Lato";
+	color: #FFF;
+	background: #0066cc;
+	border: none;
+	outline: none;
+	padding: 8px 5px;
+	cursor: pointer;
+	width: 100px;
+	height: 40px;
+	margin: 10px;
+}
+
+.button:hover {
+	background: #0099cc;
+}
+
+.button:active {
+	background: #0066cc;
 }
 
 #login-container button:hover {
