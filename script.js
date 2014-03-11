@@ -234,13 +234,13 @@ function addFeed(feedurl) {
 
 function playEpisode(id) {
 	var video = el("vid");
-	video.setAttribute("src", episodes[id].enclosure.url);
+	video.setAttribute("src", episodes[id].feed.enclosure.url);
 	video.load();
 
 	$("#vid").show();
-	$("#episode-title").html(episodes[id].title);
-	$("#episode-desc").html(episodes[id].description);
-	$("#playbar-info").html(episodes[id].title);
+	$("#episode-title").html(episodes[id].feed.title);
+	$("#episode-desc").html(episodes[id].feed.description);
+	$("#playbar-info").html(episodes[id].feed.title);
 }
 
 function playPauseToggle() {
@@ -306,10 +306,10 @@ function loadCasts() {
 					$("#episodes").empty().append(template({ episodes: res }));
 
 					res.forEach(function(episode) {
-						$("#ep-" + episode.castcloud.id).click(function() {
-							playEpisode(episode.castcloud.id);
+						$("#ep-" + episode.id).click(function() {
+							playEpisode(episode.id);
 						});
-						episodes[episode.castcloud.id] = episode;
+						episodes[episode.id] = episode;
 					});
 				});
 			});
