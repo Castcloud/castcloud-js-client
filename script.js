@@ -292,21 +292,23 @@ function finishLogin() {
 }
 
 function loadCasts() {
-	$("#podcasts").html("");
+	$("#podcasts").empty();
 	get("library/casts", function(res) {
+		var template = _.template($("script.podcasts").html());
+		$("#podcasts").append(template({ casts: res }));
+
 		res.forEach(function(cast) {
 			var cc = cast.castcloud;
-			$("#podcasts").append('<div id="cast-' + cc.id + '" class="cast">' + cast.title + "</div>");
+
 			$("#cast-" + cc.id).click(function() {
 				get("library/episodes/" + cc.id, function(res) {
-					$("#episodes").html("");
+					var template = _.template($("script.episodes").html());
+					$("#episodes").empty().append(template({ episodes: res }));
+
 					res.forEach(function(episode) {
-						if (episode.title == null) episode.title = "N/A";
-						$("#episodes").append('<div id="ep-' + episode.castcloud.id + '" class="cast">' + episode.title + "</div>");
 						$("#ep-" + episode.castcloud.id).click(function() {
 							playEpisode(episode.castcloud.id);
 						});
-
 						episodes[episode.castcloud.id] = episode;
 					});
 				});
@@ -359,10 +361,6 @@ function post(url, cb) {
 
 function el(id) {
 	return $("#" + id).get(0);
-}
-
-function loadcss(filename) {
-	$('head').append($('<link rel="stylesheet" type="text/css" />').attr('href', root + filename));
 }
 
 Number.prototype.pad = function() {
