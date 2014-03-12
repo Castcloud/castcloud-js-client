@@ -240,6 +240,11 @@ body {
 
 #episodeinfo p {
 	margin: 5px 0;
+	line-height: 1.5;
+}
+
+#episodeinfo-text {
+	margin: 10px;
 }
 
 #episode-title {
