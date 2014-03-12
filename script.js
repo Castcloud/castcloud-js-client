@@ -1,6 +1,7 @@
 var token,
 	username,
 	episodes = {},
+	casts = {},
 	root,
 	apiRoot,
 	loggedIn = false,
@@ -208,7 +209,7 @@ $(document).ready(function() {
 			}
 		});
 	});
-
+	
 	if ($.cookie("token") != null) {
 		token = $.cookie("token");
 		finishLogin();
@@ -308,6 +309,7 @@ function loadCasts() {
 
 		res.forEach(function(cast) {
 			var cc = cast.castcloud;
+			casts[cc.id] = cast;
 
 			$("#cast-" + cc.id).click(function() {
 				get("library/episodes/" + cc.id, function(res) {
