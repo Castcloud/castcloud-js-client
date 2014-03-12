@@ -189,6 +189,14 @@ $(document).ready(function() {
 		$("#cast-context-menu").hide();
 	});
 
+	$("#volume").mousemove(function(e) {
+		var width = window.innerWidth - e.pageX - 200;
+		var height = 40 / 150 * width;
+		el("vid").volume = width / 150;
+		$("#volume-top").css("border-left-width", width+"px");
+		$("#volume-top").css("border-top-width", height+"px");
+	});
+
 	$("#cast-context-unsub").click(function() {
 		$.ajax(apiRoot + "library/casts/" + contextCastId, { 
 			type: "DELETE",
