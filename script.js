@@ -239,6 +239,7 @@ function playEpisode(id) {
 
 	$("#vid").show();
 	$("#episode-title").html(episodes[id].feed.title);
+	$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
 	$("#episode-desc").html(episodes[id].feed.description);
 	$("#playbar-info").html(episodes[id].feed.title);
 }

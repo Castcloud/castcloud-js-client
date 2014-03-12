@@ -238,8 +238,16 @@ body {
 	height: 50px;
 }
 
+#episodeinfo p {
+	margin: 5px 0;
+}
+
 #episode-title {
 	margin: 5px 0px;
+}
+
+#episode-date {
+	color: #666;
 }
 
 #episode-desc {
