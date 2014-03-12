@@ -262,29 +262,21 @@ body {
 #playbar {
 	display: none;
 	background: #111;
-	height: 80px;
+	height: 60px;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	position: fixed;
-	text-align: center;
 	color: #222;
 }
 
 #playbar-controls {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	height: 75px;
 
-	text-align: center;
 }
 
 #playbar .button {
 	background: #222;
-	margin: 18px 5px;
-	width: 120px;
+	width: 50px;
 	color: #666;
 }
 
@@ -298,6 +290,7 @@ body {
 }
 
 #volume {
+	display: none;
 	position: fixed;
 	bottom: 20px;
 	right: 200px;
@@ -308,6 +301,7 @@ body {
 }
 
 #volume-top {
+	display: none;
 	position: fixed;
 	bottom: 20px;
 	right: 200px;
@@ -319,20 +313,27 @@ body {
 }
 
 #playbar-info {
+	display: none;
 	float: left;
 	line-height: 75px;
 	margin: 0px 20px;
 }
 
 #time {
-	margin: 0px 20px;
-	line-height: 75px;
+	margin: 0 20px;
+	line-height: 60px;
 	float: right;
 }
 
 #seekbar {
-	height: 5px;
+	display: inline-block;
+	position: absolute;
+	left: 100px;
+	right: 200px;
+	top: 25px;
+	height: 10px;
 	background: #FFF;
+	border-radius: 5px;
 }
 
 #seekbar:hover {
@@ -341,8 +342,9 @@ body {
 
 #seekbar div {
 	background: #0099cc;
-	height: 5px;
+	height: 10px;
 	width: 0px;
+	border-radius: 5px;
 }
 
 #cast-context-menu {
