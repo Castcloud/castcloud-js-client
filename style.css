@@ -267,7 +267,7 @@ body {
 	left: 0;
 	right: 0;
 	position: fixed;
-	color: #222;
+	color: #333;
 }
 
 #playbar-controls {
@@ -276,7 +276,11 @@ body {
 
 #playbar .button {
 	background: #222;
-	width: 50px;
+	margin: 10px;
+	margin-right: 0px;
+	width: 40px;
+	height: 40px;
+	border-radius: 20px;
 	color: #666;
 }
 
@@ -328,8 +332,8 @@ body {
 #seekbar {
 	display: inline-block;
 	position: absolute;
-	left: 100px;
-	right: 200px;
+	left: 170px;
+	right: 190px;
 	top: 25px;
 	height: 10px;
 	background: #FFF;

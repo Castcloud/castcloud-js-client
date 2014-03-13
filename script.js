@@ -110,7 +110,12 @@ $(document).ready(function() {
 				$("#vid-fs-overlay").fadeOut();
 			}, 1000);
 		}
-	})
+	});
+
+	$(".button-skipback").click(function() {
+		var video = el("vid");
+		video.currentTime = video.currentTime - 15;
+	});
 
 	$(".button-play").click(function() {
 		playPauseToggle();
@@ -121,6 +126,11 @@ $(document).ready(function() {
 		else {
 			$(this).html("||");
 		}
+	});
+
+	$(".button-skipforward").click(function() {
+		var video = el("vid");
+		video.currentTime = video.currentTime + 15;
 	});
 
 	var seeking = false;
