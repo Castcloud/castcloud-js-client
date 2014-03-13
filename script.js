@@ -133,6 +133,8 @@ $(document).ready(function() {
 		video.currentTime = video.currentTime + 15;
 	});
 
+	// type, itemid, positionts, concurrentorder, clientts
+
 	var seeking = false;
 	$("#seekbar").mousedown(function(e) {
 		el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
