@@ -5,7 +5,18 @@ var token,
 	root,
 	apiRoot,
 	loggedIn = false,
-	contextCastId = 0;
+	contextCastId,
+	currentEpisodeId;
+
+var Event = {
+	Start: 10,
+	Pause: 20,
+	Play: 30,
+	SleepStart: 40,
+	SleepEnd: 50,
+	EndOfTrack: 60,
+	Delete: 70
+}
 
 $(document).ready(function() {
 	var Router = Backbone.Router.extend({
@@ -115,6 +126,8 @@ $(document).ready(function() {
 	$(".button-skipback").click(function() {
 		var video = el("vid");
 		video.currentTime = video.currentTime - 15;
+		pushEvent(Event.Pause, currentEpisodeId, video.currentTime | 0, 0);
+		pushEvent(Event.Play, currentEpisodeId, video.currentTime | 0, 1);
 	});
 
 	$(".button-play").click(function() {
@@ -122,18 +135,26 @@ $(document).ready(function() {
 		var video = el("vid");
 		if (video.paused) {
 			$(this).html(">");
+			pushEvent(Event.Pause, currentEpisodeId, video.currentTime | 0, null);
 		}
 		else {
 			$(this).html("||");
+			pushEvent(Event.Play, currentEpisodeId, video.currentTime | 0, null);
 		}
 	});
 
 	$(".button-skipforward").click(function() {
 		var video = el("vid");
 		video.currentTime = video.currentTime + 15;
+		pushEvent(Event.Pause, currentEpisodeId, video.currentTime | 0, 0);
+		pushEvent(Event.Play, currentEpisodeId, video.currentTime | 0, 1);
 	});
 
-	// type, itemid, positionts, concurrentorder, clientts
+	$("#vid").on("canplay", function() {
+		if (episodes[currentEpisodeId].lastevent != null) {
+			el("vid").currentTime = episodes[currentEpisodeId].lastevent.positionts;
+		}
+	});
 
 	var seeking = false;
 	$("#seekbar").mousedown(function(e) {
@@ -254,6 +275,8 @@ function addFeed(feedurl) {
 }
 
 function playEpisode(id) {
+	currentEpisodeId = id;
+
 	var video = el("vid");
 	video.setAttribute("src", episodes[id].feed.enclosure.url);
 	video.load();
@@ -311,6 +334,30 @@ function finishLogin() {
 
 	loadCasts();
 	loadSettings();
+}
+
+function pushEvent(type, episodeid, positionts, concurrentorder) {
+	$.ajax(apiRoot + "library/events", { 
+		type: "POST",
+		data: { 
+			json: [{
+				type: type,
+				itemid: episodeid,
+				positionts: positionts,
+				concurrentorder: concurrentorder,
+				clientts: unix()				
+			}]
+		}, 
+		headers: { 
+			Authorization: token 
+		}, 
+		success: function(res) {
+			console.log(res);
+		},
+		error: function(res) {
+			console.log(JSON.stringify(res));
+		}
+	});
 }
 
 function loadCasts() {
@@ -384,6 +431,10 @@ function post(url, cb) {
 
 function el(id) {
 	return $("#" + id).get(0);
+}
+
+function unix() {
+	return $.now() / 1000 | 0;
 }
 
 Number.prototype.pad = function() {
