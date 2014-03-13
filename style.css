@@ -53,7 +53,7 @@ body {
 
 #main-container {
 	background: #222;
-	bottom: 80px;
+	bottom: 60px;
 	top: 60px;
 	left: 0;
 	right: 0;
@@ -333,7 +333,7 @@ body {
 	display: inline-block;
 	position: absolute;
 	left: 170px;
-	right: 190px;
+	right: 195px;
 	top: 25px;
 	height: 10px;
 	background: #FFF;

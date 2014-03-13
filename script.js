@@ -66,7 +66,20 @@ $(document).ready(function() {
 		var dateTotal = new Date(video.duration * 1000);
 		var progress = 1 / video.duration * video.currentTime;
 
-		$("#time").html(date.getMinutes().pad() + ":" + date.getSeconds().pad() + "/" + dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad());
+		date.setHours(date.getHours() - 1);
+		dateTotal.setHours(dateTotal.getHours() - 1);
+		
+		var time = "";
+		if (date.getHours() > 0) {
+			time += date.getHours().pad() + ":";
+		}
+		time += date.getMinutes().pad() + ":" + date.getSeconds().pad() + "/";
+		if (dateTotal.getHours() > 0) {
+			time += dateTotal.getHours().pad() + ":";
+		}
+		time += dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad();
+
+		$("#time").html(time);
 		$("#seekbar div").css("width", window.innerWidth * progress + "px")
 	});
 
