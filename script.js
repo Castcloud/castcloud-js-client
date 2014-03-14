@@ -159,6 +159,14 @@ $(document).ready(function() {
 		}
 	});
 
+	$(window).on("unload", function() {
+		if (currentEpisodeId != null) {
+			if (!el("vid").paused) {
+				pushEvent(Event.Play, currentEpisodeId, null);
+			}
+		}
+	});
+
 	$(".button-skipback").click(function() {
 		var video = el("vid");
 		pushEvent(Event.Pause, currentEpisodeId, 0);
