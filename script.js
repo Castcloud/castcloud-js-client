@@ -339,6 +339,12 @@ function addFeed(feedurl) {
 }
 
 function playEpisode(id) {
+	if (currentEpisodeId != null) {
+		if (!el("vid").paused) {
+			pushEvent(Event.Play, currentEpisodeId, null);
+		}
+	}
+
 	currentEpisodeId = id;
 
 	var video = el("vid");
