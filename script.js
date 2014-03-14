@@ -190,12 +190,19 @@ $(document).ready(function() {
 
 	var seeking = false;
 	$("#seekbar").mousedown(function(e) {
+		pushEvent(Event.Pause, currentEpisodeId, 0);
 		el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
 		seeking = true;
 	});
 
 	$(document).mouseup(function() {
-		seeking = false;
+		if (seeking) {
+			seeking = false;
+			pushEvent(Event.Play, currentEpisodeId, 1);
+			if (el("vid").paused) {
+				pushEvent(Event.Pause, currentEpisodeId, 2);
+			}
+		}
 	});
 
 	$(document).mousemove(function(e) {
