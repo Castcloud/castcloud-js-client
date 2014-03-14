@@ -205,12 +205,15 @@ $(document).ready(function() {
 
 	$("#vid").on("play", function() {
 		pushEvent(Event.Play, currentEpisodeId, null);
-		$(".button-play").html("||");
+
+		$(".button-play i").addClass("fa-pause");
+		$(".button-play i").removeClass("fa-play");
 	});
 
 	$("#vid").on("pause", function() {
 		pushEvent(Event.Pause, currentEpisodeId, null);
-		$(".button-play").html(">");
+		$(".button-play i").addClass("fa-play");
+		$(".button-play i").removeClass("fa-pause");
 	});
 
 	var seeking = false;
