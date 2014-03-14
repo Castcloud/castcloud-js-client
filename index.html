@@ -81,7 +81,7 @@
 
 	<script type="text/template" class="episodes">
 	<% episodes.forEach(function(episode) { %>
-		<div id="ep-<%= episode.id %>" class="cast"><%= episode.feed.title %></div>
+		<div id="ep-<%= episode.id %>" class="episode"><div class="bar"></div><div class="content"><%= episode.feed.title %></div></div>
 	<% }); %>
 	</script>
 

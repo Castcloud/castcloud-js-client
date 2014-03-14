@@ -201,13 +201,31 @@ body {
 	float: left;
 }
 
-.cast {
+.cast, .episode {
 	padding: 10px 20px;
 	cursor: pointer;
 }
 
-.cast:hover {
+.cast:hover, .episode:hover {
 	background: #0066cc;
+}
+
+.episode {
+	position: relative;
+}
+
+.episode .bar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	background: #333;
+	height: 100%;
+	width: 0px;
+}
+
+.episode .content {
+	position: relative;
 }
 
 #vid {

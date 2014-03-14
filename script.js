@@ -393,6 +393,8 @@ function pushEvent(type, episodeid, concurrentorder) {
 			Authorization: token 
 		}
 	});
+
+	$.cookie("episode-" + episodeid, el("vid").duration, { expires: 1});
 }
 
 function loadCasts() {
@@ -415,6 +417,17 @@ function loadCasts() {
 							playEpisode(episode.id);
 						});
 						episodes[episode.id] = episode;
+						if (episode.lastevent != null && $.cookie("episode-" + episode.id) != null) {
+							$("#ep-" + episode.id + " .bar").css("width", (episode.lastevent.positionts / $.cookie("episode-" + episode.id) * 100)+"%");
+						}
+					});
+
+					$(".episode").mouseover(function() {
+						$(this).children(".bar").css("background", "#0099cc");
+					});
+
+					$(".episode").mouseout(function() {
+						$(this).children(".bar").css("background", "#333");
 					});
 				});
 			});
