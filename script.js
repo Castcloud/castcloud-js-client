@@ -6,7 +6,7 @@ var token,
 	apiRoot,
 	loggedIn = false,
 	contextCastId,
-	currentEpisodeId,
+	currentEpisodeId = null,
 	videoLoading = false;
 
 var Event = {
@@ -151,6 +151,14 @@ $(document).ready(function() {
 		}
 	});
 
+	$(window).on("beforeunload", function() {
+		if (currentEpisodeId != null) {
+			if (!el("vid").paused) {
+				pushEvent(Event.Play, currentEpisodeId, null);
+			}
+		}
+	});
+
 	$(".button-skipback").click(function() {
 		var video = el("vid");
 		pushEvent(Event.Pause, currentEpisodeId, 0);
@@ -163,13 +171,6 @@ $(document).ready(function() {
 
 	$(".button-play").click(function() {
 		playPauseToggle();
-		var video = el("vid");
-		if (video.paused) {
-			pushEvent(Event.Pause, currentEpisodeId, null);
-		}
-		else {
-			pushEvent(Event.Play, currentEpisodeId, null);
-		}
 	});
 
 	$(".button-skipforward").click(function() {
@@ -195,10 +196,12 @@ $(document).ready(function() {
 	});
 
 	$("#vid").on("play", function() {
+		pushEvent(Event.Play, currentEpisodeId, null);
 		$(".button-play").html("||");
 	});
 
 	$("#vid").on("pause", function() {
+		pushEvent(Event.Pause, currentEpisodeId, null);
 		$(".button-play").html(">");
 	});
 
