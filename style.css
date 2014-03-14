@@ -305,6 +305,27 @@ body {
 	background: #0099cc;
 }
 
+#playbar-gear {
+	position: absolute;
+	right: 20px;
+	line-height: 60px;
+	cursor: pointer;
+}
+
+#playbar-gear:hover {
+	color: #0099cc;
+}
+
+#playbar-gear-menu {
+	display: none;
+	position: fixed;
+	bottom: 60px;
+	right: 0;
+	width: 200px;
+	height: 200px;
+	background: #FFF;
+}
+
 #volume {
 	display: none;
 	position: fixed;
@@ -336,7 +357,7 @@ body {
 }
 
 #time {
-	margin: 0 20px;
+	margin: 0 55px;
 	line-height: 60px;
 	float: right;
 }
@@ -345,7 +366,7 @@ body {
 	display: inline-block;
 	position: absolute;
 	left: 170px;
-	right: 195px;
+	right: 235px;
 	top: 25px;
 	height: 10px;
 	background: #FFF;

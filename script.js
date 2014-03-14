@@ -242,6 +242,10 @@ $(document).ready(function() {
 		}
 	});
 
+	$("#playbar-gear").click(function() {
+		$("#playbar-gear-menu").toggle();
+	});
+
 	$("#button-login").click(login);
 
 	$("#input-password").keydown(function(e) {
