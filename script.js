@@ -381,8 +381,8 @@ function pushEvent(type, episodeid, concurrentorder) {
 		type: type,
 		positionts: el("vid").currentTime | 0,
 		clientts: unix(),
-		clientname: episodes[episodeid].lastevent.clientname,
-		clientdescription: episodes[episodeid].lastevent.clientdescription
+		clientname: null,
+		clientdescription: null
 	}
 
 	$.ajax(apiRoot + "library/events", { 
