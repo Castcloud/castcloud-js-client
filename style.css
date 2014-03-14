@@ -236,24 +236,18 @@ body {
 	width: 100%;
 }
 
-#vid-fs-overlay {
+#overlay-info {
 	display: none;
-	position: absolute;
+	position: fixed;
 	top: 0;
 	left: 0;
-	width: 100%;
-	height: 100%;
+	margin: 20px;
+	padding: 10px;
+	background: rgba(0,0,0,0.5);
 }
 
-#vid-fs-overlay h1 {
-	margin: 10px;
-}
-
-#vid-fs-overlay button {
-	position: absolute;
-	bottom: 0px;
-	left: 0px;
-	height: 50px;
+#overlay-info h5 {
+	color: #AAA;
 }
 
 #episodeinfo p {

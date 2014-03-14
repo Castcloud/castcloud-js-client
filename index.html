@@ -51,9 +51,16 @@
 						<video id="vid" width="100%" autoplay>
 			  				<source src="#" type="video/mp4">
 						</video>
-						<div id="vid-fs-overlay">
+						<!--<div id="vid-fs-overlay">
 							<h1>TITLE</h1>
 							<button class="button"></button>
+						</div>-->
+						<div id="overlay-info"><h5></h5><h2></h2></div>
+						<div id="playbar">
+							<div id="playbar-controls"><button class="button button-skipback"><<</button><button class="button button-play">||</button><button class="button button-skipforward">>></button><div id="volume"><div id="volume-top"></div></div>
+							<div id="seekbar"><div></div></div>
+							<h3 id="playbar-info"></h2>
+							<h3 id="time">00:00/00:00</h1>
 						</div>
 					</div>
 					<div id="episodeinfo-text">
@@ -66,12 +73,7 @@
 		</div>
 		<div class="tab" id="tab-settings"></div>
 	</div>
-	<div id="playbar">
-		<div id="playbar-controls"><button class="button button-skipback"><<</button><button class="button button-play">||</button><button class="button button-skipforward">>></button><div id="volume"><div id="volume-top"></div></div>
-		<div id="seekbar"><div></div></div>
-		<h3 id="playbar-info"></h2>
-		<h3 id="time">00:00/00:00</h1>
-	</div>
+	
 
 	<script type="text/template" class="podcasts">
 	<% casts.forEach(function(cast) { %>
