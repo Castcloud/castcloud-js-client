@@ -192,6 +192,7 @@ body {
 	height:100%;
 	position: absolute;
 	background: #000;
+
 }
 
 .col {
@@ -204,6 +205,7 @@ body {
 .cast, .episode {
 	padding: 10px 20px;
 	cursor: pointer;
+
 }
 
 .cast:hover, .episode:hover {
