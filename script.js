@@ -85,8 +85,6 @@ $(document).ready(function() {
 	var prevSmall = false;
 
 	$(".col").click(function() {
-		//$(".col").hide();
-		//$(".col:eq(" + ($(this).index() + 1) + ")").show();
 		if ($(this).index() < $(".col").length - 1) {
 			router.navigate("p" + ($(this).index() + 1), { trigger: true });
 		}
@@ -97,9 +95,19 @@ $(document).ready(function() {
 		if (!prevSmall && small) {
 			$(".col").hide();
 			$(".col:eq(" + page + ")").show();
+			if (page == 2) {
+				$("#podcast-vmenu").hide();
+				$("#podcast-cols").css("left", "0px");
+			}
+			else {
+				$("#podcast-vmenu").show();
+				$("#podcast-cols").css("left", "50px");
+			}
 		}
 		else if (prevSmall && !small) {
 			$(".col").show();
+			$("#podcast-vmenu").show();
+			$("#podcast-cols").css("left", "50px");
 		}
 		prevSmall = small;
 	});
@@ -134,7 +142,7 @@ $(document).ready(function() {
 		time += dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad();
 
 		$("#time").html(time);
-		$("#seekbar div").css("width", window.innerWidth * progress + "px")
+		$("#seekbar div").css("width", $("#seekbar").width() * progress + "px")
 	});
 
 	$("#vid").click(function() {
@@ -258,7 +266,6 @@ $(document).ready(function() {
 
 	$("#vid").on("play", function() {
 		pushEvent(Event.Play, currentEpisodeId, null);
-
 		$(".button-play i").addClass("fa-pause");
 		$(".button-play i").removeClass("fa-play");
 	});
@@ -272,7 +279,7 @@ $(document).ready(function() {
 	var seeking = false;
 	$("#seekbar").mousedown(function(e) {
 		pushEvent(Event.Pause, currentEpisodeId, 0);
-		el("vid").currentTime = 1 / window.innerWidth * e.pageX * el("vid").duration;
+		el("vid").currentTime = 1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration;
 		seeking = true;
 	});
 
@@ -289,9 +296,9 @@ $(document).ready(function() {
 	$(document).mousemove(function(e) {
 		if (seeking) {
 			var video = el("vid");
-			video.currentTime = 1 / window.innerWidth * e.pageX * video.duration;
+			video.currentTime = 1 / $("#seekbar").width() * (e.pageX - 170) * video.duration;
 			var progress = 1 / video.duration * video.currentTime;
-			$("#seekbar div").css("width", window.innerWidth * progress + "px")
+			$("#seekbar div").css("width", $("#seekbar").width() * progress + "px")
 		}
 	});
 
@@ -391,8 +398,6 @@ function addFeed(feedurl) {
 			Authorization: token 
 		}, 
 		success: function(res) {
-			console.log(res.status);
-
 			loadCasts();
 		}
 	});
@@ -416,7 +421,7 @@ function playEpisode(id) {
 	$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
 	$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
 	$("#episode-desc").html(episodes[id].feed.description);
-	$("#overlay-info h5").html(casts[episodes[id].castid].title);
+	$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
 }
 
 function playPauseToggle() {
@@ -496,10 +501,9 @@ function pushEvent(type, episodeid, concurrentorder) {
 }
 
 function loadCasts() {
-	$("#podcasts").empty();
 	get("library/casts", function(res) {
 		var template = _.template($("script.podcasts").html());
-		$("#podcasts").append(template({ casts: res }));
+		$("#podcasts").empty().append(template({ casts: res }));
 
 		if ($.cookie("selectedcast") != null) {
 			loadEpisodes($.cookie("selectedcast"));
