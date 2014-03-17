@@ -217,11 +217,20 @@ body {
 		z-index: 1000;
 	}
 
+	#topbar nav li, #topbar nav a {
+		width: 100%;
+		text-align: center;
+		margin: 0px;
+		padding: 0px;
+	}
+
 	#userinfo {
 		position: relative;
 		float: right;
 		z-index: 1111;
 		background: #111;
+		width: 100%;
+		text-align: center;
 	}
 
 	.col {
