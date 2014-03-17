@@ -39,6 +39,7 @@ $(document).ready(function() {
 				if (small) {
 					page = 0;
 					$(".col").hide();
+					$("#playbar").show();
 					$(".col:eq(0)").show();
 				}
 			}
@@ -59,6 +60,7 @@ $(document).ready(function() {
 			page = n;
 			if (small) {
 				$(".col").hide();
+				$("#playbar").show();
 				$(".col:eq(" + n + ")").show();
 				if (page == 2) {
 					$("#podcast-vmenu").hide();
@@ -85,8 +87,9 @@ $(document).ready(function() {
 	$(".col").click(function() {
 		//$(".col").hide();
 		//$(".col:eq(" + ($(this).index() + 1) + ")").show();
-		
-		router.navigate("p" + ($(this).index() + 1), { trigger: true });		
+		if ($(this).index() < $(".col").length - 1) {
+			router.navigate("p" + ($(this).index() + 1), { trigger: true });
+		}
 	});
 
 	$(window).resize(function() {
@@ -498,32 +501,16 @@ function loadCasts() {
 		var template = _.template($("script.podcasts").html());
 		$("#podcasts").append(template({ casts: res }));
 
+		if ($.cookie("selectedcast") != null) {
+			loadEpisodes($.cookie("selectedcast"));
+		}
+
 		res.forEach(function(cast) {
 			casts[cast.id] = cast;
 
 			$("#cast-" + cast.id).click(function() {
-				get("library/episodes/" + cast.id, function(res) {
-					var template = _.template($("script.episodes").html());
-					$("#episodes").empty().append(template({ episodes: res }));
-
-					res.forEach(function(episode) {
-						$("#ep-" + episode.id).click(function() {
-							playEpisode(episode.id);
-						});
-						episodes[episode.id] = episode;
-						if (episode.lastevent != null && $.cookie("episode-" + episode.id) != null) {
-							$("#ep-" + episode.id + " .bar").css("width", (episode.lastevent.positionts / $.cookie("episode-" + episode.id) * 100)+"%");
-						}
-					});
-
-					$(".episode").mouseover(function() {
-						$(this).children(".bar").css("background", "#0099cc");
-					});
-
-					$(".episode").mouseout(function() {
-						$(this).children(".bar").css("background", "#333");
-					});
-				});
+				$.cookie("selectedcast", cast.id);
+				loadEpisodes(cast.id);
 			});
 		});
 
@@ -534,6 +521,36 @@ function loadCasts() {
 			$("#cast-context-menu").css("top", e.pageY + "px");
 			$("#cast-context-menu").show();
 			e.preventDefault();
+		});
+	});
+}
+
+function loadEpisodes(id) {
+	get("library/episodes/" + id, function(res) {
+		var template = _.template($("script.episodes").html());
+		$("#episodes").empty().append(template({ episodes: res }));
+
+		res.forEach(function(episode) {
+			$("#ep-" + episode.id).click(function() {
+				$.cookie("lastepisode", episode.id);
+				playEpisode(episode.id);
+			});
+			episodes[episode.id] = episode;
+			if (episode.lastevent != null && $.cookie("episode-" + episode.id) != null) {
+				$("#ep-" + episode.id + " .bar").css("width", (episode.lastevent.positionts / $.cookie("episode-" + episode.id) * 100)+"%");
+			}
+		});
+
+		if ($.cookie("lastepisode") != null) {
+			playEpisode($.cookie("lastepisode"));
+		}
+
+		$(".episode").mouseover(function() {
+			$(this).children(".bar").css("background", "#0099cc");
+		});
+
+		$(".episode").mouseout(function() {
+			$(this).children(".bar").css("background", "#333");
 		});
 	});
 }
