@@ -449,11 +449,10 @@ function loadCasts() {
 		$("#podcasts").append(template({ casts: res }));
 
 		res.forEach(function(cast) {
-			var cc = cast.castcloud;
-			casts[cc.id] = cast;
+			casts[cast.id] = cast;
 
-			$("#cast-" + cc.id).click(function() {
-				get("library/episodes/" + cc.id, function(res) {
+			$("#cast-" + cast.id).click(function() {
+				get("library/episodes/" + cast.id, function(res) {
 					var template = _.template($("script.episodes").html());
 					$("#episodes").empty().append(template({ episodes: res }));
 
