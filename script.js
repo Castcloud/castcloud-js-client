@@ -25,6 +25,7 @@ $(document).ready(function() {
 			"": "podcasts",
 			"podcasts": "podcasts",
 			"settings": "settings",
+			"p:n": "foo",
 			"*any": "podcasts"
 		},
 
@@ -35,6 +36,11 @@ $(document).ready(function() {
 			}
 			else {
 				$("#tab-podcasts").show();
+				if (small) {
+					page = 0;
+					$(".col").hide();
+					$(".col:eq(0)").show();
+				}
 			}
 		},
 
@@ -46,6 +52,23 @@ $(document).ready(function() {
 			else {
 				$("#tab-settings").show();
 			}
+		},
+
+		foo: function(n) {
+			$("#tab-podcasts").show();
+			page = n;
+			if (small) {
+				$(".col").hide();
+				$(".col:eq(" + n + ")").show();
+				if (page == 2) {
+					$("#podcast-vmenu").hide();
+					$("#podcast-cols").css("left", "0px");
+				}
+				else {
+					$("#podcast-vmenu").show();
+					$("#podcast-cols").css("left", "50px");
+				}
+			}		
 		}
 	});
 
@@ -54,6 +77,33 @@ $(document).ready(function() {
 	apiRoot = root.replace("client", "api");
 
 	var router = new Router();
+
+	var page = 0;
+	var small = $(".col").css("width") == "100%";
+	var prevSmall = false;
+
+	$(".col").click(function() {
+		//$(".col").hide();
+		//$(".col:eq(" + ($(this).index() + 1) + ")").show();
+		
+		router.navigate("p" + ($(this).index() + 1), { trigger: true });		
+	});
+
+	$(window).resize(function() {
+		small = window.innerWidth < 600;
+		if (!prevSmall && small) {
+			$(".col").hide();
+			$(".col:eq(" + page + ")").show();
+		}
+		else if (prevSmall && !small) {
+			$(".col").show();
+		}
+		prevSmall = small;
+	});
+
+	$("#navicon").click(function() {
+		$("#menu-container").toggle();
+	});
 
 	$("a").click(function(e) {
 		e.preventDefault();
