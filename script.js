@@ -568,23 +568,22 @@ function loadEpisodes(id) {
 function loadSettings() {
 	get("account/settings", function(res) {
 		var settings = {};
-		for (var key in res) {
-			var category = key.split("/")[0];
-			var setting = key.split("/")[1];
-			if (setting == null) {
-				setting = category;
+		res.forEach(function(setting) {
+			var category = setting.setting.split("/")[0];
+			var name = setting.setting.split("/")[1];
+			if (name == null) {
+				name = category;
 				category = "General";
 			}
 			if (settings[category] == null) {
 				settings[category] = {};
 			}
-			settings[category][setting] = res[key];
-			
-		}
+			settings[category][name] = setting.value;
+		});
 		for (var c in settings) {
 			$("#tab-settings").append($("<h2>").text(c));
 			for (var s in settings[c]) {
-				$("#tab-settings").append("<p><label>" + s + "</label><input type=\"text\"></p>");
+				$("#tab-settings").append("<p><label>" + s + '</label><input type="text" value="' + settings[c][s] + '"></p>');
 			}
 		}
 	});
