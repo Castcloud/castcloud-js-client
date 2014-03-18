@@ -297,7 +297,7 @@ body {
 	top: 0;
 	left: 0;
 	margin: 20px;
-	padding: 10px;
+	padding: 10px 15px;
 	background: rgba(0,0,0,0.5);
 }
 
@@ -379,6 +379,30 @@ body {
 	width: 200px;
 	height: 200px;
 	background: #FFF;
+}
+
+#playbar-gear-menu * {
+	margin: 10px;
+	margin-bottom: 5px;
+}
+
+#playbar-gear-menu .button {
+	width: 50px !important;
+	border-radius: 0px;
+	background: #0066cc;
+	color: #FFF;
+}
+
+#playbar-gear-menu .button.selected {
+	background: #0099cc;
+}
+
+#playbar-gear-menu .button:hover {
+	background: #0099cc;
+}
+
+#playbar-gear-menu .button:active {
+	background: #0066cc;
 }
 
 #volume {

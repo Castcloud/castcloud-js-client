@@ -306,6 +306,12 @@ $(document).ready(function() {
 		$("#playbar-gear-menu").toggle();
 	});
 
+	$(".playback-rate").click(function() {
+		$(".playback-rate").removeClass("selected");
+		$(this).addClass("selected");
+		el("vid").playbackRate = $(this).attr("rate");
+	});
+
 	$("#button-login").click(login);
 
 	$("#input-password").keydown(function(e) {
