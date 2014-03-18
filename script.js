@@ -215,7 +215,7 @@ $(document).ready(function() {
 	$(window).on("beforeunload", function() {
 		if (currentEpisodeId != null) {
 			if (!el("vid").paused) {
-				pushEvent(Event.Play, currentEpisodeId);
+				pushEvent(Event.Play);
 			}
 		}
 	});
@@ -223,18 +223,18 @@ $(document).ready(function() {
 	$(window).on("unload", function() {
 		if (currentEpisodeId != null) {
 			if (!el("vid").paused) {
-				pushEvent(Event.Play, currentEpisodeId);
+				pushEvent(Event.Play);
 			}
 		}
 	});
 
 	$(".button-skipback").click(function() {
 		var video = el("vid");
-		pushEvent(Event.Pause, currentEpisodeId);
+		pushEvent(Event.Pause);
 		video.currentTime = video.currentTime - 15;
-		pushEvent(Event.Play, currentEpisodeId);
+		pushEvent(Event.Play);
 		if (video.paused) {
-			pushEvent(Event.Pause, currentEpisodeId);
+			pushEvent(Event.Pause);
 		}
 	});
 
@@ -244,11 +244,11 @@ $(document).ready(function() {
 
 	$(".button-skipforward").click(function() {
 		var video = el("vid");
-		pushEvent(Event.Pause, currentEpisodeId);
+		pushEvent(Event.Pause);
 		video.currentTime = video.currentTime + 15;
-		pushEvent(Event.Play, currentEpisodeId);
+		pushEvent(Event.Play);
 		if (video.paused) {
-			pushEvent(Event.Pause, currentEpisodeId);
+			pushEvent(Event.Pause);
 		}
 	});
 
@@ -265,20 +265,20 @@ $(document).ready(function() {
 	});
 
 	$("#vid").on("play", function() {
-		pushEvent(Event.Play, currentEpisodeId);
+		pushEvent(Event.Play);
 		$(".button-play i").addClass("fa-pause");
 		$(".button-play i").removeClass("fa-play");
 	});
 
 	$("#vid").on("pause", function() {
-		pushEvent(Event.Pause, currentEpisodeId);
+		pushEvent(Event.Pause);
 		$(".button-play i").addClass("fa-play");
 		$(".button-play i").removeClass("fa-pause");
 	});
 
 	var seeking = false;
 	$("#seekbar").mousedown(function(e) {
-		pushEvent(Event.Pause, currentEpisodeId);
+		pushEvent(Event.Pause);
 		el("vid").currentTime = 1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration;
 		seeking = true;
 	});
@@ -286,9 +286,9 @@ $(document).ready(function() {
 	$(document).mouseup(function() {
 		if (seeking) {
 			seeking = false;
-			pushEvent(Event.Play, currentEpisodeId);
+			pushEvent(Event.Play);
 			if (el("vid").paused) {
-				pushEvent(Event.Pause, currentEpisodeId);
+				pushEvent(Event.Pause);
 			}
 		}
 	});
@@ -413,7 +413,7 @@ function playEpisode(id) {
 	if (currentEpisodeId != null) {
 		if (!el("vid").paused) {
 			console.log("!");
-			pushEvent(Event.Play, currentEpisodeId);
+			pushEvent(Event.Play);
 		}
 	}
 
@@ -482,7 +482,7 @@ function finishLogin() {
 var lastEventTS = null;
 var currentOrder = 0;
 
-function pushEvent(type, episodeid) {
+function pushEvent(type) {
 	eventTS = unix();
 	if (lastEventTS == eventTS) {
 		currentOrder++;
@@ -492,7 +492,7 @@ function pushEvent(type, episodeid) {
 	}
 	lastEventTS = eventTS;
 
-	episodes[episodeid].lastevent = {
+	episodes[currentEpisodeId].lastevent = {
 		type: type,
 		positionts: el("vid").currentTime | 0,
 		clientts: eventTS,
@@ -505,7 +505,7 @@ function pushEvent(type, episodeid) {
 		data: { 
 			json: [{
 				type: type,
-				itemid: episodeid,
+				itemid: currentEpisodeId,
 				positionts: el("vid").currentTime | 0,
 				concurrentorder: currentOrder,
 				clientts: eventTS				
@@ -516,7 +516,7 @@ function pushEvent(type, episodeid) {
 		}
 	});
 
-	$.cookie("episode-" + episodeid, el("vid").duration, { expires: 1});
+	$.cookie("episode-" + currentEpisodeId, el("vid").duration, { expires: 1});
 }
 
 function loadCasts() {
