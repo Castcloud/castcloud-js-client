@@ -410,25 +410,25 @@ function addFeed(feedurl) {
 }
 
 function playEpisode(id) {
-	if (currentEpisodeId != null) {
-		if (!el("vid").paused) {
-			console.log("!");
-			pushEvent(Event.Play);
+	if (currentEpisodeId != id) {
+		if (currentEpisodeId != null) {
+			if (!el("vid").paused) {
+				pushEvent(Event.Play);
+			}
 		}
+		currentEpisodeId = id;
+
+		var video = el("vid");
+		video.setAttribute("src", episodes[id].feed.enclosure.url);
+		video.load();
+		videoLoading = true;
+
+		$("#vid").show();
+		$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
+		$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
+		$("#episode-desc").html(episodes[id].feed.description);
+		$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
 	}
-
-	currentEpisodeId = id;
-
-	var video = el("vid");
-	video.setAttribute("src", episodes[id].feed.enclosure.url);
-	video.load();
-	videoLoading = true;
-
-	$("#vid").show();
-	$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
-	$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
-	$("#episode-desc").html(episodes[id].feed.description);
-	$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
 }
 
 function playPauseToggle() {
