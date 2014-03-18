@@ -57,17 +57,21 @@
 						</video>
 						<div id="overlay-info"><h5></h5><h2></h2></div>
 						<div id="playbar">
-							<div id="playbar-controls"><button class="button button-skipback"><i class="fa fa-step-backward"></i></button><button class="button button-play"><i class="fa fa-play"></i></button><button class="button button-skipforward"><i class="fa fa-step-forward"></i></button><div id="volume"><div id="volume-top"></div></div>
-							<div id="seekbar"><div></div></div>
-							<i class="fa fa-gear fa-lg" id="playbar-gear"></i>
+							<div id="playbar-controls">
+								<button class="button button-skipback"><i class="fa fa-step-backward"></i></button>
+								<button class="button button-play"><i class="fa fa-play"></i></button>
+								<button class="button button-skipforward"><i class="fa fa-step-forward"></i></button>
+								<div id="volume"><div id="volume-top"></div></div>
+								<div id="seekbar"><div></div></div>
+								<h3 id="time">00:00/00:00</h3>
+								<i class="fa fa-gear fa-lg" id="playbar-gear"></i>
+							</div>
 							<div id="playbar-gear-menu">
 								<h4>Playback rate</h4>
 								<button class="button playback-rate" rate="0.5">0.5x</button>
 								<button class="button playback-rate selected" rate="1.0">1.0x</button>
 								<button class="button playback-rate" rate="1.5">1.5x</button>
 							</div>
-							<h3 id="playbar-info"></h2>
-							<h3 id="time">00:00/00:00</h3>
 						</div>
 					</div>
 					<div id="episodeinfo-text">
@@ -80,7 +84,6 @@
 		</div>
 		<div class="tab" id="tab-settings"></div>
 	</div>
-	
 
 	<script type="text/template" class="podcasts">
 	<% casts.forEach(function(cast) { %>
