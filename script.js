@@ -10,7 +10,8 @@
 		loggedIn = false,
 		contextCastId,
 		currentEpisodeId = null,
-		videoLoading = false;
+		videoLoading = false,
+		castHovered = null;
 
 	var Event = {
 		Start: 10,
@@ -379,6 +380,24 @@
 				}
 			});
 		});
+
+		$(document).keydown(function(e) {
+			if (!(e.ctrlKey || e.metaKey)) {
+				return;
+			}
+
+			if ($(e.target).is("input:visible,textarea:visible")) {
+				return;
+			}
+
+			if (window.getSelection().toString()) {
+				return;
+			}
+
+			if (castHovered != null) {
+				$("#clip").val(casts[castHovered].url).focus().select();
+			}
+		});
 		
 		if ($.cookie("token") != null) {
 			token = $.cookie("token");
@@ -529,6 +548,14 @@
 				$("#cast-context-menu").css("top", e.pageY + "px");
 				$("#cast-context-menu").show();
 				e.preventDefault();
+			});
+
+			$(".cast").mouseover(function() {
+				castHovered = $(this).prop("id").split("-")[1];
+			});
+
+			$(".cast").mouseout(function() {
+				castHovered = null;
 			});
 		});
 	}

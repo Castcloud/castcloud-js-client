@@ -498,3 +498,10 @@ body {
 	display: inline-block;
 	width: 100px;
 }
+
+#clip {
+	position: fixed;
+	width: 1px;
+	height: 1px;
+	left: -10px;
+}
