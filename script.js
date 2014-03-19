@@ -88,10 +88,12 @@
 		var small = $(".col").css("width") == "100%";
 		var prevSmall = false;
 
-		$(".col").click(function() {
-			if ($(this).index() < $(".col").length - 1) {
-				router.navigate("p" + ($(this).index() + 1), { trigger: true });
-			}
+		$("#podcast-cols").on("click", ".cast", function() {
+			router.navigate("p1", { trigger: true });
+		});
+
+		$("#podcast-cols").on("click", ".episode", function() {
+			router.navigate("p2", { trigger: true });
 		});
 
 		$(window).resize(function() {
@@ -353,6 +355,10 @@
 				$("#input-vmenu-add").toggle();
 				$("#button-vmenu-add").toggle();
 			}
+		});
+
+		$("#vmenu-sync").click(function() {
+			loadCasts();
 		});
 
 		$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
