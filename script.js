@@ -336,8 +336,10 @@
 		});
 
 		$("#vmenu-add").click(function() {
+			var prev = $(".vmenu-toggle:visible");
 			$("#input-vmenu-add").toggle();
 			$("#button-vmenu-add").toggle();
+			prev.hide();
 			$("#input-vmenu-add").focus();
 		});
 
@@ -355,6 +357,12 @@
 				$("#input-vmenu-add").toggle();
 				$("#button-vmenu-add").toggle();
 			}
+		});
+
+		$("#vmenu-tags").click(function() {
+			var prev = $(".vmenu-toggle:visible");
+			$("#tags").toggle();
+			prev.hide();
 		});
 
 		$("#vmenu-sync").click(function() {
@@ -378,16 +386,24 @@
 			$("#volume-top").css("border-top-width", height+"px");
 		});
 
-		$("#cast-context-unsub").click(function() {
-			$.ajax(apiRoot + "library/casts/" + contextCastId, { 
-				type: "DELETE",
-				success: function(res) {
-					loadCasts();
-				}
-			});
+		$("#podcasts").on("contextmenu", ".cast", function(e) {
+			contextCastId = $(this).prop("id").split("-")[1];
+
+			$("#cast-context-menu").css("left", e.pageX + "px");
+			$("#cast-context-menu").css("top", e.pageY + "px");
+			$("#cast-context-menu").show();
+			e.preventDefault();
 		});
 
-		$(document).keydown(function(e) {
+		$("#podcasts").on("mouseover", ".cast", function() {
+			castHovered = $(this).prop("id").split("-")[1];
+		});
+
+		$("#podcasts").on("mouseout", ".cast", function() {
+			castHovered = null;
+		});
+
+		$("#podcasts").keydown(function(e) {
 			if (!(e.ctrlKey || e.metaKey)) {
 				return;
 			}
@@ -403,6 +419,15 @@
 			if (castHovered != null) {
 				$("#clip").val(casts[castHovered].url).focus().select();
 			}
+		});
+
+		$("#cast-context-unsub").click(function() {
+			$.ajax(apiRoot + "library/casts/" + contextCastId, { 
+				type: "DELETE",
+				success: function(res) {
+					loadCasts();
+				}
+			});
 		});
 		
 		if ($.cookie("token") != null) {
@@ -495,6 +520,7 @@
 
 		loadCasts();
 		loadSettings();
+		loadTags();
 	}
 
 	var lastEventTS = null;
@@ -545,23 +571,6 @@
 					$.cookie("selectedcast", cast.id);
 					loadEpisodes(cast.id);
 				});
-			});
-
-			$(".cast").on("contextmenu", function(e) {
-				contextCastId = $(this).prop("id").split("-")[1];
-
-				$("#cast-context-menu").css("left", e.pageX + "px");
-				$("#cast-context-menu").css("top", e.pageY + "px");
-				$("#cast-context-menu").show();
-				e.preventDefault();
-			});
-
-			$(".cast").mouseover(function() {
-				castHovered = $(this).prop("id").split("-")[1];
-			});
-
-			$(".cast").mouseout(function() {
-				castHovered = null;
 			});
 		});
 	}
@@ -617,6 +626,14 @@
 					$("#tab-settings").append("<p><label>" + s + '</label><input type="text" value="' + settings[c][s] + '"></p>');
 				}
 			}
+		});
+	}
+
+	function loadTags() {
+		get("library/tags", function(res) {
+			res.forEach(function(tag) {
+				$("#tags").append('<button class="button">' + tag + '</button>');
+			});
 		});
 	}
 

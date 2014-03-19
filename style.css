@@ -201,6 +201,26 @@ body {
 	background: #0099cc;
 }
 
+#tags {
+	display: none;
+}
+
+#tags .button {
+	width: auto;
+	background: #333;
+	padding: 0px 10px;
+	margin: 5px;
+	margin-right: 0px;
+}
+
+#tags .button:hover {
+	background: #0066cc;
+}
+
+#tags .button:active {
+	background: #0099cc;
+}
+
 #podcast-cols {
 	left: 50px;
 	right: 0;

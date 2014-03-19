@@ -41,12 +41,14 @@
 		<div class="tab" id="tab-podcasts">
 			<div id="podcast-vmenu">
 				<div id="vmenu-add">+</div>
+				<div id="vmenu-tags"><i class="fa fa-tag"></i></div>
 				<div id="vmenu-sync"><i class="fa fa-refresh"></i></div>
 			</div>
 			<div id="podcast-cols">
 				<div class="col">
-					<input type="text" id="input-vmenu-add" placeholder="Feed URL">
-					<button id="button-vmenu-add">Add</button>
+					<input class="vmenu-toggle" type="text" id="input-vmenu-add" placeholder="Feed URL">
+					<button class="vmenu-toggle" id="button-vmenu-add">Add</button>
+					<div class="vmenu-toggle" id="tags"></div>
 					<div id="podcasts"></div>
 				</div>
 				<div class="col" id="episodes"></div>
