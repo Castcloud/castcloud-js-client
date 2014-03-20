@@ -283,6 +283,10 @@
 			$(".button-play i").removeClass("fa-pause");
 		});
 
+		$("#vid").on("ended", function() {
+			pushEvent(Event.EndOfTrack);
+		});
+
 		var seeking = false;
 		$("#seekbar").mousedown(function(e) {
 			pushEvent(Event.Pause);
@@ -467,6 +471,10 @@
 				}
 			}
 			currentEpisodeId = id;
+
+			if (episodes[id].lastevent === null) {
+				pushEvent(Event.Start);
+			}
 
 			var video = el("vid");
 			video.setAttribute("src", episodes[id].feed.enclosure.url);
