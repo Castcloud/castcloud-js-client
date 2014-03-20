@@ -213,6 +213,10 @@ body {
 	margin-right: 0px;
 }
 
+#tags .button.selected {
+	background: #0099cc;
+}
+
 #tags .button:hover {
 	background: #0066cc;
 }

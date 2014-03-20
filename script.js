@@ -559,8 +559,8 @@
 		$.cookie("episode-" + currentEpisodeId, el("vid").duration, { expires: 1});
 	}
 
-	function loadCasts() {
-		get("library/casts", function(res) {
+	function loadCasts(tag) {
+		get(tag == undefined ? "library/casts" : "library/casts/" + tag, function(res) {
 			var template = _.template($("script.podcasts").html());
 			$("#podcasts").empty().append(template({ casts: res }));
 
@@ -637,6 +637,18 @@
 		get("library/tags", function(res) {
 			res.forEach(function(tag) {
 				$("#tags").append('<button class="button">' + tag + '</button>');
+			});
+
+			$("#tags button").click(function() {
+				if ($(this).hasClass("selected")) {
+					loadCasts();
+					$("#tags button").removeClass("selected");
+				}
+				else {
+					loadCasts($(this).text());
+					$("#tags button").removeClass("selected");
+					$($(this).addClass("selected"));
+				}
 			});
 		});
 	}
