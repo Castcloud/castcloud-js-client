@@ -11,7 +11,8 @@
 		contextCastId,
 		currentEpisodeId = null,
 		videoLoading = false,
-		castHovered = null;
+		castHovered = null,
+		ctrlDown = false;
 
 	var Event = {
 		Start: 10,
@@ -370,6 +371,7 @@
 
 		$("#vmenu-sync").click(function() {
 			loadCasts();
+			$("#tags button").removeClass("selected");
 		});
 
 		$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
@@ -411,6 +413,8 @@
 				return;
 			}
 
+			ctrlDown = true;
+
 			if ($(e.target).is("input:visible,textarea:visible")) {
 				return;
 			}
@@ -424,7 +428,14 @@
 			}
 		});
 
+		$(document).keyup(function(e) {
+			ctrlDown = false;
+		});
+
 		$("#cast-context-unsub").click(function() {
+			$(".cast.selected").each(function() {
+				$.ajax(apiRoot + "library/casts/" + $(this).prop("id").split("-")[1], { type: "DELETE" });
+			});
 			$.ajax(apiRoot + "library/casts/" + contextCastId, { 
 				type: "DELETE",
 				success: function(res) {
@@ -448,7 +459,7 @@
 	});
 
 	function addFeed(feedurl) {
-		$.post(apiRoot + "library/casts", { feedurl: feedurl }, loadCasts);
+		$.post(apiRoot + "library/casts", { feedurl: feedurl }, function() { loadCasts(); });
 	}
 
 	function playEpisode(id) {
@@ -572,8 +583,12 @@
 				casts[cast.id] = cast;
 
 				$("#cast-" + cast.id).click(function() {
-					$.cookie("selectedcast", cast.id);
 					loadEpisodes(cast.id);
+					$.cookie("selectedcast", cast.id);
+
+					if (ctrlDown) {
+						$(this).toggleClass("selected");
+					}
 				});
 			});
 		});

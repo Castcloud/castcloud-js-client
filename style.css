@@ -301,6 +301,10 @@ body {
 	background: #0066cc;
 }
 
+.cast.selected, .episode.selected {
+	background: #0099cc;
+}
+
 .episode {
 	position: relative;
 }
