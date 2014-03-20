@@ -265,7 +265,10 @@
 				el("vid").currentTime = lastevent.positionts;
 
 				if (lastevent.type == Event.Pause) {
-					el("vid").pause();
+					//el("vid").pause();
+				}
+				else {
+					el("vid").play();
 				}
 			}
 		});
@@ -403,7 +406,7 @@
 			castHovered = null;
 		});
 
-		$("#podcasts").keydown(function(e) {
+		$(document).keydown(function(e) {
 			if (!(e.ctrlKey || e.metaKey)) {
 				return;
 			}
@@ -458,6 +461,7 @@
 			currentEpisodeId = id;
 
 			var video = el("vid");
+			video.setAttribute("poster", episodes[id].feed["media:thumbnail"].url);
 			video.setAttribute("src", episodes[id].feed.enclosure.url);
 			video.load();
 			videoLoading = true;
