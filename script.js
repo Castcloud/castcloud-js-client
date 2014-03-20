@@ -410,6 +410,10 @@
 		});
 
 		$(document).keydown(function(e) {
+			if (e.which === 179) {
+				playPauseToggle();
+			}
+
 			if (!(e.ctrlKey || e.metaKey)) {
 				return;
 			}
