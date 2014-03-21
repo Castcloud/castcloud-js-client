@@ -269,6 +269,9 @@
 					el("vid").play();
 				}
 			}
+			else if (lastevent === null && videoLoading) {
+				el("vid").play();
+			}
 		});
 
 		$("#vid").on("play", function() {
@@ -449,7 +452,7 @@
 			});
 		});
 		
-		if ($.cookie("token") !== null) {
+		if ($.cookie("token") !== undefined) {
 			token = $.cookie("token");
 			finishLogin();
 
@@ -477,6 +480,7 @@
 			currentEpisodeId = id;
 
 			if (episodes[id].lastevent === null) {
+				el("vid").currentTime = 0;
 				pushEvent(Event.Start);
 			}
 
@@ -515,7 +519,7 @@
 		}, function(res) {
 			token = res.token;
 			console.log(token);
-			if (token !== null) {
+			if (token !== undefined) {
 				$.cookie("token", token);
 				$.cookie("username", username);
 				

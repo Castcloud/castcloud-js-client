@@ -139,6 +139,11 @@ body {
 	background: #0066cc;
 }
 
+#input-target {
+	background: #222;
+	color: #AAA;
+}
+
 #podcast-vmenu {
 	position: fixed;
 	width: 50px;
