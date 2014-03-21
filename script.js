@@ -61,21 +61,27 @@
 			},
 
 			foo: function(n) {
-				$("#tab-podcasts").show();
-				page = n;
-				if (small) {
-					$(".col").hide();
-					$("#playbar").show();
-					$(".col:eq(" + n + ")").show();
-					if (page === 2) {
-						$("#podcast-vmenu").hide();
-						$("#podcast-cols").css("left", "0px");
+				$(".tab").hide();
+				if (!loggedIn) {
+					$("#tab-login").show();
+				}
+				else {
+					$("#tab-podcasts").show();
+					page = n;
+					if (small) {
+						$(".col").hide();
+						$("#playbar").show();
+						$(".col:eq(" + n + ")").show();
+						if (page === 2) {
+							$("#podcast-vmenu").hide();
+							$("#podcast-cols").css("left", "0px");
+						}
+						else {
+							$("#podcast-vmenu").show();
+							$("#podcast-cols").css("left", "50px");
+						}
 					}
-					else {
-						$("#podcast-vmenu").show();
-						$("#podcast-cols").css("left", "50px");
-					}
-				}		
+				}
 			}
 		});
 
@@ -476,9 +482,8 @@
 		
 		if ($.cookie("token") !== undefined) {
 			token = $.cookie("token");
+			username = $.cookie("username");
 			finishLogin();
-
-			$("#userinfo span").html($.cookie("username"));
 
 			$("#playbar").show();
 			$("#topbar nav").show();
@@ -530,7 +535,7 @@
 	}
 
 	function login() {
-		var username = $("#input-username").val();
+		username = $("#input-username").val();
 		$.post(apiRoot + "account/login", {
 			username: username,
 			password: $("#input-password").val(),
@@ -560,6 +565,8 @@
 
 	function finishLogin() {
 		loggedIn = true;
+
+		$("#userinfo span").html(username);
 
 		$.ajaxSetup({
 			headers: { Authorization: token }
