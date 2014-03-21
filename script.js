@@ -30,6 +30,7 @@
 				"": "podcasts",
 				"podcasts": "podcasts",
 				"settings": "settings",
+				"now-playing": "nowPlaying",
 				"p:n": "foo",
 				"*any": "podcasts"
 			},
@@ -47,6 +48,9 @@
 						$("#playbar").show();
 						$(".col:eq(0)").show();
 					}
+					else {
+						$("#vid-container").addClass("thumb");
+					}
 				}
 			},
 
@@ -56,6 +60,7 @@
 					$("#tab-login").show();
 				}
 				else {
+					$("#vid-container").addClass("thumb");
 					$("#tab-settings").show();
 				}
 			},
@@ -81,6 +86,17 @@
 							$("#podcast-cols").css("left", "50px");
 						}
 					}
+				}
+			},
+
+			nowPlaying: function() {
+				$(".tab").hide();
+				if (!loggedIn) {
+					$("#tab-login").show();
+				}
+				else {
+					$("#vid-container").removeClass("thumb");
+					$("#tab-now-playing").show();
 				}
 			}
 		});
@@ -185,9 +201,11 @@
 		$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {
 			$("#vid-container").toggleClass("fs");
 			if ($("#vid-container").hasClass("fs")) {
+				$("#playbar").detach().appendTo("#vid-container");
 				$("#playbar").show();
 			}
 			else {
+				$("#playbar").detach().appendTo("#main-container");
 				if (timer !== null) {
 					clearTimeout(timer);
 				}
@@ -661,6 +679,10 @@
 
 			$(".episode").mouseout(function() {
 				$(this).children(".bar").css("background", "#333");
+			});
+
+			$(".episode").dblclick(function() {
+				Backbone.history.navigate("now-playing", { trigger: true });
 			});
 		});
 	}
