@@ -451,6 +451,26 @@
 				}
 			});
 		});
+
+		$("#input-target").keyup(function(e) {
+			var url = $(this).val();
+			if (url.indexOf("/", url.length - 1) === -1) {
+				url += "/";
+			}
+			$.ajax(url + "account/ping", { 
+				error: function(res) { 
+					if (res.responseText === "Bad token") {
+						$("#input-target-container i").show();
+					}
+					else {
+						$("#input-target-container i").hide();
+					}
+				}, 
+				success: function() { 
+					$("#input-target-container i").hide();
+				}
+			});
+		});
 		
 		if ($.cookie("token") !== undefined) {
 			token = $.cookie("token");

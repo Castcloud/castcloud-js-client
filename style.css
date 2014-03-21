@@ -139,9 +139,18 @@ body {
 	background: #0066cc;
 }
 
-#input-target {
-	background: #222;
+#input-target-container {
+	margin-left: 12px;
+	position: fixed;
+	left: 0;
+	bottom: 0;
 	color: #AAA;
+}
+
+#input-target {
+	background: #111;
+	color: #AAA;
+	margin: 5px;
 }
 
 #podcast-vmenu {
