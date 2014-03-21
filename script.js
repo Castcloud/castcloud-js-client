@@ -83,6 +83,8 @@
 		root = path.substr(0, path.indexOf("client/") + 7);
 		apiRoot = root.replace("client", "api");
 
+		$("#input-target").val(apiRoot);
+
 		var router = new Router();
 
 		var page = 0;
