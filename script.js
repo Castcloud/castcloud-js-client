@@ -343,7 +343,7 @@
 		});
 
 		$("#button-logout").click(function() {
-			$.removeCookie("token");
+			sessionStorage.removeItem("token");
 			$("#playbar").hide();
 			$("#topbar nav").hide();
 			$("#userinfo").hide();
@@ -480,9 +480,9 @@
 			});
 		});
 		
-		if ($.cookie("token") !== undefined) {
-			token = $.cookie("token");
-			username = $.cookie("username");
+		if (sessionStorage.token) {
+			token = sessionStorage.token;
+			username = sessionStorage.username;
 			finishLogin();
 
 			$("#playbar").show();
@@ -547,8 +547,8 @@
 			token = res.token;
 			console.log(token);
 			if (token !== undefined) {
-				$.cookie("token", token);
-				$.cookie("username", username);
+				sessionStorage.token = token;
+				sessionStorage.username = username;
 				
 				finishLogin();
 
@@ -608,7 +608,7 @@
 			clientts: eventTS				
 		}] });
 
-		$.cookie("episode-" + currentEpisodeId, el("vid").duration, { expires: 1});
+		localStorage.setItem("episode-" + currentEpisodeId, el("vid").duration);
 	}
 
 	function loadCasts(tag) {
@@ -616,8 +616,8 @@
 			var template = _.template($("script.podcasts").html());
 			$("#podcasts").empty().append(template({ casts: res }));
 
-			if ($.cookie("selectedcast") !== null) {
-				loadEpisodes($.cookie("selectedcast"));
+			if (sessionStorage.selectedcast) {
+				loadEpisodes(sessionStorage.selectedcast);
 			}
 
 			res.forEach(function(cast) {
@@ -625,7 +625,7 @@
 
 				$("#cast-" + cast.id).click(function() {
 					loadEpisodes(cast.id);
-					$.cookie("selectedcast", cast.id);
+					sessionStorage.selectedcast = cast.id;
 
 					if (ctrlDown) {
 						$(this).toggleClass("selected");
@@ -642,17 +642,17 @@
 
 			res.forEach(function(episode) {
 				$("#ep-" + episode.id).click(function() {
-					$.cookie("lastepisode", episode.id);
+					sessionStorage.lastepisode = episode.id;
 					playEpisode(episode.id);
 				});
 				episodes[episode.id] = episode;
-				if (episode.lastevent !== null && $.cookie("episode-" + episode.id) !== null) {
-					$("#ep-" + episode.id + " .bar").css("width", (episode.lastevent.positionts / $.cookie("episode-" + episode.id) * 100)+"%");
+				if (episode.lastevent !== null && localStorage.getItem("episode-" + episode.id) !== null) {
+					$("#ep-" + episode.id + " .bar").css("width", (episode.lastevent.positionts / localStorage.getItem("episode-" + episode.id) * 100)+"%");
 				}
 			});
 
-			if ($.cookie("lastepisode") !== null) {
-				playEpisode($.cookie("lastepisode"));
+			if (sessionStorage.lastepisode) {
+				playEpisode(sessionStorage.lastepisode);
 			}
 
 			$(".episode").mouseover(function() {
