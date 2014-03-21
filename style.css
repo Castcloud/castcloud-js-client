@@ -339,12 +339,14 @@ body {
 
 #vid {
 	display: none;
+	width: 100%;
 }
 
 #vid-container {
 	position: fixed;
 	top: 60px;
 	bottom: 60px;
+	width: 100%
 }
 
 #vid-container.fs {
@@ -357,14 +359,37 @@ body {
 
 #vid-container.thumb {
 	position: fixed;
-	right: 20px;
-	bottom: 60px;
+	right: 15px;
+	bottom: 55px;
 	top: auto;
 	width: 200px;
 }
 
-#vid {
-	width: 100%;
+#vid-thumb-bar {
+	display: none;
+}
+
+.thumb #vid-thumb-bar {
+	display: block;
+	height: 30px;
+	background: #111;
+}
+
+#vid-thumb-bar .button {
+	height: 30px;
+	margin: 0;
+	padding: 0;
+	width: 30px;
+	background: #222;
+	float: right;
+}
+
+#vid-thumb-bar .button:hover {
+	background: #0066cc;
+}
+
+#vid-thumb-bar .button:active {
+	background: #0099cc;
 }
 
 #overlay-info {

@@ -61,7 +61,7 @@
 				</div>
 				<div class="col" id="episodes"></div>
 				<div class="col" id="episodeinfo">
-					<div id="pretty" style="background: #FFF; color: #000; height: 200px"><h1>PRETTY PICTUREZ</h1></div>				
+					<img id="pretty" width="100%">			
 					<div id="episodeinfo-text">
 						<h2 id="episode-title"></h2>
 						<p id="episode-date"></p>
@@ -72,11 +72,12 @@
 		</div>
 		<div class="tab" id="tab-settings"></div>
 		<div id="vid-container">
-				<video id="vid" height="100%">
-	  				<source src="#" type="video/mp4">
-				</video>
-				<div id="overlay-info"><h5></h5><h2></h2></div>				
-			</div>
+			<div id="vid-thumb-bar"><button class="button">_</button></div>
+			<video id="vid" height="100%">
+  				<source src="#" type="video/mp4">
+			</video>
+			<div id="overlay-info"><h5></h5><h2></h2></div>				
+		</div>
 		<div id="playbar">
 			<div id="playbar-controls">
 				<button class="button button-skipback"><i class="fa fa-step-backward"></i></button>

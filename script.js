@@ -48,9 +48,7 @@
 						$("#playbar").show();
 						$(".col:eq(0)").show();
 					}
-					else {
-						$("#vid-container").addClass("thumb");
-					}
+					$("#vid-container").addClass("thumb");
 				}
 			},
 
@@ -77,7 +75,7 @@
 						$(".col").hide();
 						$("#playbar").show();
 						$(".col:eq(" + n + ")").show();
-						if (page === 2) {
+						if (page == 2) {
 							$("#podcast-vmenu").hide();
 							$("#podcast-cols").css("left", "0px");
 						}
@@ -86,6 +84,7 @@
 							$("#podcast-cols").css("left", "50px");
 						}
 					}
+					$("#vid-container").addClass("thumb");
 				}
 			},
 
@@ -198,6 +197,10 @@
 			}
 		});
 
+		$("#vid-thumb-bar button").click(function() {
+			$("#vid-container").slideUp();
+		});
+
 		$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {
 			$("#vid-container").toggleClass("fs");
 			if ($("#vid-container").hasClass("fs")) {
@@ -209,7 +212,7 @@
 				if (timer !== null) {
 					clearTimeout(timer);
 				}
-				$("#overlay-info").stop().hide();			
+				$("#overlay-info").stop().hide();
 			}
 		});
 
@@ -527,6 +530,14 @@
 			if (episodes[id].lastevent === null) {
 				el("vid").currentTime = 0;
 				pushEvent(Event.Start);
+			}
+
+			if (episodes[id].feed["media:thumbnail"]) {
+				$("#pretty").prop("src", episodes[id].feed["media:thumbnail"].url);
+				$("#pretty").show();
+			}
+			else {
+				$("#pretty").hide();
 			}
 
 			var video = el("vid");
