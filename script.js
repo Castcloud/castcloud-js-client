@@ -198,16 +198,20 @@
 		});
 
 		$("#vid-thumb-bar button").click(function() {
-			$("#vid-container").slideUp();
+			$("#vid").slideToggle("fast");
 		});
 
 		$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {
 			$("#vid-container").toggleClass("fs");
 			if ($("#vid-container").hasClass("fs")) {
+				$("#vid-container").removeClass("thumb");
 				$("#playbar").detach().appendTo("#vid-container");
 				$("#playbar").show();
 			}
 			else {
+				if (Backbone.history.fragment !== "now-playing") {
+					$("#vid-container").addClass("thumb");
+				}
 				$("#playbar").detach().appendTo("#main-container");
 				if (timer !== null) {
 					clearTimeout(timer);
@@ -365,6 +369,7 @@
 
 		$("#button-logout").click(function() {
 			sessionStorage.removeItem("token");
+			$("#vid-container").hide();
 			$("#playbar").hide();
 			$("#topbar nav").hide();
 			$("#userinfo").hide();
@@ -585,6 +590,7 @@
 				
 				finishLogin();
 
+				$("#vid-container").show();
 				$("#tab-podcasts").fadeIn("fast");
 				$("#playbar").slideDown("fast");
 				$("#topbar nav").fadeIn("fast");

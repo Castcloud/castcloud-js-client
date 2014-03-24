@@ -106,6 +106,10 @@ body {
 	display: none;
 }
 
+#userinfo div {
+	display: inline-block;
+}
+
 #userinfo span {
 	margin-right: 20px;
 }
@@ -306,6 +310,12 @@ body {
 	}
 }
 
+@media all and (min-width: 600px) and (max-width: 720px) {
+	#userinfo div {
+		display: none;
+	}
+}
+
 .cast, .episode {
 	padding: 10px 20px;
 	cursor: pointer;
@@ -360,9 +370,10 @@ body {
 #vid-container.thumb {
 	position: fixed;
 	right: 15px;
-	bottom: 55px;
+	bottom: 60px;
 	top: auto;
 	width: 200px;
+	background: #111;
 }
 
 #vid-thumb-bar {
