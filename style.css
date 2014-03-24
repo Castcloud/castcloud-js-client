@@ -331,6 +331,7 @@ a {
 
 .cast.selected, .episode.selected {
 	background: #0099cc;
+	color: #FFF !important;
 }
 
 .cast.current, .episode.current {
@@ -630,7 +631,7 @@ a {
 	border-radius: 5px;
 }
 
-#cast-context-menu {
+.context-menu {
 	display: none;
 	position: fixed;
 	width: 200px;
@@ -643,12 +644,12 @@ a {
 	border: 1px solid #AAA;
 }
 
-#cast-context-menu div {
+.context-menu div {
 	padding: 5px 10px;
 	cursor: pointer;
 }
 
-#cast-context-menu div:hover {
+.context-menu div:hover {
 	background: #0066cc;
 	color: #FFF;
 }

@@ -8,7 +8,7 @@
 		root,
 		apiRoot,
 		loggedIn = false,
-		contextCastId,
+		contextItemId,
 		currentEpisodeId = null,
 		videoLoading = false,
 		castHovered = null,
@@ -441,7 +441,7 @@
 		});
 
 		$(document).click(function() {
-			$("#cast-context-menu").hide();
+			$(".context-menu").hide();
 		});
 
 		$("#volume").mousemove(function(e) {
@@ -453,12 +453,11 @@
 		});
 
 		$("#podcasts").on("contextmenu", ".cast", function(e) {
-			contextCastId = $(this).prop("id").split("-")[1];
+			showContextMenu("#cast-context-menu", this, e);
+		});
 
-			$("#cast-context-menu").css("left", e.pageX + "px");
-			$("#cast-context-menu").css("top", e.pageY + "px");
-			$("#cast-context-menu").show();
-			e.preventDefault();
+		$("#episodes").on("contextmenu", ".episode", function(e) {
+			showContextMenu("#episode-context-menu", this, e);
 		});
 
 		$("#podcasts").on("mouseover", ".cast", function() {
@@ -501,12 +500,16 @@
 			$(".cast.selected").each(function() {
 				$.ajax(apiRoot + "library/casts/" + $(this).prop("id").split("-")[1], { type: "DELETE" });
 			});
-			$.ajax(apiRoot + "library/casts/" + contextCastId, { 
+			$.ajax(apiRoot + "library/casts/" + contextItemId, { 
 				type: "DELETE",
 				success: function(res) {
 					loadCasts();
 				}
 			});
+		});
+
+		$("#episode-context-delete").click(function() {
+			console.log("DELETE: " + contextItemId);
 		});
 
 		$("#input-target").keyup(function(e) {
@@ -710,14 +713,16 @@
 				casts[cast.id] = cast;
 
 				$("#cast-" + cast.id).click(function() {
-					loadEpisodes(cast.id);
-					sessionStorage.selectedcast = cast.id;
-
 					if (ctrlDown) {
 						$(this).toggleClass("selected");
 					}
-					$(".cast").removeClass("current");
-					$(this).addClass("current");
+					else {
+						loadEpisodes(cast.id);
+						sessionStorage.selectedcast = cast.id;
+
+						$(".cast").removeClass("current");
+						$(this).addClass("current");
+					}
 				});
 			});
 		});
@@ -731,7 +736,13 @@
 
 			res.forEach(function(episode) {
 				$("#ep-" + episode.id).click(function() {
-					loadEpisodeInfo(episode.id);
+					if (ctrlDown) {
+						$(this).toggleClass("selected");
+						$(this).children(".bar").toggle();
+					}
+					else {
+						loadEpisodeInfo(episode.id);
+					}
 				});
 
 				$("#ep-" + episode.id).dblclick(function() {
@@ -821,6 +832,16 @@
 		else {
 			$("#vid-container.thumb").css("right", "0px");
 		}
+	}
+
+	function showContextMenu(id, target, e) {
+		contextItemId = $(target).prop("id").split("-")[1];
+
+		$(id).css("left", e.pageX + "px");
+		$(id).css("top", e.pageY + "px");
+		$(".context-menu").hide();
+		$(id).show();
+		e.preventDefault();
 	}
 
 	function get(url, cb) {
