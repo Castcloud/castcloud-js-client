@@ -12,7 +12,8 @@
 		currentEpisodeId = null,
 		videoLoading = false,
 		castHovered = null,
-		ctrlDown = false;
+		ctrlDown = false,
+		autoplay = false;
 
 	var Event = {
 		Start: 10,
@@ -107,6 +108,10 @@
 		$("#input-target").val(apiRoot);
 
 		var router = new Router();
+
+		router.bind("all", function(route, router) {
+			positionThumb();
+		});
 
 		var page = 0;
 		var small = $(".col").css("width") === "100%";
@@ -306,7 +311,8 @@
 					el("vid").play();
 				}
 			}
-			else if (lastevent === null && videoLoading) {
+			if (autoplay && videoloading) {
+				autoplay = false;
 				el("vid").play();
 			}
 		});
@@ -391,17 +397,11 @@
 
 		$("#button-vmenu-add").click(function() {
 			addFeed($("#input-vmenu-add").val());
-			$("#input-vmenu-add").val("");
-			$("#input-vmenu-add").toggle();
-			$("#button-vmenu-add").toggle();
 		});
 
 		$("#input-vmenu-add").keydown(function(e) {
 			if (e.which === 13) {
 				addFeed($("#input-vmenu-add").val());
-				$("#input-vmenu-add").val("");
-				$("#input-vmenu-add").toggle();
-				$("#button-vmenu-add").toggle();
 			}
 		});
 
@@ -527,22 +527,14 @@
 
 	function addFeed(feedurl) {
 		$.post(apiRoot + "library/casts", { feedurl: feedurl }, function() { loadCasts(); });
+
+		$("#input-vmenu-add").val("");
+		$("#input-vmenu-add").toggle();
+		$("#button-vmenu-add").toggle();
 	}
 
-	function playEpisode(id) {
-		if (currentEpisodeId !== id) {
-			if (currentEpisodeId !== null) {
-				if (!el("vid").paused) {
-					pushEvent(Event.Play);
-				}
-			}
-			currentEpisodeId = id;
-
-			if (episodes[id].lastevent === null) {
-				el("vid").currentTime = 0;
-				pushEvent(Event.Start);
-			}
-
+	function loadEpisodeInfo(id) {
+		if (currentEpisodeId != id) {
 			if (episodes[id].feed["media:thumbnail"]) {
 				$("#pretty").prop("src", episodes[id].feed["media:thumbnail"].url);
 				$("#pretty").show();
@@ -555,6 +547,32 @@
 				$("#pretty").hide();
 			}
 
+			$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
+			$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
+			$("#episode-desc").html(episodes[id].feed.description);
+			$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
+
+			positionThumb();
+		}
+	}
+
+	function playEpisode(id) {
+		if (currentEpisodeId !== id) {
+			if (currentEpisodeId !== null) {
+				if (!el("vid").paused) {
+					pushEvent(Event.Play);
+				}
+			}
+
+			loadEpisodeInfo(id);
+
+			currentEpisodeId = id;
+
+			if (episodes[id].lastevent === null) {
+				el("vid").currentTime = 0;
+				pushEvent(Event.Start);
+			}
+
 			var video = el("vid");
 			video.setAttribute("src", episodes[id].feed.enclosure.url);
 			video.load();
@@ -562,10 +580,6 @@
 
 			$("#vid-container").show();
 			$("#vid-container").removeClass("minimized");
-			$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
-			$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
-			$("#episode-desc").html(episodes[id].feed.description);
-			$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
 		}
 	}
 
@@ -665,6 +679,7 @@
 		get(tag === undefined ? "library/casts" : "library/casts/" + tag, function(res) {
 			var template = _.template($("script.podcasts").html());
 			$("#podcasts").empty().append(template({ casts: res }));
+			positionThumb();
 
 			if (sessionStorage.selectedcast) {
 				loadEpisodes(sessionStorage.selectedcast);
@@ -689,13 +704,19 @@
 		get("library/episodes/" + id, function(res) {
 			var template = _.template($("script.episodes").html());
 			$("#episodes").empty().append(template({ episodes: res }));
+			positionThumb();
 
 			res.forEach(function(episode) {
 				$("#ep-" + episode.id).click(function() {
-					sessionStorage.lastepisode = episode.id;
-					playEpisode(episode.id);
-					positionThumb();
+					loadEpisodeInfo(episode.id);
 				});
+
+				$("#ep-" + episode.id).dblclick(function() {
+					sessionStorage.lastepisode = episode.id;
+					autoplay = true;
+					playEpisode(episode.id);
+				});
+
 				episodes[episode.id] = episode;
 				if (episode.lastevent !== null && localStorage.getItem("episode-" + episode.id) !== null) {
 					$("#ep-" + episode.id + " .bar").css("width", (episode.lastevent.positionts / localStorage.getItem("episode-" + episode.id) * 100)+"%");
@@ -712,10 +733,6 @@
 
 			$(".episode").mouseout(function() {
 				$(this).children(".bar").css("background", "#333");
-			});
-
-			$(".episode").dblclick(function() {
-				Backbone.history.navigate("now-playing", { trigger: true });
 			});
 		});
 	}
