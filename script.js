@@ -316,6 +316,13 @@
 				el("vid").play();
 			}
 			videoLoading = false;
+
+			if (el("vid").paused) {
+				$("#ep-" + currentEpisodeId).append('<i class="fa fa-pause"></i>');
+			}
+			else {
+				$("#ep-" + currentEpisodeId).append('<i class="fa fa-play"></i>');
+			}
 		});
 
 		$("#vid").on("play", function() {
@@ -573,8 +580,6 @@
 
 			currentEpisodeId = id;
 
-			$("#ep-" + id).append('<i class="fa fa-play"></i>');
-
 			if (episodes[id].lastevent === null) {
 				el("vid").currentTime = 0;
 				pushEvent(Event.Start);
@@ -727,6 +732,16 @@
 				episodes[episode.id] = episode;
 				if (episode.lastevent !== null && localStorage.getItem("episode-" + episode.id) !== null) {
 					$("#ep-" + episode.id + " .bar").css("width", (episode.lastevent.positionts / localStorage.getItem("episode-" + episode.id) * 100)+"%");
+				}
+
+				if (episode.id == currentEpisodeId) {
+					console.log(episode.lastevent.type);
+					if (episode.lastevent.type == Event.Pause) {
+						$("#ep-" + episode.id).append('<i class="fa fa-pause"></i>');
+					}
+					else {
+						$("#ep-" + episode.id).append('<i class="fa fa-play"></i>');
+					}
 				}
 			});
 
