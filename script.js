@@ -534,26 +534,24 @@
 	}
 
 	function loadEpisodeInfo(id) {
-		if (currentEpisodeId != id) {
-			if (episodes[id].feed["media:thumbnail"]) {
-				$("#pretty").prop("src", episodes[id].feed["media:thumbnail"].url);
-				$("#pretty").show();
-			}
-			else if (casts[episodes[id].castid].feed.image) {
-				$("#pretty").prop("src", casts[episodes[id].castid].feed.image.url);
-				$("#pretty").show();
-			}
-			else {
-				$("#pretty").hide();
-			}
-
-			$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
-			$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
-			$("#episode-desc").html(episodes[id].feed.description);
-			$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
-
-			positionThumb();
+		if (episodes[id].feed["media:thumbnail"]) {
+			$("#pretty").prop("src", episodes[id].feed["media:thumbnail"].url);
+			$("#pretty").show();
 		}
+		else if (casts[episodes[id].castid].feed.image) {
+			$("#pretty").prop("src", casts[episodes[id].castid].feed.image.url);
+			$("#pretty").show();
+		}
+		else {
+			$("#pretty").hide();
+		}
+
+		$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
+		$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
+		$("#episode-desc").html(episodes[id].feed.description);
+		$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
+
+		positionThumb();
 	}
 
 	function playEpisode(id) {
