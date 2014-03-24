@@ -559,6 +559,7 @@
 			videoLoading = true;
 
 			$("#vid-container").show();
+			$("#vid-container").removeClass("minimized");
 			$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
 			$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
 			$("#episode-desc").html(episodes[id].feed.description);
