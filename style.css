@@ -17,6 +17,10 @@ body {
 	font-family: "Lato";
 }
 
+a {
+	text-decoration: none;
+}
+
 #topbar {
 	background: #111;
 	height: 60px;
@@ -356,15 +360,15 @@ body {
 	position: fixed;
 	top: 60px;
 	bottom: 60px;
-	width: 100%
+	width: 100%;
 }
 
 #vid-container.fs {
 	height: auto;
 	left: 0;
-	top: 0 !important;
-	bottom: 0 !important;
-	width: 100% !important;
+	top: 0;
+	bottom: 0;
+	width: 100%;
 	background: #000;
 }
 
@@ -375,6 +379,12 @@ body {
 	top: auto;
 	width: 200px;
 	background: #111;
+	padding: 0 5px;
+}
+
+#vid-container.thumb.minimized {
+	height: 30px;
+	bottom: 60px;
 }
 
 #vid-thumb-bar {
@@ -387,17 +397,33 @@ body {
 	background: #111;
 }
 
+#vid-thumb-bar a {
+	color: #444;
+}
+
+#vid-thumb-bar a:hover {
+	color: #FFF;
+}
+
+#vid-thumb-bar h4 {
+	float: left;
+	line-height: 30px;
+	color: #444;
+}
+
 #vid-thumb-bar .button {
 	height: 30px;
 	margin: 0;
 	padding: 0;
 	width: 30px;
-	background: #222;
+	background: #111;
 	float: right;
+	color: #444;
 }
 
 #vid-thumb-bar .button:hover {
 	background: #0066cc;
+	color: #FFF;
 }
 
 #vid-thumb-bar .button:active {

@@ -197,8 +197,12 @@
 			}
 		});
 
-		$("#vid-thumb-bar button").click(function() {
-			$("#vid").slideToggle("fast");
+		$("#vid-thumb-bar .popout").click(function() {
+			// YOLO
+		});
+
+		$("#vid-thumb-bar .minimize").click(function() {
+			$("#vid-container").toggleClass("minimized");
 		});
 
 		$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {
@@ -612,6 +616,10 @@
 		});
 
 		$(".tab").hide();
+
+		if (Backbone.history.fragment !== "now-playing") {
+			$("#vid-container").addClass("thumb");
+		}
 
 		loadCasts();
 		loadSettings();
