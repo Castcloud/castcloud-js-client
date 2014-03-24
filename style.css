@@ -338,11 +338,11 @@ body {
 }
 
 #vid {
-	display: none;
 	width: 100%;
 }
 
 #vid-container {
+	display: none;
 	position: fixed;
 	top: 60px;
 	bottom: 60px;
@@ -606,4 +606,10 @@ body {
 	width: 1px;
 	height: 1px;
 	left: -10px;
+}
+
+#pretty {
+	max-width: 100%;
+	width: auto;
+	height: auto;
 }
