@@ -417,8 +417,10 @@
 		});
 
 		$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
+		positionThumb();
 		$(window).resize(function() {
 			$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
+			positionThumb();
 		});
 
 		$(document).click(function() {
@@ -692,6 +694,7 @@
 				$("#ep-" + episode.id).click(function() {
 					sessionStorage.lastepisode = episode.id;
 					playEpisode(episode.id);
+					positionThumb();
 				});
 				episodes[episode.id] = episode;
 				if (episode.lastevent !== null && localStorage.getItem("episode-" + episode.id) !== null) {
@@ -761,6 +764,15 @@
 		});
 	}
 
+	function positionThumb() {
+		if ($("#main-container").isOverflowing()) {
+			$("#vid-container.thumb").css("right", "15px");
+		}
+		else {
+			$("#vid-container.thumb").css("right", "0px");
+		}
+	}
+
 	function get(url, cb) {
 		$.get(apiRoot + url, cb);
 	}
@@ -779,5 +791,14 @@
 			str = "0" + str;
 		}
 		return str;
+	}
+
+	$.fn.isOverflowing = function() {
+	    var _elm = $(this)[0];
+	    var _hasScrollBar = false; 
+	    if ((_elm.clientHeight < _elm.scrollHeight) || (_elm.clientWidth < _elm.scrollWidth)) {
+	        _hasScrollBar = true;
+	    }
+	    return _hasScrollBar;
 	}
 }());
