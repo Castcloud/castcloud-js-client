@@ -32,6 +32,7 @@
 				"podcasts": "podcasts",
 				"settings": "settings",
 				"now-playing": "nowPlaying",
+				"fullscreen":  "fullscreen",
 				"p:n": "foo",
 				"*any": "podcasts"
 			},
@@ -98,6 +99,11 @@
 					$("#vid-container").removeClass("thumb");
 					$("#tab-now-playing").show();
 				}
+			},
+
+			fullscreen: function() {
+				$("#vid-container").removeClass("thumb");
+				$("#vid-container").addClass("fs");
 			}
 		});
 
@@ -203,7 +209,20 @@
 		});
 
 		$("#vid-thumb-bar .popout").click(function() {
-			// YOLO
+			var video = el("vid");
+			if (!el("vid").paused) {
+				pushEvent(Event.Play);
+			}
+			video.setAttribute("src", "#");
+			video.load();
+
+			var poppedOut = window.open(root + "fullscreen");
+			$(poppedOut).on("beforeunload", function() {
+				currentEpisodeId = null;
+
+				// Possibly store lastevent in sessionstorage instead of this hack
+				setTimeout(function() { loadEpisodes(JSON.parse(sessionStorage.lastepisode).castid); }, 500);
+			});
 		});
 
 		$("#vid-thumb-bar .minimize").click(function() {
@@ -704,6 +723,10 @@
 			$("#podcasts").empty().append(template({ casts: res }));
 			positionThumb();
 
+			if (sessionStorage.lastepisode) {
+				var lastepisode = JSON.parse(sessionStorage.lastepisode);
+				loadEpisodes(lastepisode.castid);
+			}
 			if (sessionStorage.selectedcast) {
 				loadEpisodes(sessionStorage.selectedcast);
 				$("#cast-" + sessionStorage.selectedcast).addClass("current");
@@ -746,7 +769,7 @@
 				});
 
 				$("#ep-" + episode.id).dblclick(function() {
-					sessionStorage.lastepisode = episode.id;
+					sessionStorage.lastepisode = JSON.stringify({ id: episode.id, castid: episode.castid });
 					autoplay = true;
 					playEpisode(episode.id);
 				});
@@ -767,8 +790,9 @@
 			});
 
 			if (sessionStorage.lastepisode) {
-				playEpisode(sessionStorage.lastepisode);
-				$("#ep-" + sessionStorage.lastepisode).addClass("current");
+				var lastepisode = JSON.parse(sessionStorage.lastepisode);
+				playEpisode(lastepisode.id);
+				$("#ep-" + lastepisode.id).addClass("current");
 			}
 
 			$(".episode").mouseover(function() {
