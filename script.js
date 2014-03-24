@@ -302,6 +302,10 @@
 			}
 		});
 
+		$("#vid").on("loadstart", function() {
+			$("#ep-" + currentEpisodeId).append('<i class="fa fa-spinner fa-spin"></i>');
+		});
+
 		$("#vid").on("canplay", function() {
 			var lastevent = episodes[currentEpisodeId].lastevent;
 			if (lastevent !== null && videoLoading) {
@@ -317,6 +321,7 @@
 			}
 			videoLoading = false;
 
+			$("#ep-" + currentEpisodeId + " i").remove();
 			if (el("vid").paused) {
 				$("#ep-" + currentEpisodeId).append('<i class="fa fa-pause"></i>');
 			}

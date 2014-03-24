@@ -451,6 +451,18 @@ a {
 	color: #AAA;
 }
 
+#overlay-loading {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0,0,0,0.75);
+}
+
+#overlay
+
 #episodeinfo p {
 	margin: 5px 0;
 	line-height: 1.5;
@@ -657,4 +669,8 @@ a {
 	max-width: 100%;
 	width: auto;
 	height: auto;
+}
+
+.fa-spin {
+	-webkit-filter: blur(0);
 }
