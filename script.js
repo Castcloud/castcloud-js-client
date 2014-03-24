@@ -222,6 +222,7 @@
 					$("#vid-container").addClass("thumb");
 				}
 				$("#playbar").detach().appendTo("#main-container");
+				$("#playbar").show();
 				if (timer !== null) {
 					clearTimeout(timer);
 				}
@@ -304,17 +305,17 @@
 		$("#vid").on("canplay", function() {
 			var lastevent = episodes[currentEpisodeId].lastevent;
 			if (lastevent !== null && videoLoading) {
-				videoLoading = false;
 				el("vid").currentTime = lastevent.positionts;
 
 				if (lastevent.type == Event.Play) {
 					el("vid").play();
 				}
 			}
-			if (autoplay && videoloading) {
+			if (autoplay && videoLoading) {
 				autoplay = false;
 				el("vid").play();
 			}
+			videoLoading = false;
 		});
 
 		$("#vid").on("play", function() {
@@ -809,11 +810,11 @@
 	}
 
 	$.fn.isOverflowing = function() {
-	    var _elm = $(this)[0];
-	    var _hasScrollBar = false; 
-	    if ((_elm.clientHeight < _elm.scrollHeight) || (_elm.clientWidth < _elm.scrollWidth)) {
-	        _hasScrollBar = true;
+	    var $el = $(this).get(0);
+	    var overflowing = false; 
+	    if (($el.clientHeight < $el.scrollHeight) || ($el.clientWidth < $el.scrollWidth)) {
+	        overflowing = true;
 	    }
-	    return _hasScrollBar;
+	    return overflowing;
 	}
 }());
