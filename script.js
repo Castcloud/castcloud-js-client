@@ -322,12 +322,16 @@
 			pushEvent(Event.Play);
 			$(".button-play i").addClass("fa-pause");
 			$(".button-play i").removeClass("fa-play");
+			$("#ep-" + currentEpisodeId + " i").removeClass("fa-pause");
+			$("#ep-" + currentEpisodeId + " i").addClass("fa-play");
 		});
 
 		$("#vid").on("pause", function() {
 			pushEvent(Event.Pause);
 			$(".button-play i").addClass("fa-play");
 			$(".button-play i").removeClass("fa-pause");
+			$("#ep-" + currentEpisodeId + " i").removeClass("fa-play");
+			$("#ep-" + currentEpisodeId + " i").addClass("fa-pause");
 		});
 
 		$("#vid").on("ended", function() {
@@ -565,7 +569,11 @@
 
 			loadEpisodeInfo(id);
 
+			$("#ep-" + currentEpisodeId + " i").remove();
+
 			currentEpisodeId = id;
+
+			$("#ep-" + id).append('<i class="fa fa-play"></i>');
 
 			if (episodes[id].lastevent === null) {
 				el("vid").currentTime = 0;

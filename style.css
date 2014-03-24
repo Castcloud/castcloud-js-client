@@ -351,6 +351,13 @@ a {
 	position: relative;
 }
 
+.episode i {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 12px;
+}
+
 #vid {
 	width: 100%;
 }
