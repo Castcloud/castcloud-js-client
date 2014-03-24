@@ -333,6 +333,14 @@ a {
 	background: #0099cc;
 }
 
+.cast.current, .episode.current {
+	color: #0099cc;
+}
+
+.cast.current:hover, .episode.current:hover {
+	color: #FFF;
+}
+
 .episode {
 	position: relative;
 }
@@ -669,8 +677,4 @@ a {
 	max-width: 100%;
 	width: auto;
 	height: auto;
-}
-
-.fa-spin {
-	-webkit-filter: blur(0);
 }

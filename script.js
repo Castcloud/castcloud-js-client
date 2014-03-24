@@ -221,7 +221,7 @@
 				if (Backbone.history.fragment !== "now-playing") {
 					$("#vid-container").addClass("thumb");
 				}
-				$("#playbar").detach().appendTo("#main-container");
+				$("#playbar").detach().appendTo("body");
 				$("#playbar").show();
 				if (timer !== null) {
 					clearTimeout(timer);
@@ -597,6 +597,9 @@
 
 			$("#vid-container").show();
 			$("#vid-container").removeClass("minimized");
+
+			$(".episode").removeClass("current");
+			$("#ep-" + id).addClass("current");
 		}
 	}
 
@@ -700,6 +703,7 @@
 
 			if (sessionStorage.selectedcast) {
 				loadEpisodes(sessionStorage.selectedcast);
+				$("#cast-" + sessionStorage.selectedcast).addClass("current");
 			}
 
 			res.forEach(function(cast) {
@@ -712,6 +716,8 @@
 					if (ctrlDown) {
 						$(this).toggleClass("selected");
 					}
+					$(".cast").removeClass("current");
+					$(this).addClass("current");
 				});
 			});
 		});
@@ -740,7 +746,6 @@
 				}
 
 				if (episode.id == currentEpisodeId) {
-					console.log(episode.lastevent.type);
 					if (episode.lastevent.type == Event.Pause) {
 						$("#ep-" + episode.id).append('<i class="fa fa-pause"></i>');
 					}
@@ -752,6 +757,7 @@
 
 			if (sessionStorage.lastepisode) {
 				playEpisode(sessionStorage.lastepisode);
+				$("#ep-" + sessionStorage.lastepisode).addClass("current");
 			}
 
 			$(".episode").mouseover(function() {
