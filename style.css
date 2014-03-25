@@ -470,7 +470,28 @@ a {
 	background: rgba(0,0,0,0.75);
 }
 
-#overlay
+#episode-bar {
+	margin: 0;
+	padding: 0;
+	background: #1A1A1A;
+}
+
+#episode-bar .button {
+	background: #1A1A1A;
+	color: #444;
+	width: auto;
+	margin: 0;
+	padding: 0 15px;
+}
+
+#episode-bar .button:hover {
+	background: #0066cc;
+	color: #FFF;
+}
+
+#episode-bar .button:active {
+	background: #0099cc;
+}
 
 #episodeinfo p {
 	margin: 5px 0;
@@ -491,6 +512,10 @@ a {
 
 #episode-desc {
 	color: #AAA;
+}
+
+#events {
+	display: none;
 }
 
 #playbar {
@@ -674,8 +699,16 @@ a {
 	left: -10px;
 }
 
+#episodeinfo figure {
+	text-align: center;
+	background: #1A1A1A;
+}
+
 #pretty {
+	display: block;
+	margin: 0 auto;
 	max-width: 100%;
+	max-height: 40%;
 	width: auto;
 	height: auto;
 }

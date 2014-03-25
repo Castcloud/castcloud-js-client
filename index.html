@@ -11,7 +11,7 @@
 	<textarea id="clip"></textarea>
 	<div id="cast-context-menu" class="context-menu">
 		<div id="">Show all episodes</div>
-		<div id="">Copy feed url</div>
+		<div id="">Copy URL</div>
 		<div id="cast-context-unsub">Unsubscribe</div>
 	</div>
 	<div id="episode-context-menu" class="context-menu">
@@ -67,7 +67,12 @@
 				</div>
 				<div class="col" id="episodes"></div>
 				<div class="col" id="episodeinfo">
-					<figure style="text-align:center"><img id="pretty" width="100%"></figure>			
+					<figure><img id="pretty" width="100%"></figure>
+					<div id="episode-bar">
+						<button class="button" id="episode-bar-play">Play</button>
+						<button class="button" style="float:right" id="episode-bar-events">Events <i class="fa fa-angle-down"></i></button>
+					</div>
+					<div id="events"></div>
 					<div id="episodeinfo-text">
 						<h2 id="episode-title"></h2>
 						<p id="episode-date"></p>
@@ -97,15 +102,12 @@
 			<i class="fa fa-gear fa-lg" id="playbar-gear"></i>
 		</div>
 		<div id="playbar-gear-menu">
-			<h4>
-				Playback rate
-				<select name="playback-rate">
-					<option value="0.5">0.5x</option>
-					<option value="1.0" selected>1.0x</option>
-					<option value="1.5">1.5x</option>
-				</select>
-			</h4>
-			
+			<h4>Playback rate</h4>
+			<!--<select name="playback-rate">
+				<option value="0.5">0.5x</option>
+				<option value="1.0" selected>1.0x</option>
+				<option value="1.5">1.5x</option>
+			</select>-->			
 			<button class="button playback-rate" rate="0.5">0.5x</button>
 			<button class="button playback-rate selected" rate="1.0">1.0x</button>
 			<button class="button playback-rate" rate="1.5">1.5x</button>
@@ -121,6 +123,12 @@
 	<script type="text/template" class="episodes">
 	<% episodes.forEach(function(episode) { %>
 		<div id="ep-<%= episode.id %>" class="episode"><div class="bar"></div><div class="content"><%= episode.feed.title %></div></div>
+	<% }); %>
+	</script>
+
+	<script type="text/template" class="events">
+	<% events.forEach(function(event) { %>
+		<div><%= event.type.eventName() %></div>
 	<% }); %>
 	</script>
 

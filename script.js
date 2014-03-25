@@ -24,7 +24,14 @@
 		SleepStart: 40,
 		SleepEnd: 50,
 		EndOfTrack: 60,
-		Delete: 70
+		Delete: 70,
+		10: "Start",
+		20: "Pause",
+		30: "Play",
+		40: "Sleep Started",
+		50: "Sleep Ended",
+		60: "End Of Track",
+		70: "Delete"
 	}
 
 	$(document).ready(function() {
@@ -556,6 +563,10 @@
 		$("#pretty").click(function() {
 			playEpisode(selectedEpisodeId);
 		});
+
+		$("#episode-bar-events").click(function() {
+			$("#events").slideToggle("fast");
+		});
 		
 		if (sessionStorage.token) {
 			token = sessionStorage.token;
@@ -579,6 +590,12 @@
 	}
 
 	function loadEpisodeInfo(id) {
+		console.log("Load episode info");
+		$.get(apiRoot + "library/events", { itemid: id, limit: 10 }, function(res) {
+			var template = _.template($("script.events").html());
+			$("#events").empty().append(template({ events: res.events }));
+		});
+
 		if (episodes[id].feed["media:thumbnail"]) {
 			$("#pretty").prop("src", episodes[id].feed["media:thumbnail"].url);
 			$("#pretty").show();
@@ -903,6 +920,10 @@
 			str = "0" + str;
 		}
 		return str;
+	}
+
+	Number.prototype.eventName = function() {
+		return Event[this];
 	}
 
 	$.fn.isOverflowing = function() {
