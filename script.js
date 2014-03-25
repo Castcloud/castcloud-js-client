@@ -10,10 +10,12 @@
 		loggedIn = false,
 		contextItemId,
 		currentEpisodeId = null,
+		selectedEpisodeId = null,
 		videoLoading = false,
 		castHovered = null,
 		ctrlDown = false,
-		autoplay = false;
+		autoplay = false,
+		switchingTabs = false;
 
 	var Event = {
 		Start: 10,
@@ -550,6 +552,10 @@
 				}
 			});
 		});
+
+		$("#pretty").click(function() {
+			playEpisode(selectedEpisodeId);
+		});
 		
 		if (sessionStorage.token) {
 			token = sessionStorage.token;
@@ -611,7 +617,7 @@
 
 			loadEpisodeInfo(id);
 
-			$("#ep-" + currentEpisodeId + " i").remove();
+			$(".episode i").remove();
 
 			currentEpisodeId = id;
 
@@ -748,6 +754,7 @@
 						$(this).toggleClass("selected");
 					}
 					else {
+						switchingTabs = true;
 						loadEpisodes(cast.id);
 						sessionStorage.selectedcast = cast.id;
 
@@ -772,6 +779,7 @@
 						$(this).children(".bar").toggle();
 					}
 					else {
+						selectedEpisodeId = episode.id;
 						loadEpisodeInfo(episode.id);
 					}
 				});
@@ -787,7 +795,8 @@
 					$("#ep-" + episode.id + " .bar").css("width", (episode.lastevent.positionts / localStorage.getItem("episode-" + episode.id) * 100)+"%");
 				}
 
-				if (episode.id == currentEpisodeId) {
+				if (switchingTabs && episode.id == currentEpisodeId) {
+					switchingTabs = false;
 					if (episode.lastevent.type == Event.Pause) {
 						$("#ep-" + episode.id).append('<i class="fa fa-pause"></i>');
 					}
@@ -851,7 +860,7 @@
 				else {
 					loadCasts($(this).text());
 					$("#tags button").removeClass("selected");
-					$($(this).addClass("selected"));
+					$(this).addClass("selected");
 				}
 			});
 		});
