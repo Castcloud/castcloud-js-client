@@ -577,6 +577,14 @@
 			$("#pretty").prop("src", episodes[id].feed["media:thumbnail"].url);
 			$("#pretty").show();
 		}
+		else if (episodes[id].feed["itunes:image"]) {
+			$("#pretty").prop("src", episodes[id].feed["itunes:image"].href);
+			$("#pretty").show();
+		}
+		else if (casts[episodes[id].castid].feed["itunes:image"]) {
+			$("#pretty").prop("src", casts[episodes[id].castid].feed["itunes:image"].href);
+			$("#pretty").show();
+		}
 		else if (casts[episodes[id].castid].feed.image) {
 			$("#pretty").prop("src", casts[episodes[id].castid].feed.image.url);
 			$("#pretty").show();
