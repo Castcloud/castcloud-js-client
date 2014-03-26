@@ -578,6 +578,40 @@
 		$("#episode-bar-play").click(function() {
 			playPauseToggle();
 		});
+
+		$("#events").on("click", "div", function() {
+			var type = $(this).attr("event-type");
+			var video = el("vid");
+
+			video.currentTime = $(this).attr("event-position")
+			if (type == Event.Start || type == Event.Play) {
+				video.play();
+			}
+			else {
+				video.pause();
+			}
+		});
+
+		var offsetX = 0, offsetY = 0;
+		$("#podcasts").on("mousedown", ".cast", function(e) {
+			var w = $(this).width();
+			$(this).addClass("dragging").css("width", w + "px");
+
+			offsetX = e.pageX - $(this).position().left;
+			offsetY = e.pageY - $(this).position().top;
+		});
+
+		$(document).on("mousemove", function(e) {
+			$(".dragging").css("left", e.pageX - offsetX);
+			$(".dragging").css("top", e.pageY - offsetY);
+		});
+
+		$("#podcasts").on("mouseup", ".cast", function() {
+			$(".dragging").css("left", "auto");
+			$(".dragging").css("top", "auto");
+			$(this).removeClass("dragging");
+			console.log("DRAG_END");
+		});
 		
 		if (sessionStorage.token) {
 			token = sessionStorage.token;
@@ -603,6 +637,18 @@
 	function loadEpisodeInfo(id) {
 		$.get(apiRoot + "library/events", { itemid: id, limit: 10 }, function(res) {
 			var template = _.template($("script.events").html());
+			res.events.forEach(function(event) {
+				var position = new Date(event.positionts * 1000);
+				position.setHours(position.getHours() - 1);
+				event.position = "";
+				if (position.getHours() > 0) {
+					event.position += position.getHours() + "h ";
+				}
+				event.position += position.getMinutes() + "m " + position.getSeconds() + "s";
+				var date = new Date(event.clientts * 1000);
+				date.setHours(date.getHours() - 1);
+				event.date = date.toLocaleString();
+			});
 			res.events.eventName = function(e) {
 				return Event[e];
 			}
