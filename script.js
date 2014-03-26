@@ -364,6 +364,7 @@
 			$(".button-play i").removeClass("fa-play");
 			$("#ep-" + currentEpisodeId + " i").removeClass("fa-pause");
 			$("#ep-" + currentEpisodeId + " i").addClass("fa-play");
+			$("#episode-bar-play").html("Pause");
 		});
 
 		$("#vid").on("pause", function() {
@@ -372,6 +373,7 @@
 			$(".button-play i").removeClass("fa-pause");
 			$("#ep-" + currentEpisodeId + " i").removeClass("fa-play");
 			$("#ep-" + currentEpisodeId + " i").addClass("fa-pause");
+			$("#episode-bar-play").html("Play");
 		});
 
 		$("#vid").on("ended", function() {
@@ -561,11 +563,20 @@
 		});
 
 		$("#pretty").click(function() {
-			playEpisode(selectedEpisodeId);
+			if (selectedEpisodeId !== currentEpisodeId) {
+				playEpisode(selectedEpisodeId);
+			}
+			else {
+				playPauseToggle();
+			}
 		});
 
 		$("#episode-bar-events").click(function() {
 			$("#events").slideToggle("fast");
+		});
+
+		$("#episode-bar-play").click(function() {
+			playPauseToggle();
 		});
 		
 		if (sessionStorage.token) {
@@ -617,6 +628,8 @@
 		else {
 			$("#pretty").hide();
 		}
+
+		selectedEpisodeId = id;
 
 		$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
 		$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
