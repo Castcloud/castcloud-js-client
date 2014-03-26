@@ -590,9 +590,11 @@
 	}
 
 	function loadEpisodeInfo(id) {
-		console.log("Load episode info");
 		$.get(apiRoot + "library/events", { itemid: id, limit: 10 }, function(res) {
 			var template = _.template($("script.events").html());
+			res.events.eventName = function(e) {
+				return Event[e];
+			}
 			$("#events").empty().append(template({ events: res.events }));
 		});
 

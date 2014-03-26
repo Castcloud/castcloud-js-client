@@ -128,7 +128,7 @@
 
 	<script type="text/template" class="events">
 	<% events.forEach(function(event) { %>
-		<div><%= event.type.eventName() %></div>
+		<div><%= events.eventName(event.type) %></div>
 	<% }); %>
 	</script>
 
