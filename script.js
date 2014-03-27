@@ -34,7 +34,70 @@
 		70: "Delete"
 	}
 
+	var appID = "3EC703A8";
+	var session = null;
+	var currentMedia = null;
+
+	function onInitSuccess() {
+		console.log("Cast init success");
+		//chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
+	}
+
+	function onError() {
+		console.log("Cast init error");
+	}
+
+	function receiverListener(e) {
+		if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
+			console.log("Receiver available");
+			chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
+		}
+	}
+
+	function sessionListener(e) {
+		console.log("Session ID: " + e.sessionId);
+		session = e;
+	}
+
+	function onMediaError(e) {
+		console.log("onMediaError" + JSON.stringify(e));
+	}
+
+	function onMediaDiscovered(how, media) {
+		console.log("onMediaDiscovered");
+		currentMedia = media;
+		var seek = new chrome.cast.media.SeekRequest();
+		seek.currentTime = el("vid").currentTime + 2;
+		media.seek(seek, null, null);
+	}
+
+	function onLaunchError(e) {
+		console.log("onLaunchError called: " + JSON.stringify(e));
+	}
+
+	function onRequestSessionSuccess(e) {
+		console.log("session request success");
+		session = e;
+	}
+
+	function initCastApi() {
+		//chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
+		var sessionRequest = new chrome.cast.SessionRequest(appID);
+		var apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
+		chrome.cast.initialize(apiConfig, onInitSuccess, onError);
+	}
+
 	$(document).ready(function() {
+		window["__onGCastApiAvailable"] = function(loaded, errorInfo) {
+			if (loaded) {
+				console.log("Cast loaded");
+				initCastApi();
+			}
+			else {
+				console.log(errorInfo);
+			}
+		}
+
 		var Router = Backbone.Router.extend({
 			routes: {
 				"": "podcasts",
@@ -365,6 +428,8 @@
 			$("#ep-" + currentEpisodeId + " i").removeClass("fa-pause");
 			$("#ep-" + currentEpisodeId + " i").addClass("fa-play");
 			$("#episode-bar-play").html("Pause");
+
+			currentMedia.play(new chrome.cast.media.PlayRequest(), null, null);
 		});
 
 		$("#vid").on("pause", function() {
@@ -374,6 +439,8 @@
 			$("#ep-" + currentEpisodeId + " i").removeClass("fa-play");
 			$("#ep-" + currentEpisodeId + " i").addClass("fa-pause");
 			$("#episode-bar-play").html("Play");
+
+			currentMedia.pause(new chrome.cast.media.PauseRequest(), null, null);
 		});
 
 		$("#vid").on("ended", function() {
@@ -703,6 +770,22 @@
 				el("vid").currentTime = 0;
 				pushEvent(Event.Start);
 			}
+
+			var mediaInfo = new chrome.cast.media.MediaInfo(episodes[id].feed.enclosure.url);
+			mediaInfo.contentType = episodes[id].feed.enclosure.type;
+			mediaInfo.metadata = new chrome.cast.media.TvShowMediaMetadata();
+			mediaInfo.metadata.episodeNumber = 29;
+			mediaInfo.metadata.episodeTitle = episodes[id].feed.title;
+			var image = new chrome.cast.Image(episodes[id].feed["media:thumbnail"].url);
+			image.width = "1280px";
+			image.height = "720px";
+			mediaInfo.metadata.images = [
+				image
+			];
+			mediaInfo.metadata.seriesTitle = "BSD NOOOW";
+
+			var request = new chrome.cast.media.LoadRequest(mediaInfo);
+			session.loadMedia(request, onMediaDiscovered.bind(this, "loadMedia"), onMediaError);
 
 			var video = el("vid");
 			video.setAttribute("src", episodes[id].feed.enclosure.url);
