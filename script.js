@@ -1,3 +1,110 @@
+//
+// chromecast.js
+//
+var Chromecast = (function() {
+	"use strict";
+
+	var appID,
+		available = false,
+		session = null,
+		currentMedia = null;
+
+	function initCastApi() {
+		//chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
+		var sessionRequest = new chrome.cast.SessionRequest(appID);
+		var apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
+		chrome.cast.initialize(apiConfig, onInitSuccess, onError);
+	}
+
+	function onInitSuccess() {
+		console.log("Google Cast init success");
+	}
+
+	function onError() {
+		console.log("Google Cast init error");
+	}
+
+	function receiverListener(e) {
+		if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
+			console.log("Receiver available");
+			chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
+		}
+	}
+
+	function sessionListener(e) {
+		console.log("Session ID: " + e.sessionId);
+		session = e;
+	}
+
+	function onMediaError(e) {
+		console.log("onMediaError" + JSON.stringify(e));
+	}
+
+	function onMediaDiscovered(how, media) {
+		console.log("onMediaDiscovered");
+		currentMedia = media;
+		var seek = new chrome.cast.media.SeekRequest();
+		seek.currentTime = el("vid").currentTime + 2;
+		media.seek(seek, null, null);
+	}
+
+	function onLaunchError(e) {
+		console.log("onLaunchError called: " + JSON.stringify(e));
+	}
+
+	function onRequestSessionSuccess(e) {
+		console.log("session request success");
+		session = e;
+	}
+		
+	window["__onGCastApiAvailable"] = function(loaded, errorInfo) {
+		if (loaded) {
+			available = true;
+			console.log("Google Cast loaded");
+			if (appID) {
+				initCastApi();
+			}
+		}
+		else {
+			console.log(errorInfo);
+		}
+	}
+
+	return {
+		init: function(_appID) {
+			appID = _appID;
+			if (available) {
+				initCastApi();
+			}
+		},
+
+		load: function(url) {
+			if (session) {
+				var mediaInfo = new chrome.cast.media.MediaInfo(url);
+				mediaInfo.contentType = "video/mp4";
+
+				var request = new chrome.cast.media.LoadRequest(mediaInfo);
+				session.loadMedia(request, onMediaDiscovered.bind(this, "loadMedia"), onMediaError);
+			}
+		},
+
+		play: function() {
+			if (currentMedia) {
+				currentMedia.play(new chrome.cast.media.PlayRequest(), null, null);
+			}
+		},
+
+		pause: function() {
+			if (currentMedia) {
+				currentMedia.pause(new chrome.cast.media.PauseRequest(), null, null);
+			}
+		}
+	}
+}());
+
+//
+// script.js
+//
 (function() {
 	"use strict";
 
@@ -33,71 +140,10 @@
 		60: "End Of Track",
 		70: "Delete"
 	}
-
-	var appID = "3EC703A8";
-	var session = null;
-	var currentMedia = null;
-
-	function onInitSuccess() {
-		console.log("Cast init success");
-		//chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
-	}
-
-	function onError() {
-		console.log("Cast init error");
-	}
-
-	function receiverListener(e) {
-		if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
-			console.log("Receiver available");
-			chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
-		}
-	}
-
-	function sessionListener(e) {
-		console.log("Session ID: " + e.sessionId);
-		session = e;
-	}
-
-	function onMediaError(e) {
-		console.log("onMediaError" + JSON.stringify(e));
-	}
-
-	function onMediaDiscovered(how, media) {
-		console.log("onMediaDiscovered");
-		currentMedia = media;
-		var seek = new chrome.cast.media.SeekRequest();
-		seek.currentTime = el("vid").currentTime + 2;
-		media.seek(seek, null, null);
-	}
-
-	function onLaunchError(e) {
-		console.log("onLaunchError called: " + JSON.stringify(e));
-	}
-
-	function onRequestSessionSuccess(e) {
-		console.log("session request success");
-		session = e;
-	}
-
-	function initCastApi() {
-		//chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
-		var sessionRequest = new chrome.cast.SessionRequest(appID);
-		var apiConfig = new chrome.cast.ApiConfig(sessionRequest, sessionListener, receiverListener);
-		chrome.cast.initialize(apiConfig, onInitSuccess, onError);
-	}
+	
+	Chromecast.init("3EC703A8");
 
 	$(document).ready(function() {
-		window["__onGCastApiAvailable"] = function(loaded, errorInfo) {
-			if (loaded) {
-				console.log("Cast loaded");
-				initCastApi();
-			}
-			else {
-				console.log(errorInfo);
-			}
-		}
-
 		var Router = Backbone.Router.extend({
 			routes: {
 				"": "podcasts",
@@ -429,7 +475,7 @@
 			$("#ep-" + currentEpisodeId + " i").addClass("fa-play");
 			$("#episode-bar-play").html("Pause");
 
-			currentMedia.play(new chrome.cast.media.PlayRequest(), null, null);
+			Chromecast.play();
 		});
 
 		$("#vid").on("pause", function() {
@@ -440,7 +486,7 @@
 			$("#ep-" + currentEpisodeId + " i").addClass("fa-pause");
 			$("#episode-bar-play").html("Play");
 
-			currentMedia.pause(new chrome.cast.media.PauseRequest(), null, null);
+			Chromecast.pause();
 		});
 
 		$("#vid").on("ended", function() {
@@ -771,21 +817,7 @@
 				pushEvent(Event.Start);
 			}
 
-			var mediaInfo = new chrome.cast.media.MediaInfo(episodes[id].feed.enclosure.url);
-			mediaInfo.contentType = episodes[id].feed.enclosure.type;
-			mediaInfo.metadata = new chrome.cast.media.TvShowMediaMetadata();
-			mediaInfo.metadata.episodeNumber = 29;
-			mediaInfo.metadata.episodeTitle = episodes[id].feed.title;
-			var image = new chrome.cast.Image(episodes[id].feed["media:thumbnail"].url);
-			image.width = "1280px";
-			image.height = "720px";
-			mediaInfo.metadata.images = [
-				image
-			];
-			mediaInfo.metadata.seriesTitle = "BSD NOOOW";
-
-			var request = new chrome.cast.media.LoadRequest(mediaInfo);
-			session.loadMedia(request, onMediaDiscovered.bind(this, "loadMedia"), onMediaError);
+			Chromecast.load(episodes[id].feed.enclosure.url);
 
 			var video = el("vid");
 			video.setAttribute("src", episodes[id].feed.enclosure.url);
