@@ -518,6 +518,8 @@ a {
 	display: none;
 	background: #1A1A1A;
 	cursor: pointer;
+	overflow-y: scroll;
+	max-height: 40%;
 }
 
 #events div {
@@ -538,12 +540,17 @@ a {
 }
 
 #events .who {
-	font-size: 14px;
+	font-size: 11px;
 }
 
 #events .when {
 	float: right;
-	font-size: 14px;
+	font-size: 11px;
+}
+
+#events .secondline {
+	line-height: 1;
+	clear: both;
 }
 
 #playbar {
