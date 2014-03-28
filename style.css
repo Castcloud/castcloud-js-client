@@ -516,6 +516,41 @@ a {
 
 #events {
 	display: none;
+	background: #1A1A1A;
+	cursor: pointer;
+	overflow-y: scroll;
+	max-height: 40%;
+}
+
+#events div {
+	color: #AAA;
+	padding: 5px 15px;
+}
+
+#events div:hover {
+	background: #333;
+}
+
+#events div:active {
+	background: #444;
+}
+
+#events .what {
+	color: #0099cc;
+}
+
+#events .who {
+	font-size: 11px;
+}
+
+#events .when {
+	float: right;
+	font-size: 11px;
+}
+
+#events .secondline {
+	line-height: 1;
+	clear: both;
 }
 
 #playbar {
@@ -711,4 +746,8 @@ a {
 	max-height: 40%;
 	width: auto;
 	height: auto;
+}
+
+.dragging {
+	position: fixed;
 }

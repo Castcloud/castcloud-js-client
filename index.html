@@ -128,13 +128,17 @@
 
 	<script type="text/template" class="events">
 	<% events.forEach(function(event) { %>
-		<div><%= events.eventName(event.type) %></div>
+		<div event-type="<%= event.type %>" event-position="<%= event.positionts %>">
+			<p><span class="what"><%= events.eventName(event.type) %></span><span class="when"><%= event.position %></span></p>
+			<p class="secondline"><span class="who"><%= event.clientname + " (" + event.clientdescription + ")" %></span><span class="when"><%= event.date %></span></p>
+		</div>
 	<% }); %>
 	</script>
 
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+	<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
 	<script src="script.js"></script>
 </body>
 </html>
