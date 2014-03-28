@@ -7,7 +7,8 @@ var Chromecast = (function() {
 	var appID,
 		available = false,
 		session = null,
-		currentMedia = null;
+		currentMedia = null,
+		loadedCallbacks = [];
 
 	function initCastApi() {
 		//chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
@@ -43,9 +44,8 @@ var Chromecast = (function() {
 	function onMediaDiscovered(how, media) {
 		console.log("onMediaDiscovered");
 		currentMedia = media;
-		var seek = new chrome.cast.media.SeekRequest();
-		seek.currentTime = el("vid").currentTime + 2;
-		media.seek(seek, null, null);
+	
+		loadedCallbacks.forEach(function(cb) { cb() });
 	}
 
 	function onLaunchError(e) {
@@ -78,14 +78,19 @@ var Chromecast = (function() {
 			}
 		},
 
-		load: function(url) {
+		load: function(url, data) {
 			if (session) {
 				var mediaInfo = new chrome.cast.media.MediaInfo(url);
 				mediaInfo.contentType = "video/mp4";
+				mediaInfo.metadata = data;
 
 				var request = new chrome.cast.media.LoadRequest(mediaInfo);
 				session.loadMedia(request, onMediaDiscovered.bind(this, "loadMedia"), onMediaError);
 			}
+		},
+
+		mediaLoaded: function(callback) {
+			loadedCallbacks.push(callback);
 		},
 
 		play: function() {
@@ -98,6 +103,12 @@ var Chromecast = (function() {
 			if (currentMedia) {
 				currentMedia.pause(new chrome.cast.media.PauseRequest(), null, null);
 			}
+		},
+
+		seek: function(timestamp) {
+			var seek = new chrome.cast.media.SeekRequest();
+			seek.currentTime = timestamp;
+			currentMedia.seek(seek, null, null);
 		}
 	}
 }());
@@ -141,7 +152,14 @@ var Chromecast = (function() {
 		70: "Delete"
 	}
 	
-	Chromecast.init("3EC703A8");
+	var custom = true;
+	var styledReceiver = "17DC56DD";
+	var customReceiver = "3EC703A8";
+
+	Chromecast.init(custom ? customReceiver : styledReceiver);
+	Chromecast.mediaLoaded(function() {
+		Chromecast.seek(el("vid").currentTime);
+	});
 
 	$(document).ready(function() {
 		var Router = Backbone.Router.extend({
@@ -497,6 +515,7 @@ var Chromecast = (function() {
 		$("#seekbar").mousedown(function(e) {
 			pushEvent(Event.Pause);
 			el("vid").currentTime = 1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration;
+			Chromecast.seek(1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration);
 			seeking = true;
 		});
 
@@ -514,6 +533,7 @@ var Chromecast = (function() {
 			if (seeking) {
 				var video = el("vid");
 				video.currentTime = 1 / $("#seekbar").width() * (e.pageX - 170) * video.duration;
+				Chromecast.seek(1 / $("#seekbar").width() * (e.pageX - 170) * video.duration);
 				var progress = 1 / video.duration * video.currentTime;
 				$("#seekbar div").css("width", $("#seekbar").width() * progress + "px")
 			}
@@ -696,7 +716,8 @@ var Chromecast = (function() {
 			var type = $(this).attr("event-type");
 			var video = el("vid");
 
-			video.currentTime = $(this).attr("event-position")
+			video.currentTime = $(this).attr("event-position");
+			Chromecast.seek($(this).attr("event-position"));
 			if (type == Event.Start || type == Event.Play) {
 				video.play();
 			}
@@ -768,20 +789,9 @@ var Chromecast = (function() {
 			$("#events").empty().append(template({ events: res.events }));
 		});
 
-		if (episodes[id].feed["media:thumbnail"]) {
-			$("#pretty").prop("src", episodes[id].feed["media:thumbnail"].url);
-			$("#pretty").show();
-		}
-		else if (episodes[id].feed["itunes:image"]) {
-			$("#pretty").prop("src", episodes[id].feed["itunes:image"].href);
-			$("#pretty").show();
-		}
-		else if (casts[episodes[id].castid].feed["itunes:image"]) {
-			$("#pretty").prop("src", casts[episodes[id].castid].feed["itunes:image"].href);
-			$("#pretty").show();
-		}
-		else if (casts[episodes[id].castid].feed.image) {
-			$("#pretty").prop("src", casts[episodes[id].castid].feed.image.url);
+		var image = getEpisodeImage(id);
+		if (image) {
+			$("#pretty").prop("src", image);
 			$("#pretty").show();
 		}
 		else {
@@ -817,7 +827,11 @@ var Chromecast = (function() {
 				pushEvent(Event.Start);
 			}
 
-			Chromecast.load(episodes[id].feed.enclosure.url);
+			Chromecast.load(episodes[id].feed.enclosure.url, {
+				title: episodes[id].feed.title,
+				description: episodes[id].feed.description,
+				image: getEpisodeImage(id)
+			});
 
 			var video = el("vid");
 			video.setAttribute("src", episodes[id].feed.enclosure.url);
@@ -1057,6 +1071,13 @@ var Chromecast = (function() {
 				}
 			});
 		});
+	}
+
+	function getEpisodeImage(id) {
+		return episodes[id].feed["media:thumbnail"] ? episodes[id].feed["media:thumbnail"].url : null ||
+			episodes[id].feed["itunes:image"] ? episodes[id].feed["itunes:image"].href : null ||
+			casts[episodes[id].castid].feed["itunes:image"] ? casts[episodes[id].castid].feed["itunes:image"].href : null ||
+			casts[episodes[id].castid].feed.image ? casts[episodes[id].castid].feed.image.url : null;
 	}
 
 	function positionThumb() {
