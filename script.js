@@ -10,6 +10,7 @@ var Chromecast = (function() {
 		currentMedia = null,
 		loadedCallbacks = [],
 		sessionCallbacks = [],
+		receiverCallbacks = [],
 		loadThis = null;
 
 	function initCastApi() {
@@ -30,6 +31,11 @@ var Chromecast = (function() {
 	function receiverListener(e) {
 		if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
 			console.log("Receiver available");
+			receiverCallbacks.forEach(function(cb) { cb(1); });
+		}
+		else {
+			console.log("No receivers available");
+			receiverCallbacks.forEach(function(cb) { cb(0); });
 		}
 	}
 
@@ -121,6 +127,10 @@ var Chromecast = (function() {
 
 		session: function(callback) {
 			sessionCallbacks.push(callback);
+		},
+
+		receiver: function(callback) {
+			receiverCallbacks.push(callback);
 		},
 
 		running: function() {
@@ -216,6 +226,14 @@ var Chromecast = (function() {
 		$(".cc img").prop("src", "cast_on.png");
 		el("vid").pause();
 		$("#cast-overlay").show();
+	});
+	Chromecast.receiver(function(n) {
+		if (n > 0) {
+			$(".cc").show();
+		}
+		else {
+			$(".cc").hide();
+		}
 	});
 	Chromecast.mediaLoaded(function() {
 		Chromecast.seek(el("vid").currentTime);
