@@ -752,6 +752,10 @@ a {
 	position: fixed;
 }
 
+.dragging-placeholder {
+	height: 40px;
+}
+
 .cc {
 	display: none;
 	position: absolute;

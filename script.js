@@ -178,6 +178,91 @@ var Chromecast = (function() {
 	}
 }());
 
+var DragDropMonster = (function() {
+	var parent, children;
+	var offsetX = 0, offsetY = 0;
+	var el, prevY, y;
+	var before;
+	var placeholder;
+	var dragging;
+
+	$(document).on("mousemove", function(e) {
+		$(".dragging").css("left", e.pageX - offsetX);
+		$(".dragging").css("top", e.pageY - offsetY);
+
+		placeholder(e);
+
+		console.log(el.prop("id"));			
+	});
+
+	function placeholder(e) {
+		before = true;
+		if (e.pageY - offsetY - 1 < $(parent + " " + children).first().offset().top) {
+			el = $(parent + " " + children).first();
+			y = el.offset().top;
+		}
+		else if (e.pageY - offsetY > $(parent + " " + children).last().offset().top + $(parent + " " + children).last().height()) {
+			el = $(parent + " " + children).last();
+			before = false;
+			y = el.offset().top + el.height();
+		}
+		else {
+			el = $(document.elementFromPoint(70, e.pageY - offsetY - 1));
+			y = el.offset().top;
+			if (e.pageY - offsetY > el.offset().top + el.height() / 2) {
+				before = false;
+				y += el.height();
+			}
+		}
+
+		if (dragging && y !== prevY) {
+			$(".dragging-placeholder").remove();
+			if (before) {
+				$('<div class="dragging-placeholder"></div>').insertBefore(el);
+			}
+			else {
+				$('<div class="dragging-placeholder"></div>').insertAfter(el);
+			}
+		}
+		prevY = y;
+	}
+
+	$(document).on("mouseup", ".dragging", function() {
+		$(".dragging").css("left", "auto");
+		$(".dragging").css("top", "auto");
+		$(this).removeClass("dragging");
+		dragging = false;
+
+		$(".dragging-placeholder").remove();
+		if (before) {
+			$(this).insertBefore(el);
+		}
+		else {
+			$(this).insertAfter(el);
+		}
+		console.log("DRAG_END");
+	});
+
+	return function(_parent, _children) {
+		parent = _parent;
+		children = _children;
+
+		$(parent).on("mousedown", children, function(e) {
+			var w = $(this).width();
+			$(this).addClass("dragging").css("width", w + "px");
+			$(this).css("left", $(this).offset().left);
+			$(this).css("top", $(this).offset().top);
+			$(this).detach().appendTo("body");
+
+			offsetX = e.pageX - $(this).offset().left;
+			offsetY = e.pageY - $(this).offset().top;
+			dragging = true;
+
+			placeholder(e);
+		});
+	}
+}());
+
 //
 // script.js
 //
@@ -243,6 +328,8 @@ var Chromecast = (function() {
 	});
 
 	$(document).ready(function() {
+		//DragDropMonster("#podcasts", ".cast");
+
 		var Router = Backbone.Router.extend({
 			routes: {
 				"": "podcasts",
@@ -786,27 +873,6 @@ var Chromecast = (function() {
 			else {
 				video.pause();
 			}
-		});
-
-		var offsetX = 0, offsetY = 0;
-		$("#podcasts").on("mousedown", ".cast", function(e) {
-			var w = $(this).width();
-			$(this).addClass("dragging").css("width", w + "px");
-
-			offsetX = e.pageX - $(this).position().left;
-			offsetY = e.pageY - $(this).position().top;
-		});
-
-		$(document).on("mousemove", function(e) {
-			$(".dragging").css("left", e.pageX - offsetX);
-			$(".dragging").css("top", e.pageY - offsetY);
-		});
-
-		$("#podcasts").on("mouseup", ".cast", function() {
-			$(".dragging").css("left", "auto");
-			$(".dragging").css("top", "auto");
-			$(this).removeClass("dragging");
-			console.log("DRAG_END");
 		});
 
 		$(".cc").click(function() {
