@@ -8,7 +8,9 @@ var Chromecast = (function() {
 		available = false,
 		session = null,
 		currentMedia = null,
-		loadedCallbacks = [];
+		loadedCallbacks = [],
+		sessionCallbacks = [],
+		loadThis = null;
 
 	function initCastApi() {
 		//chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
@@ -28,13 +30,17 @@ var Chromecast = (function() {
 	function receiverListener(e) {
 		if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
 			console.log("Receiver available");
-			chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
 		}
 	}
 
 	function sessionListener(e) {
 		console.log("Session ID: " + e.sessionId);
 		session = e;
+		sessionCallbacks.forEach(function(cb) { cb() });
+
+		if (session.media.length !== 0) {
+			onMediaDiscovered("onRequestSessionSuccess", session.media[0]);
+		}
 	}
 
 	function onMediaError(e) {
@@ -45,7 +51,9 @@ var Chromecast = (function() {
 		console.log("onMediaDiscovered");
 		currentMedia = media;
 	
-		loadedCallbacks.forEach(function(cb) { cb() });
+		if (how !== "onRequestSessionSuccess") {
+			loadedCallbacks.forEach(function(cb) { cb() });			
+		}
 	}
 
 	function onLaunchError(e) {
@@ -55,6 +63,28 @@ var Chromecast = (function() {
 	function onRequestSessionSuccess(e) {
 		console.log("session request success");
 		session = e;
+		sessionCallbacks.forEach(function(cb) { cb() });
+
+		if (loadThis) {
+			load(loadThis.url, loadThis.data);
+		}
+	}
+
+	function onStopSuccess(e) {
+		console.log("Session stop success");
+	}
+
+	function onStopError(e) {
+		console.log("Session stop error");
+	}
+
+	function load(url, data) {
+		var mediaInfo = new chrome.cast.media.MediaInfo(url);
+		mediaInfo.contentType = "video/mp4";
+		mediaInfo.metadata = data;
+
+		var request = new chrome.cast.media.LoadRequest(mediaInfo);
+		session.loadMedia(request, onMediaDiscovered.bind(this, "loadMedia"), onMediaError);
 	}
 		
 	window["__onGCastApiAvailable"] = function(loaded, errorInfo) {
@@ -78,14 +108,35 @@ var Chromecast = (function() {
 			}
 		},
 
+		start: function() {
+			chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
+		},
+
+		stop: function() {
+			if (session) {
+				session.stop(onStopSuccess, onStopError);
+				session = null;
+			}
+		},
+
+		session: function(callback) {
+			sessionCallbacks.push(callback);
+		},
+
+		running: function() {
+			return session !== null;
+		},
+
 		load: function(url, data) {
 			if (session) {
-				var mediaInfo = new chrome.cast.media.MediaInfo(url);
-				mediaInfo.contentType = "video/mp4";
-				mediaInfo.metadata = data;
-
-				var request = new chrome.cast.media.LoadRequest(mediaInfo);
-				session.loadMedia(request, onMediaDiscovered.bind(this, "loadMedia"), onMediaError);
+				load(url, data);
+			}
+			else {
+				loadThis = {
+					url: url,
+					data: data
+				}
+				console.log("Loading media after session is available if needed");
 			}
 		},
 
@@ -109,6 +160,10 @@ var Chromecast = (function() {
 			var seek = new chrome.cast.media.SeekRequest();
 			seek.currentTime = timestamp;
 			currentMedia.seek(seek, null, null);
+		},
+
+		receiverName: function() {
+			return session.receiver.friendlyName;
 		}
 	}
 }());
@@ -157,8 +212,16 @@ var Chromecast = (function() {
 	var customReceiver = "3EC703A8";
 
 	Chromecast.init(custom ? customReceiver : styledReceiver);
+	Chromecast.session(function() {
+		$(".cc img").prop("src", "cast_on.png");
+		el("vid").pause();
+		$("#cast-overlay").show();
+	});
 	Chromecast.mediaLoaded(function() {
 		Chromecast.seek(el("vid").currentTime);
+		if (paused) {
+			Chromecast.pause();
+		}
 	});
 
 	$(document).ready(function() {
@@ -346,7 +409,7 @@ var Chromecast = (function() {
 
 		$("#vid-thumb-bar .popout").click(function() {
 			var video = el("vid");
-			if (!el("vid").paused) {
+			if (paused) {
 				pushEvent(Event.Play);
 			}
 			video.setAttribute("src", "#");
@@ -419,7 +482,7 @@ var Chromecast = (function() {
 
 		$(window).on("beforeunload", function() {
 			if (currentEpisodeId !== null) {
-				if (!el("vid").paused) {
+				if (!paused) {
 					pushEvent(Event.Play);
 				}
 			}
@@ -427,7 +490,7 @@ var Chromecast = (function() {
 
 		$(window).on("unload", function() {
 			if (currentEpisodeId !== null) {
-				if (!el("vid").paused) {
+				if (!paused) {
 					pushEvent(Event.Play);
 				}
 			}
@@ -467,44 +530,25 @@ var Chromecast = (function() {
 				el("vid").currentTime = lastevent.positionts;
 
 				if (lastevent.type == Event.Play) {
-					el("vid").play();
+					play();
+				}
+				else {
+					pause();
 				}
 			}
 			if (autoplay && videoLoading) {
 				autoplay = false;
-				el("vid").play();
+				play();
 			}
 			videoLoading = false;
 
 			$("#ep-" + currentEpisodeId + " i").remove();
-			if (el("vid").paused) {
+			if (paused) {
 				$("#ep-" + currentEpisodeId).append('<i class="fa fa-pause"></i>');
 			}
 			else {
 				$("#ep-" + currentEpisodeId).append('<i class="fa fa-play"></i>');
 			}
-		});
-
-		$("#vid").on("play", function() {
-			pushEvent(Event.Play);
-			$(".button-play i").addClass("fa-pause");
-			$(".button-play i").removeClass("fa-play");
-			$("#ep-" + currentEpisodeId + " i").removeClass("fa-pause");
-			$("#ep-" + currentEpisodeId + " i").addClass("fa-play");
-			$("#episode-bar-play").html("Pause");
-
-			Chromecast.play();
-		});
-
-		$("#vid").on("pause", function() {
-			pushEvent(Event.Pause);
-			$(".button-play i").addClass("fa-play");
-			$(".button-play i").removeClass("fa-pause");
-			$("#ep-" + currentEpisodeId + " i").removeClass("fa-play");
-			$("#ep-" + currentEpisodeId + " i").addClass("fa-pause");
-			$("#episode-bar-play").html("Play");
-
-			Chromecast.pause();
 		});
 
 		$("#vid").on("ended", function() {
@@ -746,6 +790,24 @@ var Chromecast = (function() {
 			$(this).removeClass("dragging");
 			console.log("DRAG_END");
 		});
+
+		$(".cc").click(function() {
+			if (Chromecast.running()) {
+				$(".cc img").prop("src", "cast_off.png");
+				Chromecast.stop();
+				$("#cast-overlay").hide();
+				play();
+			}
+			else {
+				$(".cc img").prop("src", "cast_on.png");
+				Chromecast.start();
+				Chromecast.load(episodes[currentEpisodeId].feed.enclosure.url, {
+					title: episodes[currentEpisodeId].feed.title,
+					description: episodes[currentEpisodeId].feed.description,
+					image: getEpisodeImage(currentEpisodeId)
+				});				
+			}
+		});
 		
 		if (sessionStorage.token) {
 			token = sessionStorage.token;
@@ -846,13 +908,14 @@ var Chromecast = (function() {
 		}
 	}
 
+	var paused = false;
+
 	function playPauseToggle() {
-		var video = el("vid");
-		if (video.paused) {
-			video.play();
+		if (paused) {
+			play();
 		}
 		else {
-			video.pause();
+			pause();
 		}
 	}
 
@@ -1073,6 +1136,38 @@ var Chromecast = (function() {
 		});
 	}
 
+	function play() {
+		if (Chromecast.running()) {
+			Chromecast.play();
+		}
+		else {
+			el("vid").play();
+		}
+		paused = false;
+		pushEvent(Event.Play);
+		$(".button-play i").addClass("fa-pause");
+		$(".button-play i").removeClass("fa-play");
+		$("#ep-" + currentEpisodeId + " i").removeClass("fa-pause");
+		$("#ep-" + currentEpisodeId + " i").addClass("fa-play");
+		$("#episode-bar-play").html("Pause");
+	}
+
+	function pause() {
+		if (Chromecast.running()) {
+			Chromecast.pause();
+		}
+		else {
+			el("vid").pause();
+		}
+		paused = true;
+		pushEvent(Event.Pause);
+		$(".button-play i").addClass("fa-play");
+		$(".button-play i").removeClass("fa-pause");
+		$("#ep-" + currentEpisodeId + " i").removeClass("fa-play");
+		$("#ep-" + currentEpisodeId + " i").addClass("fa-pause");
+		$("#episode-bar-play").html("Play");
+	}
+
 	function getEpisodeImage(id) {
 		return episodes[id].feed["media:thumbnail"] ? episodes[id].feed["media:thumbnail"].url : null ||
 			episodes[id].feed["itunes:image"] ? episodes[id].feed["itunes:image"].href : null ||
@@ -1087,6 +1182,10 @@ var Chromecast = (function() {
 		else {
 			$("#vid-container.thumb").css("right", "0px");
 		}
+	}
+
+	function padCastOverlay() {
+		$("#cast-overlay").css("padding-top", $("#cast-overlay").height() / 2 - $("#cast-overlay h1").height() / 2 + "px");
 	}
 
 	function showContextMenu(id, target, e) {

@@ -590,7 +590,7 @@ a {
 
 #playbar-gear {
 	position: absolute;
-	right: 20px;
+	right: 60px;
 	line-height: 60px;
 	cursor: pointer;
 }
@@ -664,7 +664,7 @@ a {
 }
 
 #time {
-	margin: 0 55px;
+	margin: 0 90px;
 	line-height: 60px;
 	float: right;
 }
@@ -750,4 +750,27 @@ a {
 
 .dragging {
 	position: fixed;
+}
+
+.cc {
+	position: absolute;
+	right: 15px;
+	top: 18px;
+	cursor: pointer;
+}
+
+#cast-overlay {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background: rgba(0,0,0,0.8);
+	text-align: center;
+	z-index: 1000;
+}
+
+#cast-overlay .name {
+	color: #0099cc;
 }
