@@ -1121,7 +1121,7 @@ var DragDropMonster = (function() {
 
 		loadCasts();
 		loadSettings();
-		loadTags();
+		//loadTags();
 	}
 
 	var lastEventTS = null;
