@@ -11,6 +11,7 @@ var Chromecast = (function() {
 		loadedCallbacks = [],
 		sessionCallbacks = [],
 		receiverCallbacks = [],
+		timeUpdateCallbacks = [],
 		loadThis = null;
 
 	function initCastApi() {
@@ -40,7 +41,7 @@ var Chromecast = (function() {
 	}
 
 	function sessionListener(e) {
-		console.log("Session ID: " + e.sessionId);
+		console.log("Session found");
 		session = e;
 		sessionCallbacks.forEach(function(cb) { cb() });
 
@@ -56,6 +57,8 @@ var Chromecast = (function() {
 	function onMediaDiscovered(how, media) {
 		console.log("onMediaDiscovered");
 		currentMedia = media;
+
+		updateTime();
 	
 		if (how !== "onRequestSessionSuccess") {
 			loadedCallbacks.forEach(function(cb) { cb() });			
@@ -106,6 +109,20 @@ var Chromecast = (function() {
 		}
 	}
 
+	var id;
+
+	function updateTime() {
+		timeUpdateCallbacks.forEach(function(cb) {
+			if (currentMedia) {
+				cb(currentMedia.getEstimatedTime());
+			}
+		});
+
+		id = setTimeout(function() { 
+			updateTime();
+		}, 100);
+	}
+
 	return {
 		init: function(_appID) {
 			appID = _appID;
@@ -120,6 +137,7 @@ var Chromecast = (function() {
 
 		stop: function() {
 			if (session) {
+				clearTimeout(id);
 				session.stop(onStopSuccess, onStopError);
 				session = null;
 			}
@@ -170,6 +188,10 @@ var Chromecast = (function() {
 			var seek = new chrome.cast.media.SeekRequest();
 			seek.currentTime = timestamp;
 			currentMedia.seek(seek, null, null);
+		},
+
+		timeUpdate: function(callback) {
+			timeUpdateCallbacks.push(callback);
 		},
 
 		receiverName: function() {
@@ -467,11 +489,11 @@ var DragDropMonster = (function() {
 			router.navigate(url, { trigger: true });
 		});
 
-		$("#vid").on("timeupdate", function() {
+		function updateTime(currentTime) {
 			var video = el("vid");
-			var date = new Date(video.currentTime * 1000);
+			var date = new Date(currentTime * 1000);
 			var dateTotal = new Date(video.duration * 1000);
-			var progress = 1 / video.duration * video.currentTime;
+			var progress = 1 / video.duration * currentTime;
 
 			date.setHours(date.getHours() - 1);
 			dateTotal.setHours(dateTotal.getHours() - 1);
@@ -487,7 +509,19 @@ var DragDropMonster = (function() {
 			time += dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad();
 
 			$("#time").html(time);
-			$("#seekbar div").css("width", $("#seekbar").width() * progress + "px")
+			$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
+		}
+
+		$("#vid").on("timeupdate", function() {
+			var video = el("vid");
+			updateTime(video.currentTime);
+		});
+
+		var currentTime;
+		Chromecast.timeUpdate(function(time) {
+			updateTime(time);
+			currentTime = time;
+			//el("vid").currentTime = time;
 		});
 
 		$("#vid").click(function() {
@@ -880,6 +914,7 @@ var DragDropMonster = (function() {
 				$(".cc img").prop("src", "cast_off.png");
 				Chromecast.stop();
 				$("#cast-overlay").hide();
+				el("vid").currentTime = currentTime;
 				play();
 			}
 			else {

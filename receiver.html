@@ -110,8 +110,21 @@ It is useful for learning the basic concepts of the system.
 		margin-top: 60px;
 	}
 
+	.splash h1 {
+		font-size: 64px;
+	}
+
+	.cover, .splash img {
+		max-height: 50%;
+		width: auto;
+	}
+
 	.logo {
 		font-size: 64px;
+	}
+
+	.splash {
+		display: none;
 	}
 
 	.loading {
@@ -128,6 +141,27 @@ It is useful for learning the basic concepts of the system.
 		margin: 0 auto;
 		font-size: 1.0em;
 	}
+
+.clearfix:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+ 
+.clearfix {
+    display: inline-block;
+}
+ 
+html[xmlns] .clearfix {
+    display: block;
+}
+ 
+* html .clearfix {
+    height: 1%;
+}
 	</style>
 	<!--
 	Include the Receiver Library - Very important use our URL, don't attempt to
@@ -138,16 +172,16 @@ It is useful for learning the basic concepts of the system.
 	<title>Cast Simple Receiver</title>
 </head>
 <body>
-	<h1 class="logo">Castcloud</h1>
-	<div class="loading">
+	<h1 class="page logo">Castcloud</h1>
+	<div class="page loading">
 		<h1 class="title"></h1>
 		<figure><img class="cover" width="50%"></figure>
 		<h1><i class="fa fa-spinner fa-spin"></i> Loading...</h1>
 	</div>	
-	<div id="pausebox">
+	<div class="page" id="pausebox">
 		<div id="art">
 			<h1 class="title"></h1>
-			<figure><img class="cover" width="50%"></figure>
+			<figure><img class="cover"></figure>
 			<p class="description"></p>
 		</div>
 		<div id="playbar">
@@ -155,10 +189,24 @@ It is useful for learning the basic concepts of the system.
 			<h3 id="time">00:00/00:00</h3>
 		</div>
 	</div>
+	<div class="page splash">
+		<div class="clearfix" style="padding-right: 250px">
+			<div style="float:left;"><img style="width: 200px; margin-top: 0" src="http://www.castcloud.org/logo.php?schema=dark"></div>
+			<div style="float:left; text-align:left; margin-left: 50px">
+				<h1>Castcloud</h1>
+				<h2>Your podcasting library in the cloud</h2>
+			</div>
+		</div>
+		<div style="width: 1280px; margin: 0 auto; clear: both"><img src="splash.png"></div>
+	</div>
 	<video id='vid' />
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function() {
+		$(".page").hide();
+		$(".splash").show();
+		setTimeout(function() {$(".splash").css("margin-top", window.innerHeight / 2 - $(".splash").height() / 2);},100);
+
 		$(".loading").css("margin-top", window.innerHeight / 2 - $(".loading").height() / 2);
 		$(".logo").css("margin-top", window.innerHeight / 2 - $(".logo").height() / 2);
 		// Turn on debugging so that you can see what is going on.  Please turn this off
@@ -192,8 +240,6 @@ It is useful for learning the basic concepts of the system.
 
 		$("#vid").on("loadstart", function() {
 			$("#pausebox").hide();
-			$(".logo").hide();
-			$(".loading").show();
 
 			var metadata = mediaManager.getMediaInformation().metadata;
 			$(".title").html(metadata.title);
@@ -203,6 +249,18 @@ It is useful for learning the basic concepts of the system.
 			}
 			$(".description").html(metadata.description);
 			$(".cover").prop("src", metadata.image);
+			$(".loading").css("margin-top", window.innerHeight / 2 - $(".loading").height() / 2);
+		});
+
+		$("#vid").on("ended", function() {
+			$(".page").hide();
+			$(".splash").show();
+			$(".splash").css("margin-top", window.innerHeight / 2 - $(".splash").height() / 2);
+		});
+
+		$(".cover").load(function() {
+			$(".page").hide();
+			$(".loading").show();
 			$(".loading").css("margin-top", window.innerHeight / 2 - $(".loading").height() / 2);
 		});
 
@@ -224,6 +282,8 @@ It is useful for learning the basic concepts of the system.
 				time += dateTotal.getHours().pad() + ":";
 			}
 			time += dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad();
+
+			$("#art").css("margin-top", (window.innerHeight / 2 - $("#art").height() / 2 - 30) + "px");
 
 			$("#time").html(time);
 			$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
