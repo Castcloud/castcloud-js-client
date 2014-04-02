@@ -809,11 +809,15 @@ var DragDropMonster = (function() {
 			$("#tags button").removeClass("selected");
 		});
 
-		$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
+		$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2 - 60) + "px");
 		positionThumb();
 		$(window).resize(function() {
-			$("#login-container").css("padding-top", window.innerHeight / 2 - 150 + "px");
+			$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 			positionThumb();
+		});
+
+		$("#input-username").focus(function() {
+			$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 		});
 
 		$(document).click(function() {
@@ -1109,6 +1113,7 @@ var DragDropMonster = (function() {
 		});
 
 		$(".tab").hide();
+		$("#main-container").css("bottom", "60px");
 
 		if (Backbone.history.fragment !== "now-playing") {
 			$("#vid-container").addClass("thumb");

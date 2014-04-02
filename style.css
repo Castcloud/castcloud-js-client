@@ -60,7 +60,7 @@ a {
 
 #main-container {
 	background: #222;
-	bottom: 60px;
+	bottom: 0;
 	top: 60px;
 	left: 0;
 	right: 0;
@@ -76,14 +76,13 @@ a {
 #login-container {
 	width: 200px;
 	margin: 0 auto;
-	padding-top: 100px;
 }
 
 #login-container p {
 	margin-bottom: 5px;
 }
 
-#login-container input, #tab-settings input {
+#login-container input, #tab-settings input, #input-target-container input {
 	width: 190px;
 	font: 16px "Lato";
 	padding: 10px 5px;
@@ -280,6 +279,12 @@ a {
 	height: 100%;
 	background: #222;
 	float: left;
+}
+
+@media all and (max-height: 250px) {
+	#input-target-container {
+		position: relative;
+	}
 }
 
 @media all and (max-width: 600px) {
