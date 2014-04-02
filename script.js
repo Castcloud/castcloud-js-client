@@ -1038,7 +1038,7 @@ var DragDropMonster = (function() {
 
 			currentEpisodeId = id;
 
-			if (episodes[id].lastevent === null) {
+			if (episodes[id].lastevent == null) {
 				el("vid").currentTime = 0;
 				pushEvent(Event.Start);
 			}
