@@ -754,6 +754,7 @@ var DragDropMonster = (function() {
 			var prev = $(".vmenu-toggle:visible");
 			$("#input-vmenu-add").toggle();
 			$("#button-vmenu-add").toggle();
+			$("#vmenu-add-results").toggle();
 			prev.hide();
 			$("#input-vmenu-add").focus();
 		});
@@ -766,6 +767,35 @@ var DragDropMonster = (function() {
 			if (e.which === 13) {
 				addFeed($("#input-vmenu-add").val());
 			}
+		});
+
+		var searchTimerId;
+		$("#input-vmenu-add").keyup(function(e) {
+			clearTimeout(searchTimerId);
+			var term = $(this).val();
+			searchTimerId = setTimeout(function() {				
+				$.ajax({
+					url: "http://itunes.apple.com/search",
+					jsonp: "callback",
+					dataType: "jsonp",
+					data: {
+						media: "podcast",
+						term: term,
+						limit: 5
+					},
+					success: function(res) {
+						$("#vmenu-add-results").empty();
+						res.results.forEach(function(result) {
+							$("#vmenu-add-results").append('<p feed-url="' + result.feedUrl + '">' + result.trackName + '</p>');
+						});
+					}
+				});
+			}, 100);
+		});
+
+		$("#vmenu-add-results").on("click", "p", function() {
+			addFeed($(this).attr("feed-url"));
+			$(this).parent().empty();
 		});
 
 		$("#vmenu-tags").click(function() {
@@ -947,6 +977,7 @@ var DragDropMonster = (function() {
 		$("#input-vmenu-add").val("");
 		$("#input-vmenu-add").toggle();
 		$("#button-vmenu-add").toggle();
+		$("#vmenu-add-results").toggle();
 	}
 
 	function loadEpisodeInfo(id) {

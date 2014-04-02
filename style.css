@@ -161,6 +161,10 @@ a {
 	margin: 5px;
 }
 
+.vmenu-toggle {
+	display: none;
+}
+
 #podcast-vmenu {
 	position: fixed;
 	width: 50px;
@@ -221,6 +225,22 @@ a {
 
 #button-vmenu-add:hover {
 	background: #0099cc;
+}
+
+#vmenu-add-results {
+	background: #FFF;
+	color: #AAA;
+	position: relative;
+	width: 100%;
+}
+
+#vmenu-add-results p {
+	padding: 10px;
+	cursor: pointer;
+}
+
+#vmenu-add-results p:hover {
+	color: #0099cc;
 }
 
 #tags {
