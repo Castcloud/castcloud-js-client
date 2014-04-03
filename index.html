@@ -119,6 +119,21 @@
 	</div>
 
 	<script type="text/template" class="podcasts">
+	<div class="label">
+		<div class="name">Label #1<i class="fa fa-angle-down" style="float:right;font-size:20px"></i></div>
+		<div class="content" style="display:none">
+			<div class="cast">Cast #1</div>
+			<div class="cast">Cast #2</div>
+			<div class="cast">Cast #3</div>
+		</div>
+	</div>
+	<div class="label">
+		<div class="name">Label #2<i class="fa fa-angle-down" style="float:right;font-size:20px"></i></div>
+		<div class="content" style="display:none">
+			<div class="cast">Cast #4</div>
+			<div class="cast">Cast #5</div>
+		</div>
+	</div>
 	<% casts.forEach(function(cast) { %>
 		<div id="cast-<%= cast.id %>" class="cast"><%= cast.name %></div>
 	<% }); %>

@@ -1179,6 +1179,18 @@ var DragDropMonster = (function() {
 			$("#podcasts").empty().append(template({ casts: res }));
 			positionThumb();
 
+			$(".label .name").click(function() {
+				$(this).parent().find(".content").toggle();
+				if ($(this).find("i").hasClass("fa-angle-down")) {
+					$(this).find("i").removeClass("fa-angle-down");
+					$(this).find("i").addClass("fa-angle-up");
+				}
+				else {
+					$(this).find("i").removeClass("fa-angle-up");
+					$(this).find("i").addClass("fa-angle-down");
+				}
+			});
+
 			if (sessionStorage.lastepisode) {
 				var lastepisode = JSON.parse(sessionStorage.lastepisode);
 				loadEpisodes(lastepisode.castid);

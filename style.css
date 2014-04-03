@@ -345,12 +345,12 @@ a {
 	}
 }
 
-.cast, .episode {
+.cast, .episode, .label .name {
 	padding: 10px 20px;
 	cursor: pointer;
 }
 
-.cast:hover, .episode:hover {
+.cast:hover, .episode:hover, .label .name:hover {
 	background: #0066cc;
 }
 
@@ -374,6 +374,7 @@ a {
 	background: #222;
 	color: #FFF;
 }
+
 
 .episode {
 	position: relative;
@@ -808,6 +809,7 @@ a {
 	text-align: center;
 	z-index: 1000;
 	line-height: 300px;
+	text-shadow: 0px 0px 5px rgba(0,0,0,1);
 }
 
 .thumb #cast-overlay {
