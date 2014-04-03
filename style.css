@@ -367,6 +367,14 @@ a {
 	color: #FFF;
 }
 
+.cast input {
+	font: 16px Lato, sans-serif;
+	border: none;
+	outline: none;
+	background: #222;
+	color: #FFF;
+}
+
 .episode {
 	position: relative;
 }

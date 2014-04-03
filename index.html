@@ -12,6 +12,7 @@
 	<div id="cast-context-menu" class="context-menu">
 		<div id="">Show all episodes</div>
 		<div id="">Copy URL</div>
+		<div id="cast-context-rename">Rename</div>
 		<div id="cast-context-unsub">Unsubscribe</div>
 	</div>
 	<div id="episode-context-menu" class="context-menu">
@@ -119,7 +120,7 @@
 
 	<script type="text/template" class="podcasts">
 	<% casts.forEach(function(cast) { %>
-		<div id="cast-<%= cast.id %>" class="cast"><%= cast.feed.title %></div>
+		<div id="cast-<%= cast.id %>" class="cast"><%= cast.name %></div>
 	<% }); %>
 	</script>
 

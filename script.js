@@ -876,6 +876,20 @@ var DragDropMonster = (function() {
 			ctrlDown = false;
 		});
 
+		$("#cast-context-rename").click(function() {
+			var name = $("#cast-" + contextItemId).html();
+			$("#cast-" + contextItemId).html('<input type="text">');
+			$(".cast input").focus();
+			$(".cast input").val(name);
+			$(".cast input").keydown(function(e) {
+				if (e.which === 13) {
+					var name = $(this).val();
+					$(this).parent().html(name);
+					$.post(apiRoot + "library/casts/" + contextItemId, { name: name });
+				}
+			})
+		});
+
 		$("#cast-context-unsub").click(function() {
 			$(".cast.selected").each(function() {
 				$.ajax(apiRoot + "library/casts/" + $(this).prop("id").split("-")[1], { type: "DELETE" });
