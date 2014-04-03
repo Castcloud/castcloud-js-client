@@ -333,6 +333,7 @@ var DragDropMonster = (function() {
 		$(".cc img").prop("src", "cast_on.png");
 		el("vid").pause();
 		$("#cast-overlay").show();
+		padCastOverlay();
 	});
 	Chromecast.receiver(function(n) {
 		if (n > 0) {
@@ -423,6 +424,7 @@ var DragDropMonster = (function() {
 				}
 				else {
 					$("#vid-container").removeClass("thumb");
+					$("#vid-container").css("right", 0);
 					$("#tab-now-playing").show();
 				}
 			},
@@ -443,6 +445,7 @@ var DragDropMonster = (function() {
 
 		router.bind("all", function(route, router) {
 			positionThumb();
+			padCastOverlay();
 		});
 
 		var page = 0;
@@ -1354,7 +1357,7 @@ var DragDropMonster = (function() {
 	}
 
 	function padCastOverlay() {
-		$("#cast-overlay").css("padding-top", $("#cast-overlay").height() / 2 - $("#cast-overlay h1").height() / 2 + "px");
+		$("#cast-overlay").css("line-height", $("#cast-overlay").height() + "px");
 	}
 
 	function showContextMenu(id, target, e) {
