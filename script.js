@@ -513,6 +513,8 @@ var DragDropMonster = (function() {
 
 			$("#time").html(time);
 			$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
+
+			setEpisodeBar(currentEpisodeId, currentTime);
 		}
 
 		$("#vid").on("timeupdate", function() {
@@ -909,6 +911,16 @@ var DragDropMonster = (function() {
 			console.log("DELETE: " + contextItemId);
 		});
 
+		$("#episode-context-reset").click(function() {
+			if (contextItemId === currentEpisodeId) {
+				el("vid").currentTime = 0;
+			}
+			else {
+				pushEvent(Event.Pause, contextItemId, 0);
+				setEpisodeBar(contextItemId, 0);
+			}
+		});
+
 		$("#input-target").keyup(function(e) {
 			var url = $(this).val();
 			if (url.indexOf("/", url.length - 1) === -1) {
@@ -1056,7 +1068,7 @@ var DragDropMonster = (function() {
 			currentEpisodeId = id;
 
 			if (episodes[id].lastevent === null) {
-				pushEvent(Event.Start);
+				pushEvent(Event.Start, id, 0);
 			}
 
 			Chromecast.load(episodes[id].feed.enclosure.url, {
@@ -1143,7 +1155,7 @@ var DragDropMonster = (function() {
 	var lastEventTS = null;
 	var currentOrder = 0;
 
-	function pushEvent(type) {
+	function pushEvent(type, id, time) {
 		var eventTS = unix();
 		if (lastEventTS === eventTS) {
 			currentOrder++;
@@ -1153,9 +1165,9 @@ var DragDropMonster = (function() {
 		}
 		lastEventTS = eventTS;
 
-		episodes[currentEpisodeId].lastevent = {
+		episodes[id === undefined ? currentEpisodeId : id].lastevent = {
 			type: type,
-			positionts: el("vid").currentTime | 0,
+			positionts: time === undefined ? el("vid").currentTime | 0 : time,
 			clientts: eventTS,
 			clientname: null,
 			clientdescription: null
@@ -1163,13 +1175,15 @@ var DragDropMonster = (function() {
 
 		$.post(apiRoot + "library/events", { json: [{
 			type: type,
-			itemid: currentEpisodeId,
-			positionts: el("vid").currentTime | 0,
+			itemid: id === undefined ? currentEpisodeId : id,
+			positionts: time === undefined ? el("vid").currentTime | 0 : time,
 			concurrentorder: currentOrder,
 			clientts: eventTS				
 		}] });
 
-		localStorage.setItem("episode-" + currentEpisodeId, el("vid").duration);
+		if (id !== undefined) {
+			localStorage.setItem("episode-" + currentEpisodeId, el("vid").duration);
+		}		
 	}
 
 	function loadCasts(tag) {
@@ -1245,7 +1259,7 @@ var DragDropMonster = (function() {
 
 				episodes[episode.id] = episode;
 				if (episode.lastevent !== null && localStorage.getItem("episode-" + episode.id) !== null) {
-					$("#ep-" + episode.id + " .bar").css("width", (episode.lastevent.positionts / localStorage.getItem("episode-" + episode.id) * 100)+"%");
+					setEpisodeBar(episode.id, episode.lastevent.positionts);
 				}
 
 				if (switchingTabs && episode.id == currentEpisodeId) {
@@ -1379,6 +1393,10 @@ var DragDropMonster = (function() {
 		$(".context-menu").hide();
 		$(id).show();
 		e.preventDefault();
+	}
+
+	function setEpisodeBar(id, time) {
+		$("#ep-" + id + " .bar").css("width", (time / localStorage.getItem("episode-" + id) * 100)+"%");
 	}
 
 	function get(url, cb) {
