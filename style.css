@@ -15,6 +15,7 @@ body {
 	background: #222;
 	color: #FFF;
 	font-family: "Lato";
+	overflow: hidden;
 }
 
 a {
@@ -65,7 +66,7 @@ a {
 	left: 0;
 	right: 0;
 	position: absolute;
-	overflow: auto;
+	/*overflow: auto;*/
 }
 
 .tab {
@@ -279,6 +280,7 @@ a {
 	height: 100%;
 	background: #222;
 	float: left;
+	overflow: auto;
 }
 
 @media all and (max-height: 250px) {

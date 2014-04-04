@@ -185,9 +185,11 @@ var Chromecast = (function() {
 		},
 
 		seek: function(timestamp) {
-			var seek = new chrome.cast.media.SeekRequest();
-			seek.currentTime = timestamp;
-			currentMedia.seek(seek, null, null);
+			if (currentMedia) {
+				var seek = new chrome.cast.media.SeekRequest();
+				seek.currentTime = timestamp;
+				currentMedia.seek(seek, null, null);
+			}
 		},
 
 		timeUpdate: function(callback) {
@@ -208,14 +210,14 @@ var DragDropMonster = (function() {
 	var placeholder;
 	var dragging;
 
-	$(document).on("mousemove", function(e) {
+	/*$(document).on("mousemove", function(e) {
 		$(".dragging").css("left", e.pageX - offsetX);
 		$(".dragging").css("top", e.pageY - offsetY);
 
 		placeholder(e);
 
 		console.log(el.prop("id"));			
-	});
+	});*/
 
 	function placeholder(e) {
 		before = true;
@@ -697,13 +699,13 @@ var DragDropMonster = (function() {
 
 		$("#vid").on("ended", function() {
 			pushEvent(Event.EndOfTrack);
+			$("#vid-container").addClass("minimized");
 		});
 
 		var seeking = false;
 		$("#seekbar").mousedown(function(e) {
 			pushEvent(Event.Pause);
-			el("vid").currentTime = 1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration;
-			Chromecast.seek(1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration);
+			seek(1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration);
 			seeking = true;
 		});
 
@@ -719,11 +721,7 @@ var DragDropMonster = (function() {
 
 		$(document).mousemove(function(e) {
 			if (seeking) {
-				var video = el("vid");
-				video.currentTime = 1 / $("#seekbar").width() * (e.pageX - 170) * video.duration;
-				Chromecast.seek(1 / $("#seekbar").width() * (e.pageX - 170) * video.duration);
-				var progress = 1 / video.duration * video.currentTime;
-				$("#seekbar div").css("width", $("#seekbar").width() * progress + "px")
+				seek(1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration);
 			}
 		});
 
@@ -913,7 +911,7 @@ var DragDropMonster = (function() {
 
 		$("#episode-context-reset").click(function() {
 			if (contextItemId === currentEpisodeId) {
-				el("vid").currentTime = 0;
+				seek(0);
 			}
 			else {
 				pushEvent(Event.Pause, contextItemId, 0);
@@ -990,7 +988,7 @@ var DragDropMonster = (function() {
 				});				
 			}
 		});
-		
+
 		if (sessionStorage.token) {
 			token = sessionStorage.token;
 			username = sessionStorage.username;
@@ -1363,6 +1361,14 @@ var DragDropMonster = (function() {
 		$("#ep-" + currentEpisodeId + " i").removeClass("fa-play");
 		$("#ep-" + currentEpisodeId + " i").addClass("fa-pause");
 		$("#episode-bar-play").html("Play");
+	}
+
+	function seek(time) {
+		var video = el("vid");
+		video.currentTime = time;
+		Chromecast.seek(time);
+		var progress = 1 / video.duration * time;
+		$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
 	}
 
 	function getEpisodeImage(id) {
