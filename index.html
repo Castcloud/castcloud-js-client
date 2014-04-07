@@ -37,7 +37,7 @@
 				<p><div>Logged in as <span style="color: #0099cc"></span></div><button class="button" id="button-logout">Log out</button></p>
 			</div>
 		</div>
-		<i class="fa fa-bars" id="navicon"></i>
+		<!--<i class="fa fa-bars" id="navicon"></i>-->
 	</div>
 	<div id="main-container">
 		<div class="tab" id="tab-login">
@@ -140,9 +140,11 @@
 	</script>
 
 	<script type="text/template" class="episodes">
+	<div>
 	<% episodes.forEach(function(episode) { %>
 		<div id="ep-<%= episode.id %>" class="episode"><div class="bar"></div><div class="content"><%= episode.feed.title %></div></div>
 	<% }); %>
+	</div>
 	</script>
 
 	<script type="text/template" class="events">
@@ -155,6 +157,9 @@
 	</script>
 
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/iScroll/5.1.1/iscroll-min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.11/jquery.scrollTo.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.6/jquery.mousewheel.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
 	<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>

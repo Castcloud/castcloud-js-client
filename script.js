@@ -355,6 +355,12 @@ var DragDropMonster = (function() {
 	$(document).ready(function() {
 		//DragDropMonster("#podcasts", ".cast");
 
+		//$(".col").mousewheel(function(e) {
+		//	$(this).scrollTo($(this).scrollTop() - e.deltaY * e.deltaFactor, 0);
+		//});
+
+		
+
 		var Router = Backbone.Router.extend({
 			routes: {
 				"": "podcasts",
@@ -1236,6 +1242,11 @@ var DragDropMonster = (function() {
 			var template = _.template($("script.episodes").html());
 			$("#episodes").empty().append(template({ episodes: res }));
 			positionThumb();
+
+			var scroll = new IScroll('#episodes', {
+				mouseWheel: true,
+				scrollbars: 'custom'
+			});
 
 			res.forEach(function(episode) {
 				$("#ep-" + episode.id).click(function() {
