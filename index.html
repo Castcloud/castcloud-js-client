@@ -119,24 +119,25 @@
 	</div>
 
 	<script type="text/template" class="podcasts">
-	<div class="label">
-		<div class="name">Label #1<i class="fa fa-angle-down" style="float:right;font-size:20px"></i></div>
-		<div class="content" style="display:none">
-			<div class="cast">Cast #1</div>
-			<div class="cast">Cast #2</div>
-			<div class="cast">Cast #3</div>
-		</div>
-	</div>
-	<div class="label">
-		<div class="name">Label #2<i class="fa fa-angle-down" style="float:right;font-size:20px"></i></div>
-		<div class="content" style="display:none">
-			<div class="cast">Cast #4</div>
-			<div class="cast">Cast #5</div>
-		</div>
-	</div>
-	<% casts.forEach(function(cast) { %>
-		<div id="cast-<%= cast.id %>" class="cast"><%= cast.name %></div>
-	<% }); %>
+	<% 	labels.root.forEach(function(label) { 
+			if (label.type === "cast") { %>
+				<div id="cast-<%= label.id %>" class="cast"><%= casts[label.id].name %></div>
+	<% 		}
+			else if (label.type === "label") { %>
+				<div id="label-<%= label.id %>" class="label">
+					<div class="name"><%= labels[label.id].name %><i class="fa fa-angle-down" style="float:right;font-size:20px"></i></div>
+					<div class="content" style="display:none">
+	<%					if (labels[label.id].name !== "root") { 
+							labels[labels[label.id].name].forEach(function(cast) {
+								if (cast.type === "cast") { %>
+									<div id="cast-<%= cast.id %>" class="cast"><%= casts[cast.id].name %></div>
+	<%							}
+							});
+						} %>
+					</div>
+				</div>
+	<%		}
+		}); %>
 	</script>
 
 	<script type="text/template" class="episodes">
@@ -156,7 +157,7 @@
 	<% }); %>
 	</script>
 
-	<script src="http://jsconsole.com/remote.js?B28E1C2A-431C-4476-BAD7-AFEF7B050074"></script>
+	<!--<script src="http://jsconsole.com/remote.js?B28E1C2A-431C-4476-BAD7-AFEF7B050074"></script>-->
 
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/iScroll/5.1.1/iscroll-min.js"></script>

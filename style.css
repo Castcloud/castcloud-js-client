@@ -382,6 +382,9 @@ a {
 	color: #FFF;
 }
 
+.label .content .cast {
+	padding-left: 40px;
+}
 
 .episode {
 	position: relative;

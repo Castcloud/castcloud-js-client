@@ -297,6 +297,7 @@ var DragDropMonster = (function() {
 		username,
 		episodes = {},
 		casts = {},
+		labels,
 		root,
 		apiRoot,
 		loggedIn = false,
@@ -814,7 +815,7 @@ var DragDropMonster = (function() {
 		});
 
 		$("#vmenu-sync").click(function() {
-			loadCasts();
+			loadTags();
 			$("#tags button").removeClass("selected");
 		});
 
@@ -906,7 +907,7 @@ var DragDropMonster = (function() {
 			$.ajax(apiRoot + "library/casts/" + contextItemId, { 
 				type: "DELETE",
 				success: function(res) {
-					loadCasts();
+					loadTags();
 				}
 			});
 		});
@@ -1014,7 +1015,7 @@ var DragDropMonster = (function() {
 	});
 
 	function addFeed(feedurl) {
-		$.post(apiRoot + "library/casts", { feedurl: feedurl }, function() { loadCasts(); });
+		$.post(apiRoot + "library/casts", { feedurl: feedurl }, function() { loadTags(); });
 
 		$("#input-vmenu-add").val("");
 		$("#input-vmenu-add").toggle();
@@ -1156,9 +1157,9 @@ var DragDropMonster = (function() {
 			$("#vid-container").addClass("thumb");
 		}
 
-		loadCasts();
+		
 		loadSettings();
-		//loadTags();
+		loadTags();
 	}
 
 	var lastEventTS = null;
@@ -1197,8 +1198,12 @@ var DragDropMonster = (function() {
 
 	function loadCasts(tag) {
 		get(tag === undefined ? "library/casts" : "library/casts/" + tag, function(res) {
+			res.forEach(function(cast) {
+				casts[cast.id] = cast;
+			});
+
 			var template = _.template($("script.podcasts").html());
-			$("#podcasts").empty().append(template({ casts: res }));
+			$("#podcasts").empty().append(template({ labels: labels, casts: casts }));
 			positionThumb();
 
 			$(".label .name").click(function() {
@@ -1223,8 +1228,6 @@ var DragDropMonster = (function() {
 			}
 
 			res.forEach(function(cast) {
-				casts[cast.id] = cast;
-
 				$("#cast-" + cast.id).click(function() {
 					if (ctrlDown) {
 						$(this).toggleClass("selected");
@@ -1238,7 +1241,7 @@ var DragDropMonster = (function() {
 						$(this).addClass("current");
 					}
 				});
-			});
+			})
 		});
 	}
 
@@ -1354,8 +1357,26 @@ var DragDropMonster = (function() {
 	}
 
 	function loadTags() {
-		get("library/tags", function(res) {
-			res.forEach(function(tag) {
+		get("library/labels", function(res) {
+			labels = {};
+			res.forEach(function(label) {
+				labels[label.name] = [];
+				label.content.split(",").forEach(function(item) {
+					var split = item.split("/");
+					labels[label.name].push({
+						type: split[0],
+						id: parseInt(split[1])
+					});
+					labels[label.id] = {
+						name: label.name
+					};
+				});
+			});
+			
+			loadCasts();
+
+			console.log(JSON.stringify(labels, null, 4));
+			/*res.forEach(function(tag) {
 				$("#tags").append('<button class="button">' + tag + '</button>');
 			});
 
@@ -1369,7 +1390,7 @@ var DragDropMonster = (function() {
 					$("#tags button").removeClass("selected");
 					$(this).addClass("selected");
 				}
-			});
+			});*/
 		});
 	}
 
