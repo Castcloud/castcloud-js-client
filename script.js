@@ -858,7 +858,7 @@ var DragDropMonster = (function() {
 		});
 
 		$(document).keydown(function(e) {
-			if (e.which === 179) {
+			if (e.which === 179 || e.which === 32) {
 				playPauseToggle();
 			}
 
@@ -959,7 +959,12 @@ var DragDropMonster = (function() {
 		});
 
 		$("#episode-bar-play").click(function() {
-			playPauseToggle();
+			if (selectedEpisodeId !== currentEpisodeId) {
+				playEpisode(selectedEpisodeId);
+			}
+			else {
+				playPauseToggle();
+			}
 		});
 
 		$("#events").on("click", "div", function() {
@@ -1245,7 +1250,21 @@ var DragDropMonster = (function() {
 
 			var scroll = new IScroll('#episodes', {
 				mouseWheel: true,
-				scrollbars: 'custom'
+				scrollbars: 'custom',
+				keyBindings: true,
+				interactiveScrollbars: true,
+				click: true
+			});
+
+			scroll.on('flick', function() {
+				console.log("FLICK");
+			});
+
+			$(".iScrollVerticalScrollbar").hide();
+			$("#episodes").hover(function() {
+				$(".iScrollVerticalScrollbar").show();
+			}, function() {
+				$(".iScrollVerticalScrollbar").hide();
 			});
 
 			res.forEach(function(episode) {
@@ -1257,6 +1276,18 @@ var DragDropMonster = (function() {
 					else {
 						selectedEpisodeId = episode.id;
 						loadEpisodeInfo(episode.id);
+
+						if (currentEpisodeId === episode.id) {
+							if (paused) {
+								$("#episode-bar-play").html("Play");
+							}
+							else {
+								$("#episode-bar-play").html("Pause");
+							}
+						}
+						else {
+							$("#episode-bar-play").html("Play");
+						}
 					}
 				});
 

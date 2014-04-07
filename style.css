@@ -71,7 +71,7 @@ a {
 	left: 0;
 	right: 0;
 	position: absolute;
-	/*overflow: auto;*/
+	overflow: hidden;
 }
 
 .tab {
@@ -846,12 +846,13 @@ a {
 }
 
 .iScrollVerticalScrollbar {
-	position: relative;
-	z-index: 9999;
-	width: 16px;
+	position: absolute;
+	z-index: 99999;
+	width: 8px;
 	bottom: 2px;
 	top: 2px;
-	right: 2px;
+	right: 33.333333%;
+	margin-right: 2px;
 	overflow: hidden;
 }
 
@@ -861,11 +862,7 @@ a {
 
 .iScrollIndicator {
 	position: relative;
-	background: #cc3f6e;
-	border-width: 1px;
-	border-style: solid;
-	border-color: #EB97B4 #7C2845 #7C2845 #EB97B4;
-	border-radius: 8px;
+	background: rgba(0,0,0,0.2);
 }
 
 .iScrollHorizontalScrollbar .iScrollIndicator {
@@ -879,9 +876,4 @@ a {
 
 .iScrollVerticalScrollbar .iScrollIndicator {
 	width: 100%;
-	background: -moz-linear-gradient(top, #cc3f6e 0%, #93004e 100%);
-	background: -webkit-linear-gradient(top,  #cc3f6e 0%,#93004e 100%);
-	background: -o-linear-gradient(top, #cc3f6e 0%,#93004e 100%);
-	background: -ms-linear-gradient(top, #cc3f6e 0%,#93004e 100%);
-	background: linear-gradient(to bottom,  #cc3f6e 0%,#93004e 100%);
 }

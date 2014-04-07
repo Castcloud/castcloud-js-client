@@ -140,7 +140,7 @@
 	</script>
 
 	<script type="text/template" class="episodes">
-	<div>
+	<div style="position:relative;z-index:0;width:100%">
 	<% episodes.forEach(function(episode) { %>
 		<div id="ep-<%= episode.id %>" class="episode"><div class="bar"></div><div class="content"><%= episode.feed.title %></div></div>
 	<% }); %>
@@ -155,6 +155,8 @@
 		</div>
 	<% }); %>
 	</script>
+
+	<script src="http://jsconsole.com/remote.js?B28E1C2A-431C-4476-BAD7-AFEF7B050074"></script>
 
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/iScroll/5.1.1/iscroll-min.js"></script>
