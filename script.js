@@ -202,22 +202,32 @@ var Chromecast = (function() {
 	}
 }());
 
-var DragDropMonster = (function() {
+/*var DragDropMonster = (function() {
 	var parent, children;
 	var offsetX = 0, offsetY = 0;
 	var el, prevY, y;
 	var before;
 	var placeholder;
 	var dragging;
+	var dragEl = null;
+	var startedMoving = false;
 
-	/*$(document).on("mousemove", function(e) {
-		$(".dragging").css("left", e.pageX - offsetX);
+	$(document).on("mousemove", function(e) {
+		if (dragging && !startedMoving) {
+			startedMoving = true;
+			var w = dragEl.width();
+			dragEl.addClass("dragging").css("width", w + "px");
+			dragEl.css("left", $(this).offset().left);
+			dragEl.css("top", $(this).offset().top);
+			dragEl.detach().appendTo("body");
+		}
+		$(".dragging").css("left", "50px");
 		$(".dragging").css("top", e.pageY - offsetY);
 
 		placeholder(e);
 
 		console.log(el.prop("id"));			
-	});*/
+	});
 
 	function placeholder(e) {
 		before = true;
@@ -251,20 +261,27 @@ var DragDropMonster = (function() {
 		prevY = y;
 	}
 
-	$(document).on("mouseup", ".dragging", function() {
-		$(".dragging").css("left", "auto");
-		$(".dragging").css("top", "auto");
-		$(this).removeClass("dragging");
-		dragging = false;
+	$(document).on("mouseup", function() {
+		if (dragEl !== null) {
+			$(".dragging").css("left", "auto");
+			$(".dragging").css("top", "auto");
+			dragEl.removeClass("dragging");
+			dragging = false;
+			startedMoving = false;
 
-		$(".dragging-placeholder").remove();
-		if (before) {
-			$(this).insertBefore(el);
+			if (el !== null) {
+				$(".dragging-placeholder").remove();
+				if (before) {
+					dragEl.insertBefore(el);
+				}
+				else {
+					dragEl.insertAfter(el);
+				}
+			}
+			dragEl = null;
+			el = null;
+			console.log("DRAG_END");
 		}
-		else {
-			$(this).insertAfter(el);
-		}
-		console.log("DRAG_END");
 	});
 
 	return function(_parent, _children) {
@@ -272,17 +289,96 @@ var DragDropMonster = (function() {
 		children = _children;
 
 		$(parent).on("mousedown", children, function(e) {
-			var w = $(this).width();
-			$(this).addClass("dragging").css("width", w + "px");
-			$(this).css("left", $(this).offset().left);
-			$(this).css("top", $(this).offset().top);
-			$(this).detach().appendTo("body");
+			dragEl = $(this);
 
 			offsetX = e.pageX - $(this).offset().left;
 			offsetY = e.pageY - $(this).offset().top;
 			dragging = true;
 
-			placeholder(e);
+			console.log("DRAG_START " + dragEl.prop("id"));
+
+			//placeholder(e);
+		});
+	}
+}());*/
+
+var DragDrop = (function() {
+	var container;
+	var child;
+	var dragging;
+	var moving;
+	var el;
+
+	var offsetX, offsetY;
+	var x, y;
+
+	function find(y) {
+		var result;
+		$(".cast:not(.dragging)").each(function(index, element) {
+			if (Math.abs($(element).offset().top + 15 - y) < 10) {
+				result = $(element);
+			}
+		});
+		return result;
+	}
+
+	return function(_container, _child) {
+		container = _container;
+		child = _child;
+
+		$(container).on("mousedown", child, function(e) {
+			dragging = $(this);
+
+			x = e.pageX;
+			y = e.pageY;
+			offsetX = e.pageX - dragging.offset().left;
+			offsetY = e.pageY - dragging.offset().top;
+		});
+
+		$(document).mousemove(function(e) {
+			if (x !== e.pageX && y !== e.pageY) {
+				if (dragging && !moving) {
+					console.log("!");
+					moving = true;
+					var width = dragging.width();
+					var height = dragging.outerHeight();
+					dragging.replaceWith('<div class="dragging-placeholder"></div>');
+					$(".dragging-placeholder").height(height);
+					dragging.addClass("dragging").width(width);
+					dragging.css("left", dragging.offset().left);
+					dragging.css("top", dragging.offset().top);
+					dragging.detach().appendTo("body");
+				}
+				if (dragging) {
+					dragging.css("left", "50px");
+					dragging.css("top", e.pageY - offsetY);
+
+					var height = dragging.outerHeight();
+
+					el = find(e.pageY - offsetY + 15);
+					if (el !== undefined) {
+						var placeholder = $(".dragging-placeholder");
+						var id = el.prop("id");
+						var temp = el.replaceWith('<div class="dragging-placeholder"></div>');
+						$(".dragging-placeholder").height(height);
+						placeholder.replaceWith(temp);
+					}
+				}
+			}			
+		});
+
+		$(document).mouseup(function(e) {
+			if (dragging) {
+				if (moving) {
+					dragging.css("left", "auto");
+					dragging.css("top", "auto");
+
+					dragging.removeClass("dragging");
+					$(".dragging-placeholder").replaceWith(dragging);
+					moving = false;
+				}
+				dragging = null;
+			}			
 		});
 	}
 }());
@@ -355,12 +451,11 @@ var DragDropMonster = (function() {
 
 	$(document).ready(function() {
 		//DragDropMonster("#podcasts", ".cast");
+		//DragDrop("#podcasts", ".cast");
 
 		//$(".col").mousewheel(function(e) {
 		//	$(this).scrollTo($(this).scrollTop() - e.deltaY * e.deltaFactor, 0);
 		//});
-
-		
 
 		var Router = Backbone.Router.extend({
 			routes: {
@@ -1257,10 +1352,6 @@ var DragDropMonster = (function() {
 				keyBindings: true,
 				interactiveScrollbars: true,
 				click: true
-			});
-
-			scroll.on('flick', function() {
-				console.log("FLICK");
 			});
 
 			$(".iScrollVerticalScrollbar").hide();
