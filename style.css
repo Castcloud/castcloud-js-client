@@ -380,6 +380,7 @@ a {
 	outline: none;
 	background: #222;
 	color: #FFF;
+	width: 100%;
 }
 
 .label .content .cast {

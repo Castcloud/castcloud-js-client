@@ -896,6 +896,12 @@ var DragDrop = (function() {
 					var name = $(this).val();
 					$(this).parent().html(name);
 					$.post(apiRoot + "library/casts/" + contextItemId, { name: name });
+					$.ajax(apiRoot + "library/casts/" + contextItemId, {
+						type: "PUT",
+						data: {
+							name: name
+						}
+					});
 				}
 			})
 		});
