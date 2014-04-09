@@ -202,120 +202,22 @@ var Chromecast = (function() {
 	}
 }());
 
-/*var DragDropMonster = (function() {
-	var parent, children;
-	var offsetX = 0, offsetY = 0;
-	var el, prevY, y;
-	var before;
-	var placeholder;
-	var dragging;
-	var dragEl = null;
-	var startedMoving = false;
-
-	$(document).on("mousemove", function(e) {
-		if (dragging && !startedMoving) {
-			startedMoving = true;
-			var w = dragEl.width();
-			dragEl.addClass("dragging").css("width", w + "px");
-			dragEl.css("left", $(this).offset().left);
-			dragEl.css("top", $(this).offset().top);
-			dragEl.detach().appendTo("body");
-		}
-		$(".dragging").css("left", "50px");
-		$(".dragging").css("top", e.pageY - offsetY);
-
-		placeholder(e);
-
-		console.log(el.prop("id"));			
-	});
-
-	function placeholder(e) {
-		before = true;
-		if (e.pageY - offsetY - 1 < $(parent + " " + children).first().offset().top) {
-			el = $(parent + " " + children).first();
-			y = el.offset().top;
-		}
-		else if (e.pageY - offsetY > $(parent + " " + children).last().offset().top + $(parent + " " + children).last().height()) {
-			el = $(parent + " " + children).last();
-			before = false;
-			y = el.offset().top + el.height();
-		}
-		else {
-			el = $(document.elementFromPoint(70, e.pageY - offsetY - 1));
-			y = el.offset().top;
-			if (e.pageY - offsetY > el.offset().top + el.height() / 2) {
-				before = false;
-				y += el.height();
-			}
-		}
-
-		if (dragging && y !== prevY) {
-			$(".dragging-placeholder").remove();
-			if (before) {
-				$('<div class="dragging-placeholder"></div>').insertBefore(el);
-			}
-			else {
-				$('<div class="dragging-placeholder"></div>').insertAfter(el);
-			}
-		}
-		prevY = y;
-	}
-
-	$(document).on("mouseup", function() {
-		if (dragEl !== null) {
-			$(".dragging").css("left", "auto");
-			$(".dragging").css("top", "auto");
-			dragEl.removeClass("dragging");
-			dragging = false;
-			startedMoving = false;
-
-			if (el !== null) {
-				$(".dragging-placeholder").remove();
-				if (before) {
-					dragEl.insertBefore(el);
-				}
-				else {
-					dragEl.insertAfter(el);
-				}
-			}
-			dragEl = null;
-			el = null;
-			console.log("DRAG_END");
-		}
-	});
-
-	return function(_parent, _children) {
-		parent = _parent;
-		children = _children;
-
-		$(parent).on("mousedown", children, function(e) {
-			dragEl = $(this);
-
-			offsetX = e.pageX - $(this).offset().left;
-			offsetY = e.pageY - $(this).offset().top;
-			dragging = true;
-
-			console.log("DRAG_START " + dragEl.prop("id"));
-
-			//placeholder(e);
-		});
-	}
-}());*/
-
 var DragDrop = (function() {
 	var container;
 	var child;
 	var dragging;
 	var moving;
 	var el;
-
-	var offsetX, offsetY;
-	var x, y;
+	var offsetX;
+	var offsetY;
+	var y;
+	var h;
+	var prevY;
 
 	function find(y) {
 		var result;
 		$(".cast:not(.dragging)").each(function(index, element) {
-			if (Math.abs($(element).offset().top + 15 - y) < 10) {
+			if (Math.abs($(element).offset().top + h - y) < h) {
 				result = $(element);
 			}
 		});
@@ -328,17 +230,17 @@ var DragDrop = (function() {
 
 		$(container).on("mousedown", child, function(e) {
 			dragging = $(this);
+			h = dragging.outerHeight() / 2;
 
-			x = e.pageX;
 			y = e.pageY;
+			prevY = y;
 			offsetX = e.pageX - dragging.offset().left;
 			offsetY = e.pageY - dragging.offset().top;
 		});
 
 		$(document).mousemove(function(e) {
-			if (x !== e.pageX && y !== e.pageY) {
+			if (e.pageY !== y) {
 				if (dragging && !moving) {
-					console.log("!");
 					moving = true;
 					var width = dragging.width();
 					var height = dragging.outerHeight();
@@ -355,14 +257,18 @@ var DragDrop = (function() {
 
 					var height = dragging.outerHeight();
 
-					el = find(e.pageY - offsetY + 15);
+					el = find(e.pageY - offsetY + h);
 					if (el !== undefined) {
-						var placeholder = $(".dragging-placeholder");
-						var id = el.prop("id");
-						var temp = el.replaceWith('<div class="dragging-placeholder"></div>');
+						$(".dragging-placeholder").remove();
+						if (prevY < e.pageY) {
+							$('<div class="dragging-placeholder"></div>').insertAfter(el);
+						}
+						else {
+							$('<div class="dragging-placeholder"></div>').insertBefore(el);
+						}
 						$(".dragging-placeholder").height(height);
-						placeholder.replaceWith(temp);
 					}
+					prevY = e.pageY;
 				}
 			}			
 		});
@@ -450,8 +356,7 @@ var DragDrop = (function() {
 	});
 
 	$(document).ready(function() {
-		//DragDropMonster("#podcasts", ".cast");
-		//DragDrop("#podcasts", ".cast");
+		DragDrop("#podcasts", ".cast");
 
 		//$(".col").mousewheel(function(e) {
 		//	$(this).scrollTo($(this).scrollTop() - e.deltaY * e.deltaFactor, 0);
@@ -1322,7 +1227,7 @@ var DragDrop = (function() {
 				$("#cast-" + sessionStorage.selectedcast).addClass("current");
 			}
 
-			res.forEach(function(cast) {
+			/*res.forEach(function(cast) {
 				$("#cast-" + cast.id).click(function() {
 					if (ctrlDown) {
 						$(this).toggleClass("selected");
@@ -1336,7 +1241,22 @@ var DragDrop = (function() {
 						$(this).addClass("current");
 					}
 				});
-			})
+			});*/
+
+			$("#podcasts").on("click", ".cast", function() {
+				if (ctrlDown) {
+					$(this).toggleClass("selected");
+				}
+				else {
+					var id = $(this).prop("id").split("-")[1];
+					switchingTabs = true;
+					loadEpisodes(id);
+					sessionStorage.selectedcast = id;
+
+					$(".cast").removeClass("current");
+					$(this).addClass("current");
+				}
+			});
 		});
 	}
 
