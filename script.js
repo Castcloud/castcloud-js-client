@@ -678,7 +678,8 @@ var DragDrop = (function() {
 			if ($("#ep-" + currentEpisodeId + " i").length > 0) {
 				$("#ep-" + currentEpisodeId + " i").remove();
 			}
-			$("#ep-" + currentEpisodeId).append('<i class="fa fa-spinner fa-spin"></i>');
+			updateEpisodeIndicators();
+			//$("#ep-" + currentEpisodeId).append('<i class="fa fa-spinner fa-spin"></i>');
 		});
 
 		$("#vid").on("canplay", function() {
@@ -699,18 +700,22 @@ var DragDrop = (function() {
 			}
 			videoLoading = false;
 
-			$("#ep-" + currentEpisodeId + " i").remove();
+			updateEpisodeIndicators();
+
+			/*$("#ep-" + currentEpisodeId + " i").remove();
 			if (paused) {
 				$("#ep-" + currentEpisodeId).append('<i class="fa fa-pause"></i>');
 			}
 			else {
 				$("#ep-" + currentEpisodeId).append('<i class="fa fa-play"></i>');
-			}
+			}*/
 		});
 
 		$("#vid").on("ended", function() {
 			pushEvent(Event.EndOfTrack);
 			$("#vid-container").addClass("minimized");
+			ended = true;
+			updateEpisodeIndicators();			
 		});
 
 		var seeking = false;
@@ -1088,8 +1093,6 @@ var DragDrop = (function() {
 
 			loadEpisodeInfo(id);
 
-			$(".episode i:not(.progress)").remove();
-
 			currentEpisodeId = id;
 
 			if (episodes[id].lastevent === null) {
@@ -1106,6 +1109,7 @@ var DragDrop = (function() {
 			video.setAttribute("src", episodes[id].feed.enclosure.url);
 			video.load();
 			videoLoading = true;
+			ended = false;
 
 			$("#vid-container").show();
 			$("#vid-container").removeClass("minimized");
@@ -1116,6 +1120,7 @@ var DragDrop = (function() {
 	}
 
 	var paused = false;
+	var ended = false;
 
 	function playPauseToggle() {
 		if (paused) {
@@ -1328,16 +1333,9 @@ var DragDrop = (function() {
 
 				episodes[episode.id] = episode;
 
-				if (episode.lastevent !== null) {
-					if (episode.lastevent.type == Event.EndOfTrack) {
-						$("#ep-" + episode.id).append('<i class="fa fa-circle progress"></i>')
-					}
-					else if (episode.lastevent.positionts > 0) {
-						$("#ep-" + episode.id).append('<i class="fa fa-circle-o progress"></i>')
-					}
-				}
+				updateEpisodeIndicators();
 
-				if (switchingTabs && episode.id == currentEpisodeId) {
+				/*if (switchingTabs && episode.id == currentEpisodeId) {
 					switchingTabs = false;
 					if (episode.lastevent.type == Event.Pause) {
 						$("#ep-" + episode.id).append('<i class="fa fa-pause"></i>');
@@ -1345,7 +1343,7 @@ var DragDrop = (function() {
 					else {
 						$("#ep-" + episode.id).append('<i class="fa fa-play"></i>');
 					}
-				}
+				}*/
 			});
 
 			if (sessionStorage.lastepisode) {
@@ -1437,8 +1435,9 @@ var DragDrop = (function() {
 		pushEvent(Event.Play);
 		$(".button-play i").addClass("fa-pause");
 		$(".button-play i").removeClass("fa-play");
-		$("#ep-" + currentEpisodeId + " i").removeClass("fa-pause");
-		$("#ep-" + currentEpisodeId + " i").addClass("fa-play");
+		//$("#ep-" + currentEpisodeId + " i").removeClass("fa-pause");
+		//$("#ep-" + currentEpisodeId + " i").addClass("fa-play");
+		updateEpisodeIndicators();
 		$("#episode-bar-play").html("Pause");
 		$(".pretty-overlay").hide();
 	}
@@ -1454,8 +1453,9 @@ var DragDrop = (function() {
 		pushEvent(Event.Pause);
 		$(".button-play i").addClass("fa-play");
 		$(".button-play i").removeClass("fa-pause");
-		$("#ep-" + currentEpisodeId + " i").removeClass("fa-play");
-		$("#ep-" + currentEpisodeId + " i").addClass("fa-pause");
+		//$("#ep-" + currentEpisodeId + " i").removeClass("fa-play");
+		//$("#ep-" + currentEpisodeId + " i").addClass("fa-pause");
+		updateEpisodeIndicators();
 		$("#episode-bar-play").html("Play");
 		$(".pretty-overlay").show();
 	}
@@ -1481,6 +1481,32 @@ var DragDrop = (function() {
 		}
 		else {
 			$("#vid-container.thumb").css("right", "0px");
+		}
+	}
+
+	function updateEpisodeIndicators() {
+		$(".episode i").remove();
+		for (var id in episodes) {
+			var episode = episodes[id];
+			if (id === currentEpisodeId && !ended) {
+				if (videoLoading) {
+					$("#ep-" + id).append('<i class="fa fa-spinner fa-spin"></i>');
+				}
+				else if (paused) {
+					$("#ep-" + id).append('<i class="fa fa-pause"></i>');
+				}
+				else {
+					$("#ep-" + id).append('<i class="fa fa-play"></i>');
+				}
+			}
+			else if (episode.lastevent !== null) {				
+				if (episode.lastevent.type == Event.EndOfTrack) {
+					$("#ep-" + id).append('<i class="fa fa-circle"></i>');
+				}
+				else if (episode.lastevent.positionts > 0) {
+					$("#ep-" + id).append('<i class="fa fa-circle-o"></i>');
+				}
+			}
 		}
 	}
 
