@@ -69,7 +69,10 @@
 				</div>
 				<div class="col" id="episodes"></div>
 				<div class="col" id="episodeinfo">
-					<figure><img id="pretty" width="100%"></figure>
+					<figure id="pretty">
+						<div class="pretty-overlay"><i class="fa fa-play-circle-o pretty-button"></i></div>
+						<img width="100%">
+					</figure>
 					<div id="episode-bar">
 						<button class="button" id="episode-bar-play">Play</button>
 						<button class="button" style="float:right" id="episode-bar-events">Events <i class="fa fa-angle-down"></i></button>
@@ -143,7 +146,7 @@
 	<script type="text/template" class="episodes">
 	<div style="position:relative;z-index:0;width:100%">
 	<% episodes.forEach(function(episode) { %>
-		<div id="ep-<%= episode.id %>" class="episode"><div class="bar"></div><div class="content"><%= episode.feed.title %></div></div>
+		<div id="ep-<%= episode.id %>" class="episode"><%= episode.feed.title %></div>
 	<% }); %>
 	</div>
 	</script>
