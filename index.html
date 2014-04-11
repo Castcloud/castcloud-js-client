@@ -15,6 +15,9 @@
 		<div id="cast-context-rename">Rename</div>
 		<div id="cast-context-unsub">Unsubscribe</div>
 	</div>
+	<div id="label-context-menu" class="context-menu">
+		<div id="label-context-rename">Rename</div>
+	</div>
 	<div id="episode-context-menu" class="context-menu">
 		<div id="episode-context-reset">Reset playback</div>
 		<div id="episode-context-delete">Delete</div>
@@ -128,7 +131,7 @@
 	<% 		}
 			else if (label.type === "label") { %>
 				<div id="label-<%= label.id %>" class="label drag">
-					<div class="name"><%= labels[label.id].name %><i class="fa fa-angle-down" style="float:right;font-size:20px"></i></div>
+					<div class="name"><span><%= labels[label.id].name %></span><i class="fa fa-angle-down" style="float:right;font-size:20px"></i></div>
 					<div class="content" style="display:none">
 	<%					if (labels[label.id].name !== "root") { 
 							labels[labels[label.id].name].forEach(function(cast) {

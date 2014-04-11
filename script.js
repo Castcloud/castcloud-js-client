@@ -213,6 +213,7 @@ var DragDrop = (function() {
 	var y;
 	var h;
 	var prevY;
+	var endCallbacks = [];
 
 	function find(y) {
 		var result;
@@ -224,77 +225,84 @@ var DragDrop = (function() {
 		return result;
 	}
 
-	return function(_container, _child) {
-		container = _container;
-		child = _child;
+	return {
+		init: function(_container, _child) {
+			container = _container;
+			child = _child;
 
-		$(container).on("mousedown", child, function(e) {
-			e.stopPropagation();
-			dragging = $(this);
-			h = dragging.outerHeight() / 2;
+			$(container).on("mousedown", child, function(e) {
+				e.stopPropagation();
+				dragging = $(this);
+				h = dragging.outerHeight() / 2;
 
-			y = e.pageY;
-			prevY = y;
-			offsetX = e.pageX - dragging.offset().left;
-			offsetY = e.pageY - dragging.offset().top;
-		});
+				y = e.pageY;
+				prevY = y;
+				offsetX = e.pageX - dragging.offset().left;
+				offsetY = e.pageY - dragging.offset().top;
+			});
 
-		$(document).mousemove(function(e) {
-			if (e.pageY !== y) {
-				if (dragging && !moving) {
-					if (dragging.hasClass("label")) {
-						dragging.find(".content").hide();
+			$(document).mousemove(function(e) {
+				if (e.pageY !== y) {
+					if (dragging && !moving) {
+						if (dragging.hasClass("label")) {
+							dragging.find(".content").hide();
+						}
+						moving = true;
+						var width = dragging.width();
+						var height = dragging.outerHeight();
+						dragging.replaceWith('<div class="dragging-placeholder"></div>');
+						$(".dragging-placeholder").height(height);
+						dragging.addClass("dragging").width(width);
+						dragging.css("left", dragging.offset().left);
+						dragging.css("top", dragging.offset().top);
+						dragging.detach().appendTo("body");
 					}
-					moving = true;
-					var width = dragging.width();
-					var height = dragging.outerHeight();
-					dragging.replaceWith('<div class="dragging-placeholder"></div>');
-					$(".dragging-placeholder").height(height);
-					dragging.addClass("dragging").width(width);
-					dragging.css("left", dragging.offset().left);
-					dragging.css("top", dragging.offset().top);
-					dragging.detach().appendTo("body");
-				}
-				if (dragging) {
-					dragging.css("left", "50px");
-					dragging.css("top", e.pageY - offsetY);
+					if (dragging) {
+						dragging.css("left", "50px");
+						dragging.css("top", e.pageY - offsetY);
 
-					var height = dragging.outerHeight();
+						var height = dragging.outerHeight();
 
-					el = find(e.pageY - offsetY + h);
-					if (el !== undefined) {
-						$(".dragging-placeholder").remove();
-						if (prevY < e.pageY) {
-							if (el.hasClass("label")) {
-								el.find(".content").prepend($('<div class="dragging-placeholder"></div>'));
+						el = find(e.pageY - offsetY + h);
+						if (el !== undefined) {
+							$(".dragging-placeholder").remove();
+							if (prevY < e.pageY) {
+								if (el.hasClass("label")) {
+									el.find(".content").prepend($('<div class="dragging-placeholder"></div>'));
+								}
+								else {
+									$('<div class="dragging-placeholder"></div>').insertAfter(el);	
+								}							
 							}
 							else {
-								$('<div class="dragging-placeholder"></div>').insertAfter(el);	
-							}							
+								$('<div class="dragging-placeholder"></div>').insertBefore(el);
+							}
+							$(".dragging-placeholder").height(height);
 						}
-						else {
-							$('<div class="dragging-placeholder"></div>').insertBefore(el);
-						}
-						$(".dragging-placeholder").height(height);
+						prevY = e.pageY;
 					}
-					prevY = e.pageY;
-				}
-			}			
-		});
+				}			
+			});
 
-		$(document).mouseup(function(e) {
-			if (dragging) {
-				if (moving) {
-					dragging.css("left", "auto");
-					dragging.css("top", "auto");
+			$(document).mouseup(function(e) {
+				if (dragging) {
+					if (moving) {
+						dragging.css("left", "auto");
+						dragging.css("top", "auto");
 
-					dragging.removeClass("dragging");
-					$(".dragging-placeholder").replaceWith(dragging);
-					moving = false;
-				}
-				dragging = null;
-			}			
-		});
+						dragging.removeClass("dragging");
+						$(".dragging-placeholder").replaceWith(dragging);
+						moving = false;
+						endCallbacks.forEach(function(cb) { cb(); });
+					}
+					dragging = null;
+				}			
+			});
+		},
+
+		ended: function(cb) {
+			endCallbacks.push(cb);
+		}
 	}
 }());
 
@@ -309,6 +317,7 @@ var DragDrop = (function() {
 		episodes = {},
 		casts = {},
 		labels,
+		rootLabelId,
 		root,
 		apiRoot,
 		loggedIn = false,
@@ -318,8 +327,7 @@ var DragDrop = (function() {
 		videoLoading = false,
 		castHovered = null,
 		ctrlDown = false,
-		autoplay = false,
-		switchingTabs = false;
+		autoplay = false;
 
 	var Event = {
 		Start: 10,
@@ -365,11 +373,8 @@ var DragDrop = (function() {
 	});
 
 	$(document).ready(function() {
-		DragDrop("#podcasts", ".drag");
-
-		//$(".col").mousewheel(function(e) {
-		//	$(this).scrollTo($(this).scrollTop() - e.deltaY * e.deltaFactor, 0);
-		//});
+		DragDrop.init("#podcasts", ".drag");
+		DragDrop.ended(saveTags);
 
 		var Router = Backbone.Router.extend({
 			routes: {
@@ -545,7 +550,6 @@ var DragDrop = (function() {
 		Chromecast.timeUpdate(function(time) {
 			updateTime(time);
 			currentTime = time;
-			//el("vid").currentTime = time;
 		});
 
 		$("#vid").click(function() {
@@ -688,7 +692,6 @@ var DragDrop = (function() {
 				$("#ep-" + currentEpisodeId + " i").remove();
 			}
 			updateEpisodeIndicators();
-			//$("#ep-" + currentEpisodeId).append('<i class="fa fa-spinner fa-spin"></i>');
 		});
 
 		$("#vid").on("canplay", function() {
@@ -710,14 +713,6 @@ var DragDrop = (function() {
 			videoLoading = false;
 
 			updateEpisodeIndicators();
-
-			/*$("#ep-" + currentEpisodeId + " i").remove();
-			if (paused) {
-				$("#ep-" + currentEpisodeId).append('<i class="fa fa-pause"></i>');
-			}
-			else {
-				$("#ep-" + currentEpisodeId).append('<i class="fa fa-play"></i>');
-			}*/
 		});
 
 		$("#vid").on("ended", function() {
@@ -861,7 +856,12 @@ var DragDrop = (function() {
 		});
 
 		$("#podcasts").on("contextmenu", ".cast", function(e) {
+			e.stopPropagation();
 			showContextMenu("#cast-context-menu", this, e);
+		});
+
+		$("#podcasts").on("contextmenu", ".label", function(e) {
+			showContextMenu("#label-context-menu", this, e);
 		});
 
 		$("#episodes").on("contextmenu", ".episode", function(e) {
@@ -913,7 +913,6 @@ var DragDrop = (function() {
 				if (e.which === 13) {
 					var name = $(this).val();
 					$(this).parent().html(name);
-					$.post(apiRoot + "library/casts/" + contextItemId, { name: name });
 					$.ajax(apiRoot + "library/casts/" + contextItemId, {
 						type: "PUT",
 						data: {
@@ -932,6 +931,25 @@ var DragDrop = (function() {
 				type: "DELETE",
 				success: function(res) {
 					loadTags();
+				}
+			});
+		});
+
+		$("#label-context-rename").click(function() {
+			var name = $("#label-" + contextItemId + " .name span").html();
+			$("#label-" + contextItemId + " .name span").html('<input type="text">');
+			$(".label input").focus();
+			$(".label input").val(name);
+			$(".label input").keydown(function(e) {
+				if (e.which === 13) {
+					var name = $(this).val();
+					$(this).parent().html(name);
+					$.ajax(apiRoot + "library/labels/" + contextItemId, {
+						type: "PUT",
+						data: {
+							name: name
+						}
+					});
 				}
 			});
 		});
@@ -1256,29 +1274,12 @@ var DragDrop = (function() {
 				$("#cast-" + sessionStorage.selectedcast).addClass("current");
 			}
 
-			/*res.forEach(function(cast) {
-				$("#cast-" + cast.id).click(function() {
-					if (ctrlDown) {
-						$(this).toggleClass("selected");
-					}
-					else {
-						switchingTabs = true;
-						loadEpisodes(cast.id);
-						sessionStorage.selectedcast = cast.id;
-
-						$(".cast").removeClass("current");
-						$(this).addClass("current");
-					}
-				});
-			});*/
-
 			$("#podcasts").on("click", ".cast", function() {
 				if (ctrlDown) {
 					$(this).toggleClass("selected");
 				}
 				else {
 					var id = $(this).prop("id").split("-")[1];
-					switchingTabs = true;
 					loadEpisodes(id);
 					sessionStorage.selectedcast = id;
 
@@ -1343,16 +1344,6 @@ var DragDrop = (function() {
 				episodes[episode.id] = episode;
 
 				updateEpisodeIndicators();
-
-				/*if (switchingTabs && episode.id == currentEpisodeId) {
-					switchingTabs = false;
-					if (episode.lastevent.type == Event.Pause) {
-						$("#ep-" + episode.id).append('<i class="fa fa-pause"></i>');
-					}
-					else {
-						$("#ep-" + episode.id).append('<i class="fa fa-play"></i>');
-					}
-				}*/
 			});
 
 			if (sessionStorage.lastepisode) {
@@ -1415,21 +1406,35 @@ var DragDrop = (function() {
 			loadCasts();
 
 			console.log(JSON.stringify(labels, null, 4));
-			/*res.forEach(function(tag) {
-				$("#tags").append('<button class="button">' + tag + '</button>');
+		});
+	}
+
+	function saveTags() {
+		var content = [];
+		$("#podcasts > div").each(function(index, el) {
+			content.push($(el).prop("id").replace("-", "/"));
+		});
+
+		$.ajax(apiRoot + "library/labels/" + rootLabelId, {
+			type: "PUT",
+			data: {
+				content: content.join()
+			}
+		});
+
+		$("#podcasts .label").each(function(index, el) {
+			content = [];
+			$(el).find(".cast").each(function(index, el) {
+				content.push($(el).prop("id").replace("-", "/"));
 			});
 
-			$("#tags button").click(function() {
-				if ($(this).hasClass("selected")) {
-					loadCasts();
-					$("#tags button").removeClass("selected");
+			$.ajax(apiRoot + "library/labels/" + $(el).prop("id").split("-")[1], {
+				type: "PUT",
+				data: {
+					content: content.join(),
+					expanded: $(el).find(".content").is(":visible")
 				}
-				else {
-					loadCasts($(this).text());
-					$("#tags button").removeClass("selected");
-					$(this).addClass("selected");
-				}
-			});*/
+			});
 		});
 	}
 
@@ -1444,8 +1449,6 @@ var DragDrop = (function() {
 		pushEvent(Event.Play);
 		$(".button-play i").addClass("fa-pause");
 		$(".button-play i").removeClass("fa-play");
-		//$("#ep-" + currentEpisodeId + " i").removeClass("fa-pause");
-		//$("#ep-" + currentEpisodeId + " i").addClass("fa-play");
 		updateEpisodeIndicators();
 		$("#episode-bar-play").html("Pause");
 		$(".pretty-overlay").hide();
@@ -1462,8 +1465,6 @@ var DragDrop = (function() {
 		pushEvent(Event.Pause);
 		$(".button-play i").addClass("fa-play");
 		$(".button-play i").removeClass("fa-pause");
-		//$("#ep-" + currentEpisodeId + " i").removeClass("fa-play");
-		//$("#ep-" + currentEpisodeId + " i").addClass("fa-pause");
 		updateEpisodeIndicators();
 		$("#episode-bar-play").html("Play");
 		$(".pretty-overlay").show();

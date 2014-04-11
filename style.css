@@ -374,13 +374,13 @@ a {
 	color: #FFF;
 }
 
-.cast input {
+.cast input, .label input {
 	font: 16px Lato, sans-serif;
 	border: none;
 	outline: none;
-	background: #222;
+	background: rgba(0,0,0,0);
 	color: #FFF;
-	width: 100%;
+	width: 90%;
 }
 
 .label .content .cast {
