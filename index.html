@@ -124,16 +124,16 @@
 	<script type="text/template" class="podcasts">
 	<% 	labels.root.forEach(function(label) { 
 			if (label.type === "cast") { %>
-				<div id="cast-<%= label.id %>" class="cast"><%= casts[label.id].name %></div>
+				<div id="cast-<%= label.id %>" class="cast drag"><%= casts[label.id].name %></div>
 	<% 		}
 			else if (label.type === "label") { %>
-				<div id="label-<%= label.id %>" class="label">
+				<div id="label-<%= label.id %>" class="label drag">
 					<div class="name"><%= labels[label.id].name %><i class="fa fa-angle-down" style="float:right;font-size:20px"></i></div>
 					<div class="content" style="display:none">
 	<%					if (labels[label.id].name !== "root") { 
 							labels[labels[label.id].name].forEach(function(cast) {
 								if (cast.type === "cast") { %>
-									<div id="cast-<%= cast.id %>" class="cast"><%= casts[cast.id].name %></div>
+									<div id="cast-<%= cast.id %>" class="cast drag"><%= casts[cast.id].name %></div>
 	<%							}
 							});
 						} %>

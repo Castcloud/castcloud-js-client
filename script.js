@@ -216,7 +216,7 @@ var DragDrop = (function() {
 
 	function find(y) {
 		var result;
-		$(".cast:not(.dragging)").each(function(index, element) {
+		$(child + ":not(.dragging)").each(function(index, element) {
 			if (Math.abs($(element).offset().top + h - y) < h) {
 				result = $(element);
 			}
@@ -229,6 +229,7 @@ var DragDrop = (function() {
 		child = _child;
 
 		$(container).on("mousedown", child, function(e) {
+			e.stopPropagation();
 			dragging = $(this);
 			h = dragging.outerHeight() / 2;
 
@@ -241,6 +242,9 @@ var DragDrop = (function() {
 		$(document).mousemove(function(e) {
 			if (e.pageY !== y) {
 				if (dragging && !moving) {
+					if (dragging.hasClass("label")) {
+						dragging.find(".content").hide();
+					}
 					moving = true;
 					var width = dragging.width();
 					var height = dragging.outerHeight();
@@ -261,7 +265,12 @@ var DragDrop = (function() {
 					if (el !== undefined) {
 						$(".dragging-placeholder").remove();
 						if (prevY < e.pageY) {
-							$('<div class="dragging-placeholder"></div>').insertAfter(el);
+							if (el.hasClass("label")) {
+								el.find(".content").prepend($('<div class="dragging-placeholder"></div>'));
+							}
+							else {
+								$('<div class="dragging-placeholder"></div>').insertAfter(el);	
+							}							
 						}
 						else {
 							$('<div class="dragging-placeholder"></div>').insertBefore(el);
@@ -356,7 +365,7 @@ var DragDrop = (function() {
 	});
 
 	$(document).ready(function() {
-		DragDrop("#podcasts", ".cast");
+		DragDrop("#podcasts", ".drag");
 
 		//$(".col").mousewheel(function(e) {
 		//	$(this).scrollTo($(this).scrollTop() - e.deltaY * e.deltaFactor, 0);
@@ -1221,7 +1230,7 @@ var DragDrop = (function() {
 			$("#podcasts").empty().append(template({ labels: labels, casts: casts }));
 			positionThumb();
 
-			$(".label .name").click(function() {
+			$("#podcasts").on("click", ".label .name", function() {
 				$(this).parent().find(".content").toggle();
 				if ($(this).find("i").hasClass("fa-angle-down")) {
 					$(this).find("i").removeClass("fa-angle-down");
