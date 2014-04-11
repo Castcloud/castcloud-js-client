@@ -1390,6 +1390,9 @@ var DragDrop = (function() {
 		get("library/labels", function(res) {
 			labels = {};
 			res.forEach(function(label) {
+				if (label.name === "root") {
+					rootLabelId = label.id;
+				}
 				labels[label.name] = [];
 				label.content.split(",").forEach(function(item) {
 					var split = item.split("/");
