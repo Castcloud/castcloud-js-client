@@ -1160,6 +1160,10 @@ var DragDrop = (function() {
 
 	function login() {
 		username = $("#input-username").val();
+		apiRoot = $("#input-target").val();
+		if (apiRoot.indexOf("/", apiRoot.length - 1) === -1) {
+			apiRoot += "/";
+		}
 		$.post(apiRoot + "account/login", {
 			username: username,
 			password: $("#input-password").val(),
