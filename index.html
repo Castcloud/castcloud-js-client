@@ -64,7 +64,7 @@
 			</div>
 			<div id="podcast-cols">
 				<div class="col">
-					<input class="vmenu-toggle" type="text" id="input-vmenu-add" placeholder="Feed URL">
+					<input class="vmenu-toggle" type="text" id="input-vmenu-add" placeholder="Feed URL / Search">
 					<button class="vmenu-toggle" id="button-vmenu-add">Add</button>
 					<div class="vmenu-toggle" id="vmenu-add-results"></div>
 					<div class="vmenu-toggle" id="tags"></div>
@@ -78,14 +78,14 @@
 					</figure>
 					<div id="episode-bar">
 						<button class="button" id="episode-bar-play">Play</button>
-						<button class="button" style="float:right" id="episode-bar-events">Events <i class="fa fa-angle-down"></i></button>
+						<button class="button" style="float:right" id="episode-bar-events">Events</button>
 					</div>
-					<div id="events"></div>
 					<div id="episodeinfo-text">
 						<h2 id="episode-title"></h2>
 						<p id="episode-date"></p>
 						<p id="episode-desc"></p>
 					</div>
+					<div id="events"></div>
 				</div>
 			</div>
 		</div>
@@ -155,6 +155,8 @@
 	</script>
 
 	<script type="text/template" class="events">
+	<h1>Events</h1>
+	<button id="events-close" class="button">Close</button>
 	<% events.forEach(function(event) { %>
 		<div event-type="<%= event.type %>" event-position="<%= event.positionts %>">
 			<p><span class="what"><%= events.eventName(event.type) %></span><span class="when"><%= event.position %></span></p>

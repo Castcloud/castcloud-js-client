@@ -396,6 +396,12 @@ a {
 	top: 0;
 	right: 0;
 	padding: 12px;
+	margin-right: 5px;
+}
+
+.episode .progress {
+	font-size: 14px;
+	color: #666;
 }
 
 #vid {
@@ -509,7 +515,7 @@ a {
 
 #episode-bar .button {
 	background: none;
-	color: #444;
+	color: #AAA;
 	width: auto;
 	margin: 0;
 	padding: 0 10px;
@@ -545,16 +551,30 @@ a {
 }
 
 #events {
-	display: none;
+	position: absolute;
+	left: 100%;
+	top: 0;
+	bottom: 0;
+	width: 100%;
 	background: #1A1A1A;
-	cursor: pointer;
-	overflow-y: scroll;
-	max-height: 40%;
+	z-index: 1;
+	-webkit-transition: left .2s;
+}
+
+#events-close {
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+
+#events h1 {
+	margin: 10px 15px;
 }
 
 #events div {
 	color: #AAA;
 	padding: 5px 15px;
+	cursor: pointer;
 }
 
 #events div:hover {
@@ -921,4 +941,8 @@ a {
 
 .iScrollVerticalScrollbar .iScrollIndicator {
 	width: 100%;
+}
+
+#episodeinfo {
+	position: relative;
 }

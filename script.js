@@ -1002,7 +1002,7 @@ var DragDrop = (function() {
 		});
 
 		$("#episode-bar-events").click(function() {
-			$("#events").slideToggle("fast");
+			$("#events").css("left", 0);
 		});
 
 		$("#episode-bar-play").click(function() {
@@ -1014,7 +1014,12 @@ var DragDrop = (function() {
 			}
 		});
 
+		$("#events").on("click", "#events-close", function() {
+			$("#events").css("left", "100%");
+		});
+
 		$("#events").on("click", "div", function() {
+			$("#events").css("left", "100%");
 			var type = $(this).attr("event-type");
 			var video = el("vid");
 
@@ -1357,11 +1362,11 @@ var DragDrop = (function() {
 			}
 
 			$(".episode").mouseover(function() {
-				$(this).children(".bar").css("background", "#0099cc");
+				$(this).children(".progress").css("color", "#FFF");
 			});
 
 			$(".episode").mouseout(function() {
-				$(this).children(".bar").css("background", "#333");
+				$(this).children(".progress").css("color", "#666");
 			});
 		});
 	}
@@ -1518,10 +1523,10 @@ var DragDrop = (function() {
 			}
 			else if (episode.lastevent !== null) {				
 				if (episode.lastevent.type == Event.EndOfTrack) {
-					$("#ep-" + id).append('<i class="fa fa-circle"></i>');
+					$("#ep-" + id).append('<i class="fa fa-circle progress"></i>');
 				}
 				else if (episode.lastevent.positionts > 0) {
-					$("#ep-" + id).append('<i class="fa fa-circle-o"></i>');
+					$("#ep-" + id).append('<i class="fa fa-circle-o progress"></i>');
 				}
 			}
 		}
