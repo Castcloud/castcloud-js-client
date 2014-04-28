@@ -1422,9 +1422,9 @@ var DragDrop = (function() {
 				autoplay = true;
 				playEpisode(episode.id);
 			});
-
-			updateEpisodeIndicators();
 		});
+
+		updateEpisodeIndicators();
 
 		if (sessionStorage.lastepisode) {
 			var lastepisode = JSON.parse(sessionStorage.lastepisode);
