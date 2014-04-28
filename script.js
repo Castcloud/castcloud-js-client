@@ -828,8 +828,9 @@ var DragDrop = (function() {
 		});
 
 		$("#vmenu-sync").click(function() {
-			loadTags();
-			$("#tags button").removeClass("selected");
+			sync(true);
+			//loadTags();
+			//$("#tags button").removeClass("selected");
 		});
 
 		$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2 - 60) + "px");
@@ -1213,9 +1214,39 @@ var DragDrop = (function() {
 			$("#vid-container").addClass("thumb");
 		}
 
+		var foo = false;
+
+		if (localStorage.labels) {
+			console.log("Labels loaded from localstorage");
+			labels = JSON.parse(localStorage.labels);
+		}
+
+		if (localStorage.casts) {
+			console.log("Casts loaded from localstorage");
+			casts = JSON.parse(localStorage.casts);
+			foo = true;
+		}
+
+		if (localStorage.episodes) {
+			console.log("Episodes loaded from localstorage");
+			episodes = JSON.parse(localStorage.episodes);
+		}
+
+		if (foo) {
+			renderCasts();
+		}
 		
 		loadSettings();
+		sync();
+	}
+
+	function sync(onDemand) {
 		loadTags();
+		loadEpisodes();
+
+		if (!onDemand) {
+			setTimeout(sync, 10000);
+		}		
 	}
 
 	var lastEventTS = null;
@@ -1258,48 +1289,159 @@ var DragDrop = (function() {
 				casts[cast.id] = cast;
 			});
 
-			var template = _.template($("script.podcasts").html());
-			$("#podcasts").empty().append(template({ labels: labels, casts: casts }));
-			positionThumb();
+			localStorage.casts = JSON.stringify(casts);
 
-			$("#podcasts").on("click", ".label .name", function() {
-				$(this).parent().find(".content").toggle();
-				if ($(this).find("i").hasClass("fa-angle-down")) {
-					$(this).find("i").removeClass("fa-angle-down");
-					$(this).find("i").addClass("fa-angle-up");
-				}
-				else {
-					$(this).find("i").removeClass("fa-angle-up");
-					$(this).find("i").addClass("fa-angle-down");
-				}
-			});
-
-			if (sessionStorage.lastepisode) {
-				var lastepisode = JSON.parse(sessionStorage.lastepisode);
-				loadEpisodes(lastepisode.castid);
-			}
-			if (sessionStorage.selectedcast) {
-				loadEpisodes(sessionStorage.selectedcast);
-				$("#cast-" + sessionStorage.selectedcast).addClass("current");
-			}
-
-			$("#podcasts").on("click", ".cast", function() {
-				if (ctrlDown) {
-					$(this).toggleClass("selected");
-				}
-				else {
-					var id = $(this).prop("id").split("-")[1];
-					loadEpisodes(id);
-					sessionStorage.selectedcast = id;
-
-					$(".cast").removeClass("current");
-					$(this).addClass("current");
-				}
-			});
+			renderCasts();
 		});
 	}
 
-	function loadEpisodes(id) {
+	function renderCasts() {
+		var template = _.template($("script.podcasts").html());
+		$("#podcasts").empty().append(template({ labels: labels, casts: casts }));
+		positionThumb();
+
+		labels.root.forEach(function(label) {
+			if (label.type === "label") {
+				if (labels[label.id].expanded) {
+					$("#label-" + label.id + " .content").show();
+				}
+			}
+		});
+
+		$("#podcasts").on("click", ".label .name", function() {
+			$(this).parent().find(".content").toggle();
+			if ($(this).find("i").hasClass("fa-angle-down")) {
+				$(this).find("i").removeClass("fa-angle-down");
+				$(this).find("i").addClass("fa-angle-up");
+			}
+			else {
+				$(this).find("i").removeClass("fa-angle-up");
+				$(this).find("i").addClass("fa-angle-down");
+			}
+			saveTags();
+		});
+
+		if (sessionStorage.lastepisode) {
+			var lastepisode = JSON.parse(sessionStorage.lastepisode);
+			//loadEpisodes(lastepisode.castid);
+			renderEpisodes(lastepisode.castid);
+		}
+		if (sessionStorage.selectedcast) {
+			renderEpisodes(sessionStorage.selectedcast);
+			$("#cast-" + sessionStorage.selectedcast).addClass("current");
+		}
+
+		$("#podcasts").on("click", ".cast", function() {
+			if (ctrlDown) {
+				$(this).toggleClass("selected");
+			}
+			else {
+				var id = $(this).prop("id").split("-")[1];
+				//loadEpisodes(id);
+				renderEpisodes(id);
+				sessionStorage.selectedcast = id;
+
+				$(".cast").removeClass("current");
+				$(this).addClass("current");
+			}
+		});
+	}
+
+	function loadEpisodes() {
+		if (localStorage.since) {
+			localStorage.since = unix();
+		}
+		else {
+			localStorage.since = 0;
+		}
+		console.log("fetching episodes since " + localStorage.since);
+		$.get(apiRoot + "library/newepisodes", { since: localStorage.since }, function(res) {
+			console.log(res.episodes.length + " episodes fetched");
+			var localEpisodes = JSON.parse(localStorage.episodes || "{}");
+			res.episodes.forEach(function(episode) {
+				episodes[episode.id] = episode;
+				localEpisodes[episode.id] = episode;
+			});
+			localStorage.episodes = JSON.stringify(localEpisodes);
+		});
+	}
+
+	function renderEpisodes(id) {
+		var e = [];
+		for (var x in episodes) {
+			if (episodes[x].castid == id) {
+				e.push(episodes[x]);
+			}
+		}
+
+		var template = _.template($("script.episodes").html());
+		$("#episodes").empty().append(template({ episodes: e }));
+		positionThumb();
+
+		var scroll = new IScroll('#episodes', {
+			mouseWheel: true,
+			scrollbars: 'custom',
+			keyBindings: true,
+			interactiveScrollbars: true,
+			click: true
+		});
+
+		$(".iScrollVerticalScrollbar").hide();
+		$("#episodes").hover(function() {
+			$(".iScrollVerticalScrollbar").show();
+		}, function() {
+			$(".iScrollVerticalScrollbar").hide();
+		});
+
+		e.forEach(function(episode) {
+			$("#ep-" + episode.id).click(function() {
+				if (ctrlDown) {
+					$(this).toggleClass("selected");
+					$(this).children(".bar").toggle();
+				}
+				else {
+					selectedEpisodeId = episode.id;
+					loadEpisodeInfo(episode.id);
+
+					if (currentEpisodeId === episode.id) {
+						if (paused) {
+							$("#episode-bar-play").html("Play");
+						}
+						else {
+							$("#episode-bar-play").html("Pause");
+						}
+					}
+					else {
+						$("#episode-bar-play").html("Play");
+					}
+				}
+			});
+
+			$("#ep-" + episode.id).dblclick(function() {
+				sessionStorage.lastepisode = JSON.stringify({ id: episode.id, castid: episode.castid });
+				autoplay = true;
+				playEpisode(episode.id);
+			});
+
+			updateEpisodeIndicators();
+		});
+
+		if (sessionStorage.lastepisode) {
+			var lastepisode = JSON.parse(sessionStorage.lastepisode);
+			playEpisode(lastepisode.id);
+			$("#ep-" + lastepisode.id).addClass("current");
+		}
+
+		$(".episode").mouseover(function() {
+			$(this).children(".progress").css("color", "#FFF");
+		});
+
+		$(".episode").mouseout(function() {
+			$(this).children(".progress").css("color", "#666");
+		});
+	}
+
+	/*function loadEpisodes(id) {
 		get("library/episodes/" + id, function(res) {
 			var template = _.template($("script.episodes").html());
 			$("#episodes").empty().append(template({ episodes: res }));
@@ -1369,7 +1511,7 @@ var DragDrop = (function() {
 				$(this).children(".progress").css("color", "#666");
 			});
 		});
-	}
+	}*/
 
 	function loadSettings() {
 		get("account/settings", function(res) {
@@ -1410,14 +1552,16 @@ var DragDrop = (function() {
 						id: parseInt(split[1])
 					});
 					labels[label.id] = {
-						name: label.name
+						name: label.name,
+						expanded: label.expanded
 					};
 				});
 			});
-			
+			localStorage.labels = JSON.stringify(labels);
+	
 			loadCasts();
 
-			console.log(JSON.stringify(labels, null, 4));
+			//console.log(JSON.stringify(labels, null, 4));
 		});
 	}
 
