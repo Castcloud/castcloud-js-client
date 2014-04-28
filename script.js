@@ -317,6 +317,7 @@ var DragDrop = (function() {
 		episodes = {},
 		casts = {},
 		labels,
+		events,
 		rootLabelId,
 		root,
 		apiRoot,
@@ -1076,7 +1077,7 @@ var DragDrop = (function() {
 	}
 
 	function loadEpisodeInfo(id) {
-		$.get(apiRoot + "library/events", { itemid: id, limit: 10 }, function(res) {
+		/*$.get(apiRoot + "library/events", { itemid: id, limit: 10 }, function(res) {
 			var template = _.template($("script.events").html());
 			res.events.forEach(function(event) {
 				var position = new Date(event.positionts * 1000);
@@ -1094,7 +1095,9 @@ var DragDrop = (function() {
 				return Event[e];
 			}
 			$("#events").empty().append(template({ events: res.events }));
-		});
+		});*/
+
+		renderEvents(id);
 
 		var image = getEpisodeImage(id);
 		if (image) {
@@ -1232,6 +1235,11 @@ var DragDrop = (function() {
 			episodes = JSON.parse(localStorage.episodes);
 		}
 
+		if (localStorage.events) {
+			console.log("Events loaded from localstorage");
+			events = JSON.parse(localStorage.events);
+		}
+
 		if (foo) {
 			renderCasts();
 		}
@@ -1243,6 +1251,7 @@ var DragDrop = (function() {
 	function sync(onDemand) {
 		loadTags();
 		loadEpisodes();
+		loadEvents();
 
 		if (!onDemand) {
 			setTimeout(sync, 10000);
@@ -1592,6 +1601,36 @@ var DragDrop = (function() {
 				}
 			});
 		});
+	}
+
+	function loadEvents() {
+		$.get(apiRoot + "library/events", function(res) {
+			res.events.forEach(function(event) {
+				var position = new Date(event.positionts * 1000);
+				position.setHours(position.getHours() - 1);
+				event.position = "";
+				if (position.getHours() > 0) {
+					event.position += position.getHours() + "h ";
+				}
+				event.position += position.getMinutes() + "m " + position.getSeconds() + "s";
+				var date = new Date(event.clientts * 1000);
+				date.setHours(date.getHours() - 1);
+				event.date = date.toLocaleString();
+				event.name = Event[event.type];
+			});
+			localStorage.events = JSON.stringify(res.events);
+		});
+	}
+
+	function renderEvents(id) {
+		var e = [];
+		JSON.parse(localStorage.events).forEach(function(event) {
+			if (event.episodeid == id) {
+				e.push(event);
+			}
+		});
+		var template = _.template($("script.events").html());
+		$("#events").empty().append(template({ events: e }));
 	}
 
 	function play() {
