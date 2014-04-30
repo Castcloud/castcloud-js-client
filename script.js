@@ -964,6 +964,8 @@ var DragDrop = (function() {
 		$("#episode-context-delete").click(function() {
 			$("#ep-" + contextItemId).remove();
 			pushEvent(Event.Delete, contextItemId);
+			delete episodes[contextItemId];
+			localStorage[uniqueName("episodes")] = JSON.stringify(episodes);
 		});
 
 		$("#episode-context-reset").click(function() {
