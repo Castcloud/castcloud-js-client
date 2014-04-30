@@ -538,8 +538,6 @@ var DragDrop = (function() {
 
 			$("#time").html(time);
 			$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
-
-			setEpisodeBar(currentEpisodeId, currentTime);
 		}
 
 		$("#vid").on("timeupdate", function() {
@@ -830,8 +828,6 @@ var DragDrop = (function() {
 
 		$("#vmenu-sync").click(function() {
 			sync(true);
-			//loadTags();
-			//$("#tags button").removeClass("selected");
 		});
 
 		$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2 - 60) + "px");
@@ -966,7 +962,6 @@ var DragDrop = (function() {
 			}
 			else {
 				pushEvent(Event.Pause, contextItemId, 0);
-				setEpisodeBar(contextItemId, 0);
 			}
 		});
 
@@ -1077,26 +1072,6 @@ var DragDrop = (function() {
 	}
 
 	function loadEpisodeInfo(id) {
-		/*$.get(apiRoot + "library/events", { itemid: id, limit: 10 }, function(res) {
-			var template = _.template($("script.events").html());
-			res.events.forEach(function(event) {
-				var position = new Date(event.positionts * 1000);
-				position.setHours(position.getHours() - 1);
-				event.position = "";
-				if (position.getHours() > 0) {
-					event.position += position.getHours() + "h ";
-				}
-				event.position += position.getMinutes() + "m " + position.getSeconds() + "s";
-				var date = new Date(event.clientts * 1000);
-				date.setHours(date.getHours() - 1);
-				event.date = date.toLocaleString();
-			});
-			res.events.eventName = function(e) {
-				return Event[e];
-			}
-			$("#events").empty().append(template({ events: res.events }));
-		});*/
-
 		renderEvents(id);
 
 		var image = getEpisodeImage(id);
@@ -1173,13 +1148,16 @@ var DragDrop = (function() {
 		if (apiRoot.indexOf("/", apiRoot.length - 1) === -1) {
 			apiRoot += "/";
 		}
+
+		localStorage[uniqueName("uuid")] = localStorage[uniqueName("uuid")] || uuid();
+
 		$.post(apiRoot + "account/login", {
 			username: username,
 			password: $("#input-password").val(),
 			clientname: "Castcloud",
 			clientdescription: "Best",
 			clientversion: "1.0",
-			uuid: "1881"
+			uuid: localStorage[uniqueName("uuid")]
 		}, function(res) {
 			token = res.token;
 			console.log(token);
@@ -1219,25 +1197,25 @@ var DragDrop = (function() {
 
 		var foo = false;
 
-		if (localStorage.labels) {
+		if (localStorage[uniqueName("labels")]) {
 			console.log("Labels loaded from localstorage");
-			labels = JSON.parse(localStorage.labels);
+			labels = JSON.parse(localStorage[uniqueName("labels")]);
 		}
 
-		if (localStorage.casts) {
+		if (localStorage[uniqueName("casts")]) {
 			console.log("Casts loaded from localstorage");
-			casts = JSON.parse(localStorage.casts);
+			casts = JSON.parse(localStorage[uniqueName("casts")]);
 			foo = true;
 		}
 
-		if (localStorage.episodes) {
+		if (localStorage[uniqueName("episodes")]) {
 			console.log("Episodes loaded from localstorage");
-			episodes = JSON.parse(localStorage.episodes);
+			episodes = JSON.parse(localStorage[uniqueName("episodes")]);
 		}
 
-		if (localStorage.events) {
+		if (localStorage[uniqueName("events")]) {
 			console.log("Events loaded from localstorage");
-			events = JSON.parse(localStorage.events);
+			events = JSON.parse(localStorage[uniqueName("events")]);
 
 			events.forEach(function(event) {
 				if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.positionts > episodes[event.episodeid].lastevent.positionts)) {
@@ -1291,11 +1269,7 @@ var DragDrop = (function() {
 			positionts: time === undefined ? el("vid").currentTime | 0 : time,
 			concurrentorder: currentOrder,
 			clientts: eventTS				
-		}] });
-
-		if (id !== undefined) {
-			localStorage.setItem("episode-" + currentEpisodeId, el("vid").duration);
-		}		
+		}] });	
 	}
 
 	function loadCasts(tag) {
@@ -1304,7 +1278,7 @@ var DragDrop = (function() {
 				casts[cast.id] = cast;
 			});
 
-			localStorage.casts = JSON.stringify(casts);
+			localStorage[uniqueName("casts")] = JSON.stringify(casts);
 
 			renderCasts();
 		});
@@ -1363,21 +1337,21 @@ var DragDrop = (function() {
 	}
 
 	function loadEpisodes() {
-		if (localStorage.since) {
-			localStorage.since = unix();
+		if (localStorage[uniqueName("since")]) {
+			localStorage[uniqueName("since")] = unix();
 		}
 		else {
-			localStorage.since = 0;
+			localStorage[uniqueName("since")] = 0;
 		}
-		console.log("fetching episodes since " + localStorage.since);
-		$.get(apiRoot + "library/newepisodes", { since: localStorage.since }, function(res) {
+		console.log("fetching episodes since " + localStorage[uniqueName("since")]);
+		$.get(apiRoot + "library/newepisodes", { since: localStorage[uniqueName("since")] }, function(res) {
 			console.log(res.episodes.length + " episodes fetched");
-			var localEpisodes = JSON.parse(localStorage.episodes || "{}");
+			var localEpisodes = JSON.parse(localStorage[uniqueName("episodes")] || "{}");
 			res.episodes.forEach(function(episode) {
 				episodes[episode.id] = episode;
 				localEpisodes[episode.id] = episode;
 			});
-			localStorage.episodes = JSON.stringify(localEpisodes);
+			localStorage[uniqueName("episodes")] = JSON.stringify(localEpisodes);
 		});
 	}
 
@@ -1456,78 +1430,6 @@ var DragDrop = (function() {
 		});
 	}
 
-	/*function loadEpisodes(id) {
-		get("library/episodes/" + id, function(res) {
-			var template = _.template($("script.episodes").html());
-			$("#episodes").empty().append(template({ episodes: res }));
-			positionThumb();
-
-			var scroll = new IScroll('#episodes', {
-				mouseWheel: true,
-				scrollbars: 'custom',
-				keyBindings: true,
-				interactiveScrollbars: true,
-				click: true
-			});
-
-			$(".iScrollVerticalScrollbar").hide();
-			$("#episodes").hover(function() {
-				$(".iScrollVerticalScrollbar").show();
-			}, function() {
-				$(".iScrollVerticalScrollbar").hide();
-			});
-
-			res.forEach(function(episode) {
-				$("#ep-" + episode.id).click(function() {
-					if (ctrlDown) {
-						$(this).toggleClass("selected");
-						$(this).children(".bar").toggle();
-					}
-					else {
-						selectedEpisodeId = episode.id;
-						loadEpisodeInfo(episode.id);
-
-						if (currentEpisodeId === episode.id) {
-							if (paused) {
-								$("#episode-bar-play").html("Play");
-							}
-							else {
-								$("#episode-bar-play").html("Pause");
-							}
-						}
-						else {
-							$("#episode-bar-play").html("Play");
-						}
-					}
-				});
-
-				$("#ep-" + episode.id).dblclick(function() {
-					sessionStorage.lastepisode = JSON.stringify({ id: episode.id, castid: episode.castid });
-					autoplay = true;
-					playEpisode(episode.id);
-				});
-
-				episodes[episode.id] = episode;
-
-				updateEpisodeIndicators();
-			});
-
-			if (sessionStorage.lastepisode) {
-				var lastepisode = JSON.parse(sessionStorage.lastepisode);
-				playEpisode(lastepisode.id);
-				$("#ep-" + lastepisode.id).addClass("current");
-			}
-
-			$(".episode").mouseover(function() {
-				$(this).children(".progress").css("color", "#FFF");
-			});
-
-			$(".episode").mouseout(function() {
-				$(this).children(".progress").css("color", "#666");
-			});
-		});
-	}*/
-
 	function loadSettings() {
 		get("account/settings", function(res) {
 			var settings = {};
@@ -1572,11 +1474,9 @@ var DragDrop = (function() {
 					};
 				});
 			});
-			localStorage.labels = JSON.stringify(labels);
+			localStorage[uniqueName("labels")] = JSON.stringify(labels);
 	
 			loadCasts();
-
-			//console.log(JSON.stringify(labels, null, 4));
 		});
 	}
 
@@ -1628,13 +1528,18 @@ var DragDrop = (function() {
 					episodes[event.episodeid].lastevent = event;
 				}
 			});
-			localStorage.events = JSON.stringify(res.events);
+
+			if (selectedEpisodeId !== null) {
+				renderEvents(selectedEpisodeId);
+			}
+
+			localStorage[uniqueName("events")] = JSON.stringify(res.events);
 		});
 	}
 
 	function renderEvents(id) {
 		var e = [];
-		JSON.parse(localStorage.events).forEach(function(event) {
+		JSON.parse(localStorage[uniqueName("events")]).forEach(function(event) {
 			if (event.episodeid == id) {
 				e.push(event);
 			}
@@ -1739,10 +1644,6 @@ var DragDrop = (function() {
 		e.preventDefault();
 	}
 
-	function setEpisodeBar(id, time) {
-		$("#ep-" + id + " .bar").css("width", (time / localStorage.getItem("episode-" + id) * 100)+"%");
-	}
-
 	function get(url, cb) {
 		$.get(apiRoot + url, cb);
 	}
@@ -1753,6 +1654,17 @@ var DragDrop = (function() {
 
 	function unix() {
 		return $.now() / 1000 | 0;
+	}
+
+	function uuid() {
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+		    return v.toString(16);
+		});
+	}
+
+	function uniqueName(name) {
+		return username + "-" + name;
 	}
 
 	Number.prototype.pad = function() {
