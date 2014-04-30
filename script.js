@@ -962,6 +962,7 @@ var DragDrop = (function() {
 		});
 
 		$("#episode-context-delete").click(function() {
+			$("#ep-" + contextItemId).remove();
 			pushEvent(Event.Delete, contextItemId);
 		});
 
