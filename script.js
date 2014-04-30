@@ -374,6 +374,15 @@ var DragDrop = (function() {
 	});
 
 	$(document).ready(function() {
+		console.log("Local Storage Usage:");
+		var total = 0;
+		for(var x in localStorage) {
+			var amount = (localStorage[x].length * 2) / 1024 / 1024;
+			total += amount;
+			console.log( x + " = " + amount.toFixed(2) + " MB");
+		}
+		console.log( "Total: " + total.toFixed(2) + " MB");
+
 		DragDrop.init("#podcasts", ".drag");
 		DragDrop.ended(saveTags);
 
@@ -953,7 +962,7 @@ var DragDrop = (function() {
 		});
 
 		$("#episode-context-delete").click(function() {
-			console.log("DELETE: " + contextItemId);
+			pushEvent(Event.Delete, contextItemId);
 		});
 
 		$("#episode-context-reset").click(function() {
