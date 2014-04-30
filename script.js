@@ -1238,6 +1238,12 @@ var DragDrop = (function() {
 		if (localStorage.events) {
 			console.log("Events loaded from localstorage");
 			events = JSON.parse(localStorage.events);
+
+			events.forEach(function(event) {
+				if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.positionts > episodes[event.episodeid].lastevent.positionts)) {
+					episodes[event.episodeid].lastevent = event;
+				}
+			});
 		}
 
 		if (foo) {
@@ -1617,6 +1623,10 @@ var DragDrop = (function() {
 				date.setHours(date.getHours() - 1);
 				event.date = date.toLocaleString();
 				event.name = Event[event.type];
+
+				if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.positionts > episodes[event.episodeid].lastevent.positionts)) {
+					episodes[event.episodeid].lastevent = event;
+				}
 			});
 			localStorage.events = JSON.stringify(res.events);
 		});

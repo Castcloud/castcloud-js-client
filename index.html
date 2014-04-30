@@ -159,7 +159,7 @@
 	<button id="events-close" class="button">Close</button>
 	<% events.forEach(function(event) { %>
 		<div event-type="<%= event.type %>" event-position="<%= event.positionts %>">
-			<p><span class="what"><%= events.name %></span><span class="when"><%= event.position %></span></p>
+			<p><span class="what"><%= event.name %></span><span class="when"><%= event.position %></span></p>
 			<p class="secondline"><span class="who"><%= event.clientname + " (" + event.clientdescription + ")" %></span><span class="when"><%= event.date %></span></p>
 		</div>
 	<% }); %>
