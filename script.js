@@ -1151,6 +1151,17 @@ var DragDrop = (function() {
 			reader.readAsText(file);
 		});
 
+		$("#opml").click(function() {
+			$.get(apiRoot + "library/casts.opml", function(res) {
+				var a = window.document.createElement('a');
+				a.href = window.URL.createObjectURL(new Blob([res], {type: 'text/plain'}));
+				a.download = 'casts.opml';
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+			});			
+		});
+
 		if (sessionStorage.token) {
 			token = sessionStorage.token;
 			username = sessionStorage.username;
