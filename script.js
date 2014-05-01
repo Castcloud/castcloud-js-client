@@ -1275,6 +1275,8 @@ var DragDrop = (function() {
 			clientdescription: null
 		}
 
+		//events.unshift()
+
 		$.post(apiRoot + "library/events", { json: [{
 			type: type,
 			itemid: id === undefined ? currentEpisodeId : id,
@@ -1429,7 +1431,9 @@ var DragDrop = (function() {
 
 		if (sessionStorage.lastepisode) {
 			var lastepisode = JSON.parse(sessionStorage.lastepisode);
-			playEpisode(lastepisode.id);
+			if (lastepisode.id in episodes) {
+				playEpisode(lastepisode.id);
+			}			
 			$("#ep-" + lastepisode.id).addClass("current");
 		}
 
@@ -1541,6 +1545,8 @@ var DragDrop = (function() {
 				}
 			});
 
+			events = res.events;
+
 			if (selectedEpisodeId !== null) {
 				renderEvents(selectedEpisodeId);
 			}
@@ -1551,7 +1557,7 @@ var DragDrop = (function() {
 
 	function renderEvents(id) {
 		var e = [];
-		JSON.parse(localStorage[uniqueName("events")]).forEach(function(event) {
+		events.forEach(function(event) {
 			if (event.episodeid == id) {
 				e.push(event);
 			}
