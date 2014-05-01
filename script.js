@@ -1126,6 +1126,31 @@ var DragDrop = (function() {
 			playEpisode(id);
 		});
 
+		$("#episodes").on("hover", ".episode", function() {
+			if ($(this).find(".fa-circle").length > 0) {
+				console.log("!");
+			}
+		});
+
+		$("body").on("dragover", function(e) {
+			e.stopPropagation();
+			e.preventDefault();
+		});
+
+		$("body").on("drop", function(e) {
+			e.stopPropagation();
+			e.preventDefault();
+
+			var file = e.originalEvent.dataTransfer.files[0];
+			var reader = new FileReader();
+
+			reader.onload = function() {
+				$.post(apiRoot + "casts.opml", { opml: reader.result });
+			};
+
+			reader.readAsText(file);
+		});
+
 		if (sessionStorage.token) {
 			token = sessionStorage.token;
 			username = sessionStorage.username;
@@ -1256,30 +1281,20 @@ var DragDrop = (function() {
 		$("#input-password").val("");
 	}
 
-	var hits = 0;
-	function hit() {
-		hits++;
-		if (hits === 4) {
-			console.log("Rendering...");
-			renderCasts();
-		}
-	}
-
-	var dbReady = false;
-
 	function finishLogin() {
 		loggedIn = true;
+
+		var render = _.after(4, renderCasts);
 
 		db = new IDBStore({
 			storeName: uniqueName("db"),
 			keyPath: null
 		}, function() {
-			dbReady = true;
 			db.get("labels", function(data) {
 				if (data) {
 					console.log("Labels loaded from IDB");
 					labels = data;
-					hit();
+					render();
 				}
 			});
 
@@ -1287,7 +1302,7 @@ var DragDrop = (function() {
 				if (data) {
 					console.log("Casts loaded from IDB");
 					casts = data;
-					hit();
+					render();
 				}
 			})
 
@@ -1295,7 +1310,7 @@ var DragDrop = (function() {
 				if (data) {
 					console.log("Episodes loaded from IDB");
 					episodes = data;
-					hit();
+					render();
 				}
 			});
 
@@ -1309,7 +1324,7 @@ var DragDrop = (function() {
 							episodes[event.episodeid].lastevent = event;
 						}
 					});
-					hit();
+					render();
 				}
 			});
 		});	
@@ -1368,6 +1383,7 @@ var DragDrop = (function() {
 		loadLabels();
 		loadEpisodes();
 		loadEvents();
+		loadSettings();
 
 		if (!onDemand) {
 			setTimeout(sync, 10000);
@@ -1387,7 +1403,17 @@ var DragDrop = (function() {
 		}
 		lastEventTS = eventTS;
 
-		episodes[id === undefined ? currentEpisodeId : id].lastevent = {
+		var id = id === undefined ? currentEpisodeId : id;
+
+		$.post(apiRoot + "library/events", { json: [{
+			type: type,
+			itemid: id,
+			positionts: time === undefined ? el("vid").currentTime | 0 : time,
+			concurrentorder: currentOrder,
+			clientts: eventTS				
+		}] });	
+
+		episodes[id].lastevent = {
 			type: type,
 			positionts: time === undefined ? el("vid").currentTime | 0 : time,
 			clientts: eventTS,
@@ -1395,15 +1421,32 @@ var DragDrop = (function() {
 			clientdescription: null
 		}
 
-		//events.unshift()
-
-		$.post(apiRoot + "library/events", { json: [{
-			type: type,
-			itemid: id === undefined ? currentEpisodeId : id,
+		var event = {
+			clientdescription: "Best",
+			clientname: "Castcloud",
+			clientts: eventTS,
+			episodeid: id,
+			name: Event[type],
 			positionts: time === undefined ? el("vid").currentTime | 0 : time,
-			concurrentorder: currentOrder,
-			clientts: eventTS				
-		}] });	
+			type: type
+		};
+
+		var position = new Date(event.positionts * 1000);
+		position.setHours(position.getHours() - 1);
+		event.position = "";
+		if (position.getHours() > 0) {
+			event.position += position.getHours() + "h ";
+		}
+		event.position += position.getMinutes() + "m " + position.getSeconds() + "s";
+		var date = new Date(event.clientts * 1000);
+		date.setHours(date.getHours() - 1);
+		event.date = date.toLocaleString();
+
+		events.unshift(event);
+
+		if (id == selectedEpisodeId) {
+			renderEvents(id);
+		}
 	}
 
 	function loadCasts(tag) {
@@ -1518,21 +1561,23 @@ var DragDrop = (function() {
 			res.forEach(function(setting) {
 				var category = setting.setting.split("/")[0];
 				var name = setting.setting.split("/")[1];
-				if (name === null) {
+				if (name === undefined) {
 					name = category;
 					category = "General";
 				}
-				if (settings[category] === null) {
+				if (settings[category] === undefined) {
 					settings[category] = {};
 				}
 				settings[category][name] = setting.value;
 			});
+			$("#tab-settings").empty();
 			for (var c in settings) {
 				$("#tab-settings").append($("<h2>").text(c));
 				for (var s in settings[c]) {
 					$("#tab-settings").append("<p><label>" + s + '</label><input type="text" value="' + settings[c][s] + '"></p>');
 				}
 			}
+			db.put("settings", settings);
 		});
 	}
 
