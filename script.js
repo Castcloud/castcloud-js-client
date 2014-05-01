@@ -1061,6 +1061,64 @@ var DragDrop = (function() {
 			}
 		});
 
+		$("#podcasts").on("click", ".label .name", function() {
+			$(this).parent().find(".content").toggle();
+			if ($(this).find("i").hasClass("fa-angle-down")) {
+				$(this).find("i").removeClass("fa-angle-down");
+				$(this).find("i").addClass("fa-angle-up");
+			}
+			else {
+				$(this).find("i").removeClass("fa-angle-up");
+				$(this).find("i").addClass("fa-angle-down");
+			}
+			saveTags();
+		});
+
+		$("#podcasts").on("click", ".cast", function() {
+			if (ctrlDown) {
+				$(this).toggleClass("selected");
+			}
+			else {
+				var id = $(this).prop("id").split("-")[1];
+				renderEpisodes(id);
+				sessionStorage.selectedcast = id;
+
+				$(".cast").removeClass("current");
+				$(this).addClass("current");
+			}
+		});
+
+		$("#episodes").on("click", ".episode", function() {
+			if (ctrlDown) {
+				$(this).toggleClass("selected");
+				$(this).children(".bar").toggle();
+			}
+			else {
+				var id = $(this).prop("id").split("-")[1];
+				selectedEpisodeId = id;
+				loadEpisodeInfo(id);
+
+				if (currentEpisodeId === id) {
+					if (paused) {
+						$("#episode-bar-play").html("Play");
+					}
+					else {
+						$("#episode-bar-play").html("Pause");
+					}
+				}
+				else {
+					$("#episode-bar-play").html("Play");
+				}
+			}
+		});
+
+		$("#episodes").on("dblclick", ".episode", function() {
+			var id = $(this).prop("id").split("-")[1];
+			sessionStorage.lastepisode = JSON.stringify({ id: id, castid: episodes[id].castid });
+			autoplay = true;
+			playEpisode(id);
+		});
+
 		if (sessionStorage.token) {
 			token = sessionStorage.token;
 			username = sessionStorage.username;
@@ -1311,43 +1369,14 @@ var DragDrop = (function() {
 			}
 		});
 
-		$("#podcasts").on("click", ".label .name", function() {
-			$(this).parent().find(".content").toggle();
-			if ($(this).find("i").hasClass("fa-angle-down")) {
-				$(this).find("i").removeClass("fa-angle-down");
-				$(this).find("i").addClass("fa-angle-up");
-			}
-			else {
-				$(this).find("i").removeClass("fa-angle-up");
-				$(this).find("i").addClass("fa-angle-down");
-			}
-			saveTags();
-		});
-
 		if (sessionStorage.lastepisode) {
 			var lastepisode = JSON.parse(sessionStorage.lastepisode);
-			//loadEpisodes(lastepisode.castid);
 			renderEpisodes(lastepisode.castid);
 		}
 		if (sessionStorage.selectedcast) {
 			renderEpisodes(sessionStorage.selectedcast);
 			$("#cast-" + sessionStorage.selectedcast).addClass("current");
 		}
-
-		$("#podcasts").on("click", ".cast", function() {
-			if (ctrlDown) {
-				$(this).toggleClass("selected");
-			}
-			else {
-				var id = $(this).prop("id").split("-")[1];
-				//loadEpisodes(id);
-				renderEpisodes(id);
-				sessionStorage.selectedcast = id;
-
-				$(".cast").removeClass("current");
-				$(this).addClass("current");
-			}
-		});
 	}
 
 	function loadEpisodes() {
@@ -1396,7 +1425,7 @@ var DragDrop = (function() {
 			$(".iScrollVerticalScrollbar").hide();
 		});
 
-		e.forEach(function(episode) {
+		/*e.forEach(function(episode) {
 			$("#ep-" + episode.id).click(function() {
 				if (ctrlDown) {
 					$(this).toggleClass("selected");
@@ -1425,7 +1454,7 @@ var DragDrop = (function() {
 				autoplay = true;
 				playEpisode(episode.id);
 			});
-		});
+		});*/
 
 		updateEpisodeIndicators();
 
