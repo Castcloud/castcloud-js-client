@@ -318,6 +318,7 @@ var DragDrop = (function() {
 		casts = {},
 		labels,
 		events,
+		db,
 		rootLabelId,
 		root,
 		apiRoot,
@@ -383,8 +384,14 @@ var DragDrop = (function() {
 		}
 		console.log( "Total: " + total.toFixed(2) + " MB");
 
+		window.webkitStorageInfo.queryUsageAndQuota(webkitStorageInfo.TEMPORARY, 
+			function(used, remaining) {
+				console.log("IndexedDB, Used: " + (used / 1024 / 1024).toFixed(2) + "MB, Remaining: " + (remaining / 1024 / 1024 / 1024).toFixed(2) + "GB");
+			}
+		);	
+
 		DragDrop.init("#podcasts", ".drag");
-		DragDrop.ended(saveTags);
+		DragDrop.ended(saveLabels);
 
 		var Router = Backbone.Router.extend({
 			routes: {
@@ -937,7 +944,7 @@ var DragDrop = (function() {
 			$.ajax(apiRoot + "library/casts/" + contextItemId, { 
 				type: "DELETE",
 				success: function(res) {
-					loadTags();
+					loadLabels();
 				}
 			});
 		});
@@ -1071,7 +1078,7 @@ var DragDrop = (function() {
 				$(this).find("i").removeClass("fa-angle-up");
 				$(this).find("i").addClass("fa-angle-down");
 			}
-			saveTags();
+			saveLabels();
 		});
 
 		$("#podcasts").on("click", ".cast", function() {
@@ -1133,7 +1140,7 @@ var DragDrop = (function() {
 	});
 
 	function addFeed(feedurl) {
-		$.post(apiRoot + "library/casts", { feedurl: feedurl }, function() { loadTags(); });
+		$.post(apiRoot + "library/casts", { feedurl: feedurl }, function() { loadLabels(); });
 
 		$("#input-vmenu-add").val("");
 		$("#input-vmenu-add").toggle();
@@ -1249,23 +1256,67 @@ var DragDrop = (function() {
 		$("#input-password").val("");
 	}
 
+	var hits = 0;
+	function hit() {
+		hits++;
+		if (hits === 4) {
+			console.log("Rendering...");
+			renderCasts();
+		}
+	}
+
+	var dbReady = false;
+
 	function finishLogin() {
 		loggedIn = true;
 
+		db = new IDBStore({
+			storeName: uniqueName("db"),
+			keyPath: null
+		}, function() {
+			dbReady = true;
+			db.get("labels", function(data) {
+				if (data) {
+					console.log("Labels loaded from IDB");
+					labels = data;
+					hit();
+				}
+			});
+
+			db.get("casts", function(data) {
+				if (data) {
+					console.log("Casts loaded from IDB");
+					casts = data;
+					hit();
+				}
+			})
+
+			db.get("episodes", function(data) {
+				if (data) {
+					console.log("Episodes loaded from IDB");
+					episodes = data;
+					hit();
+				}
+			});
+
+			db.get("events", function(data) {
+				if (data) {
+					console.log("Events loaded from IDB");
+					events = data;
+
+					events.forEach(function(event) {
+						if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.positionts > episodes[event.episodeid].lastevent.positionts)) {
+							episodes[event.episodeid].lastevent = event;
+						}
+					});
+					hit();
+				}
+			});
+		});	
+
 		$("#userinfo span").html(username);
 
-		$.ajaxSetup({
-			headers: { Authorization: token }
-		});
-
-		$(".tab").hide();
-		$("#main-container").css("bottom", "60px");
-
-		if (Backbone.history.fragment !== "now-playing") {
-			$("#vid-container").addClass("thumb");
-		}
-
-		var foo = false;
+		/*var foo = false;
 
 		if (localStorage[uniqueName("labels")]) {
 			console.log("Labels loaded from localstorage");
@@ -1296,6 +1347,17 @@ var DragDrop = (function() {
 
 		if (foo) {
 			renderCasts();
+		}*/
+
+		$.ajaxSetup({
+			headers: { Authorization: token }
+		});
+
+		$(".tab").hide();
+		$("#main-container").css("bottom", "60px");
+
+		if (Backbone.history.fragment !== "now-playing") {
+			$("#vid-container").addClass("thumb");
 		}
 		
 		loadSettings();
@@ -1303,7 +1365,7 @@ var DragDrop = (function() {
 	}
 
 	function sync(onDemand) {
-		loadTags();
+		loadLabels();
 		loadEpisodes();
 		loadEvents();
 
@@ -1345,12 +1407,13 @@ var DragDrop = (function() {
 	}
 
 	function loadCasts(tag) {
-		get(tag === undefined ? "library/casts" : "library/casts/" + tag, function(res) {
+		$.get(apiRoot + (tag === undefined ? "library/casts" : "library/casts/" + tag), function(res) {
 			res.forEach(function(cast) {
 				casts[cast.id] = cast;
 			});
 
-			localStorage[uniqueName("casts")] = JSON.stringify(casts);
+			//localStorage[uniqueName("casts")] = JSON.stringify(casts);
+			db.put("casts", casts);
 
 			renderCasts();
 		});
@@ -1389,12 +1452,17 @@ var DragDrop = (function() {
 		console.log("fetching episodes since " + localStorage[uniqueName("since")]);
 		$.get(apiRoot + "library/newepisodes", { since: localStorage[uniqueName("since")] }, function(res) {
 			console.log(res.episodes.length + " episodes fetched");
-			var localEpisodes = JSON.parse(localStorage[uniqueName("episodes")] || "{}");
-			res.episodes.forEach(function(episode) {
-				episodes[episode.id] = episode;
-				localEpisodes[episode.id] = episode;
+			//var localEpisodes = JSON.parse(localStorage[uniqueName("episodes")] || "{}");
+			db.get("episodes", function(localEpisodes) {
+				localEpisodes = localEpisodes || {};
+				res.episodes.forEach(function(episode) {
+					episodes[episode.id] = episode;
+					localEpisodes[episode.id] = episode;
+				});
+				db.put("episodes", localEpisodes);
 			});
-			localStorage[uniqueName("episodes")] = JSON.stringify(localEpisodes);
+			
+			//localStorage[uniqueName("episodes")] = JSON.stringify(localEpisodes);
 		});
 	}
 
@@ -1425,37 +1493,6 @@ var DragDrop = (function() {
 			$(".iScrollVerticalScrollbar").hide();
 		});
 
-		/*e.forEach(function(episode) {
-			$("#ep-" + episode.id).click(function() {
-				if (ctrlDown) {
-					$(this).toggleClass("selected");
-					$(this).children(".bar").toggle();
-				}
-				else {
-					selectedEpisodeId = episode.id;
-					loadEpisodeInfo(episode.id);
-
-					if (currentEpisodeId === episode.id) {
-						if (paused) {
-							$("#episode-bar-play").html("Play");
-						}
-						else {
-							$("#episode-bar-play").html("Pause");
-						}
-					}
-					else {
-						$("#episode-bar-play").html("Play");
-					}
-				}
-			});
-
-			$("#ep-" + episode.id).dblclick(function() {
-				sessionStorage.lastepisode = JSON.stringify({ id: episode.id, castid: episode.castid });
-				autoplay = true;
-				playEpisode(episode.id);
-			});
-		});*/
-
 		updateEpisodeIndicators();
 
 		if (sessionStorage.lastepisode) {
@@ -1476,7 +1513,7 @@ var DragDrop = (function() {
 	}
 
 	function loadSettings() {
-		get("account/settings", function(res) {
+		$.get(apiRoot + "account/settings", function(res) {
 			var settings = {};
 			res.forEach(function(setting) {
 				var category = setting.setting.split("/")[0];
@@ -1499,8 +1536,8 @@ var DragDrop = (function() {
 		});
 	}
 
-	function loadTags() {
-		get("library/labels", function(res) {
+	function loadLabels() {
+		$.get(apiRoot + "library/labels", function(res) {
 			labels = {};
 			res.forEach(function(label) {
 				if (label.name === "root") {
@@ -1519,13 +1556,14 @@ var DragDrop = (function() {
 					};
 				});
 			});
-			localStorage[uniqueName("labels")] = JSON.stringify(labels);
-	
+			//localStorage[uniqueName("labels")] = JSON.stringify(labels);
+			db.put("labels", labels);
+
 			loadCasts();
 		});
 	}
 
-	function saveTags() {
+	function saveLabels() {
 		var content = [];
 		$("#podcasts > div").each(function(index, el) {
 			content.push($(el).prop("id").replace("-", "/"));
@@ -1580,7 +1618,8 @@ var DragDrop = (function() {
 				renderEvents(selectedEpisodeId);
 			}
 
-			localStorage[uniqueName("events")] = JSON.stringify(res.events);
+			//localStorage[uniqueName("events")] = JSON.stringify(res.events);
+			db.put("events", res.events);
 		});
 	}
 
@@ -1691,10 +1730,6 @@ var DragDrop = (function() {
 		e.preventDefault();
 	}
 
-	function get(url, cb) {
-		$.get(apiRoot + url, cb);
-	}
-
 	function el(id) {
 		return $("#" + id).get(0);
 	}
@@ -1720,10 +1755,6 @@ var DragDrop = (function() {
 			str = "0" + str;
 		}
 		return str;
-	}
-
-	Number.prototype.eventName = function() {
-		return Event[this];
 	}
 
 	$.fn.isOverflowing = function() {
