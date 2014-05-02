@@ -471,6 +471,7 @@ var DragDrop = (function() {
 			},
 
 			fullscreen: function() {
+				$("#topbar").hide();
 				$("#vid-container").removeClass("thumb");
 				$("#vid-container").addClass("fs");
 			}
@@ -970,10 +971,7 @@ var DragDrop = (function() {
 		});
 
 		$("#episode-context-delete").click(function() {
-			$("#ep-" + contextItemId).remove();
-			pushEvent(Event.Delete, contextItemId);
-			delete episodes[contextItemId];
-			localStorage[uniqueName("episodes")] = JSON.stringify(episodes);
+			deleteEpisode(contextItemId);
 		});
 
 		$("#episode-context-reset").click(function() {
@@ -1128,10 +1126,10 @@ var DragDrop = (function() {
 			playEpisode(id);
 		});
 
-		$("#episodes").on("hover", ".episode", function() {
-			if ($(this).find(".fa-circle").length > 0) {
-				console.log("!");
-			}
+		$("#episodes").on("click", ".delete", function(e) {
+			e.stopPropagation();
+			var id = $(this).parent().prop("id").split("-")[1];
+			deleteEpisode(id);
 		});
 
 		$("body").on("dragover", function(e) {
@@ -1243,6 +1241,14 @@ var DragDrop = (function() {
 			$(".episode").removeClass("current");
 			$("#ep-" + id).addClass("current");
 		}
+	}
+
+	function deleteEpisode(id) {
+		console.log("del " + id);
+		$("#ep-" + id).remove();
+		pushEvent(Event.Delete, id);
+		//delete episodes[contextItemId];
+		//localStorage[uniqueName("episodes")] = JSON.stringify(episodes);
 	}
 
 	var paused = false;
@@ -1562,10 +1568,14 @@ var DragDrop = (function() {
 
 		$(".episode").mouseover(function() {
 			$(this).children(".progress").css("color", "#FFF");
+			if ($(this).find(".fa-circle").length > 0) {
+				$(this).children(".delete").show();
+			}
 		});
 
 		$(".episode").mouseout(function() {
 			$(this).children(".progress").css("color", "#666");
+			$(this).children(".delete").hide();
 		});
 	}
 

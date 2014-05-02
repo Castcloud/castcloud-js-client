@@ -408,6 +408,21 @@ a {
 	color: #666;
 }
 
+.episode .delete {
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 1;
+	background: #0099cc;
+	padding: 10px;
+	color: #FFF;
+	display: none;
+}
+
+.episode .delete:active {
+	background: #0066cc;
+}
+
 #vid {
 	width: 100%;
 }
