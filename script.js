@@ -652,7 +652,7 @@ var DragDrop = (function() {
 
 		$(window).on("beforeunload", function() {
 			if (currentEpisodeId !== null) {
-				if (!paused) {
+				if (!paused && !ended) {
 					pushEvent(Event.Play);
 				}
 			}
@@ -660,7 +660,7 @@ var DragDrop = (function() {
 
 		$(window).on("unload", function() {
 			if (currentEpisodeId !== null) {
-				if (!paused) {
+				if (!paused && !ended) {
 					pushEvent(Event.Play);
 				}
 			}
@@ -699,7 +699,13 @@ var DragDrop = (function() {
 
 		$("#vid").on("canplay", function() {
 			var lastevent = episodes[currentEpisodeId].lastevent;
-			if (lastevent !== null && videoLoading) {
+
+			if (lastevent && lastevent.type == Event.EndOfTrack) {
+				ended = true;
+				paused = true;
+			}
+
+			if (lastevent !== null && videoLoading && lastevent.type != Event.EndOfTrack) {
 				el("vid").currentTime = lastevent.positionts;
 
 				if (lastevent.type == Event.Play) {
@@ -711,7 +717,9 @@ var DragDrop = (function() {
 			}
 			if (autoplay && videoLoading) {
 				autoplay = false;
-				play();
+				if (!(lastevent && lastevent.type == Event.EndOfTrack)) {
+					play();
+				}
 			}
 			videoLoading = false;
 
@@ -929,8 +937,11 @@ var DragDrop = (function() {
 
 		$("#cast-context-unsub").click(function() {
 			$(".cast.selected").each(function() {
-				$.ajax(apiRoot + "library/casts/" + $(this).prop("id").split("-")[1], { type: "DELETE" });
+				var id = $(this).prop("id").split("-")[1];
+				$("#cast-" + id).remove();
+				$.ajax(apiRoot + "library/casts/" + id, { type: "DELETE" });
 			});
+			$("#cast-" + contextItemId).remove();
 			$.ajax(apiRoot + "library/casts/" + contextItemId, { 
 				type: "DELETE",
 				success: function(res) {
@@ -971,6 +982,7 @@ var DragDrop = (function() {
 			}
 			else {
 				pushEvent(Event.Pause, contextItemId, 0);
+				updateEpisodeIndicators();
 			}
 		});
 
@@ -1321,7 +1333,7 @@ var DragDrop = (function() {
 					events = data;
 
 					events.forEach(function(event) {
-						if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.positionts > episodes[event.episodeid].lastevent.positionts)) {
+						if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
 							episodes[event.episodeid].lastevent = event;
 						}
 					});
@@ -1488,14 +1500,12 @@ var DragDrop = (function() {
 	}
 
 	function loadEpisodes() {
-		if (localStorage[uniqueName("since")]) {
-			localStorage[uniqueName("since")] = unix();
-		}
-		else {
+		if (!localStorage[uniqueName("since")]) {
 			localStorage[uniqueName("since")] = 0;
 		}
 		console.log("fetching episodes since " + localStorage[uniqueName("since")]);
 		$.get(apiRoot + "library/newepisodes", { since: localStorage[uniqueName("since")] }, function(res) {
+			localStorage[uniqueName("since")] = res.timestamp;
 			console.log(res.episodes.length + " episodes fetched");
 			//var localEpisodes = JSON.parse(localStorage[uniqueName("episodes")] || "{}");
 			db.get("episodes", function(localEpisodes) {
@@ -1515,7 +1525,9 @@ var DragDrop = (function() {
 		var e = [];
 		for (var x in episodes) {
 			if (episodes[x].castid == id) {
-				e.push(episodes[x]);
+				if (!(episodes[x].lastevent && episodes[x].lastevent.type == Event.Delete)) {
+					e.push(episodes[x]);
+				}
 			}
 		}
 
@@ -1654,7 +1666,7 @@ var DragDrop = (function() {
 				event.date = date.toLocaleString();
 				event.name = Event[event.type];
 
-				if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.positionts > episodes[event.episodeid].lastevent.positionts)) {
+				if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
 					episodes[event.episodeid].lastevent = event;
 				}
 			});
@@ -1688,6 +1700,7 @@ var DragDrop = (function() {
 		else {
 			el("vid").play();
 		}
+		ended = false;
 		paused = false;
 		pushEvent(Event.Play);
 		$(".button-play i").addClass("fa-pause");
