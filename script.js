@@ -1145,7 +1145,7 @@ var DragDrop = (function() {
 			var reader = new FileReader();
 
 			reader.onload = function() {
-				$.post(apiRoot + "casts.opml", { opml: reader.result });
+				$.post(apiRoot + "library/casts.opml", { opml: reader.result });
 			};
 
 			reader.readAsText(file);
