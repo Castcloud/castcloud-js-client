@@ -362,6 +362,7 @@ var DragDrop = (function() {
 	Chromecast.receiver(function(n) {
 		if (n > 0) {
 			$(".cc").show();
+			$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
 		}
 		else {
 			$(".cc").hide();
@@ -553,6 +554,7 @@ var DragDrop = (function() {
 			time += dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad();
 
 			$("#time").html(time);
+			$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
 			$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
 		}
 
@@ -572,21 +574,7 @@ var DragDrop = (function() {
 		});
 
 		$("#vid").dblclick(function() {
-			var video = el("vid-container");
-			if ($("#vid-container").hasClass("fs")) {
-				document.webkitExitFullscreen();
-			}
-			else {
-				if (video.requestFullscreen) {
-					video.requestFullscreen();
-				} else if (video.msRequestFullscreen){
-					video.msRequestFullscreen();
-				} else if (video.mozRequestFullScreen){
-					video.mozRequestFullScreen();
-				} else if (video.webkitRequestFullscreen){
-					video.webkitRequestFullscreen();
-				}			
-			}
+			toggleFullscreen();
 		});
 
 		$("#vid-thumb-bar .popout").click(function() {
@@ -763,6 +751,8 @@ var DragDrop = (function() {
 		$("#playbar-gear").click(function() {
 			$("#playbar-gear-menu").toggle();
 		});
+
+		$("#playbar-fullscreen").click(toggleFullscreen);
 
 		$(".playback-rate").click(function() {
 			$(".playback-rate").removeClass("selected");
@@ -1381,6 +1371,7 @@ var DragDrop = (function() {
 
 		$(".tab").hide();
 		$("#main-container").css("bottom", "60px");
+		$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
 
 		if (Backbone.history.fragment !== "now-playing") {
 			$("#vid-container").addClass("thumb");
@@ -1728,6 +1719,26 @@ var DragDrop = (function() {
 		Chromecast.seek(time);
 		var progress = 1 / video.duration * time;
 		$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
+	}
+
+	function toggleFullscreen() {
+		var video = el("vid-container");
+		if ($("#vid-container").hasClass("fs")) {
+			document.webkitExitFullscreen();
+			$("#playbar-fullscreen").removeClass("fa-compress").addClass("fa-expand");
+		}
+		else {
+			if (video.requestFullscreen) {
+				video.requestFullscreen();
+			} else if (video.msRequestFullscreen){
+				video.msRequestFullscreen();
+			} else if (video.mozRequestFullScreen){
+				video.mozRequestFullScreen();
+			} else if (video.webkitRequestFullscreen){
+				video.webkitRequestFullscreen();
+			}
+			$("#playbar-fullscreen").removeClass("fa-expand").addClass("fa-compress");
+		}
 	}
 
 	function getEpisodeImage(id) {
