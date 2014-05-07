@@ -317,7 +317,7 @@ var DragDrop = (function() {
 		episodes = {},
 		casts = {},
 		labels,
-		events,
+		events = [],
 		db,
 		rootLabelId,
 		root,
