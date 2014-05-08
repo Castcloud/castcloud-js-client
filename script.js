@@ -385,11 +385,11 @@ var DragDrop = (function() {
 		}
 		console.log( "Total: " + total.toFixed(2) + " MB");
 
-		window.webkitStorageInfo.queryUsageAndQuota(webkitStorageInfo.TEMPORARY, 
+		/*window.webkitStorageInfo.queryUsageAndQuota(webkitStorageInfo.TEMPORARY, 
 			function(used, remaining) {
 				console.log("IndexedDB, Used: " + (used / 1024 / 1024).toFixed(2) + "MB, Remaining: " + (remaining / 1024 / 1024 / 1024).toFixed(2) + "GB");
 			}
-		);	
+		);*/	
 
 		DragDrop.init("#podcasts", ".drag");
 		DragDrop.ended(saveLabels);
