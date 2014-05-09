@@ -1087,6 +1087,9 @@ var DragDrop = (function() {
 			}
 			else {
 				var id = $(this).prop("id").split("-")[1];
+
+				console.log("CastID: " + id);
+
 				renderEpisodes(id);
 				sessionStorage.selectedcast = id;
 
@@ -1536,6 +1539,8 @@ var DragDrop = (function() {
 				}
 			}
 		}
+
+		console.log(e.length + " episodes");
 
 		var template = _.template($("script.episodes").html());
 		$("#episodes").empty().append(template({ episodes: e }));
