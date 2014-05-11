@@ -291,10 +291,6 @@ a {
 	float: left;
 }
 
-.col:first-child {
-	overflow: auto;
-}
-
 @media all and (max-height: 250px) {
 	#input-target-container {
 		position: relative;

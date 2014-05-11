@@ -391,8 +391,8 @@ var DragDrop = (function() {
 			}
 		);*/	
 
-		DragDrop.init("#podcasts", ".drag");
-		DragDrop.ended(saveLabels);
+		//DragDrop.init("#podcasts", ".drag");
+		//DragDrop.ended(saveLabels);
 
 		var Router = Backbone.Router.extend({
 			routes: {
@@ -1489,6 +1489,14 @@ var DragDrop = (function() {
 		var template = _.template($("script.podcasts").html());
 		$("#podcasts").empty().append(template({ labels: labels, casts: casts }));
 		positionThumb();
+
+		var scroll = new IScroll('#foo', {
+			mouseWheel: true,
+			scrollbars: 'custom',
+			keyBindings: true,
+			interactiveScrollbars: true,
+			click: true
+		});
 
 		labels.root.forEach(function(label) {
 			if (label.type === "label") {
