@@ -521,7 +521,7 @@ var DragDrop = (function() {
 				$("#podcast-vmenu").show();
 				$("#podcast-cols").css("left", "50px");
 			}
-			$(".pretty-button").css("line-height", $(this).height() + "px");
+			$(".pretty-button").css("line-height", $("#pretty img").height() + "px");
 			prevSmall = small;
 		});
 
@@ -1206,6 +1206,14 @@ var DragDrop = (function() {
 		$("#episode-desc").html(episodes[id].feed.description);
 		$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
 		$("#episode-bar").show();
+
+		var scroll = new IScroll('#episodeinfo', {
+			mouseWheel: true,
+			scrollbars: 'custom',
+			keyBindings: true,
+			interactiveScrollbars: true,
+			click: true
+		});
 
 		positionThumb();
 	}
