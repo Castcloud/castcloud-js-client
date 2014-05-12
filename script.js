@@ -1228,7 +1228,7 @@ var DragDrop = (function() {
 
 			Chromecast.load(episodes[id].feed.enclosure.url, {
 				title: episodes[id].feed.title,
-				description: episodes[id].feed.description,
+				description: episodes[id].feed.description.replace(/(<([^>]+)>)/ig,""),
 				image: getEpisodeImage(id)
 			});
 
