@@ -479,7 +479,13 @@ var DragDrop = (function() {
 
 		var path = window.location.pathname;
 		root = path.substr(0, path.indexOf("client/") + 7);
-		apiRoot = root.replace("client", "api");
+		
+		if(localStorage.username){
+			username = localStorage.username;
+			$("#input-username").val(username);
+		}
+		
+		apiRoot = localStorage[uniqueName("apiTarget")] || window.location.origin + root.replace("client", "api");
 
 		$("#input-target").val(apiRoot);
 
@@ -778,7 +784,7 @@ var DragDrop = (function() {
 		});
 
 		$("#button-logout").click(function() {
-			sessionStorage.removeItem("token");
+			localStorage.removeItem("token");
 			$("#vid-container").hide();
 			$("#playbar").hide();
 			$("#topbar nav").hide();
@@ -1165,9 +1171,8 @@ var DragDrop = (function() {
 			});			
 		});
 
-		if (sessionStorage.token) {
-			token = sessionStorage.token;
-			username = sessionStorage.username;
+		if (localStorage.token) {
+			token = localStorage.token;
 			finishLogin();
 
 			$("#playbar").show();
@@ -1280,8 +1285,8 @@ var DragDrop = (function() {
 		if (apiRoot.indexOf("/", apiRoot.length - 1) === -1) {
 			apiRoot += "/";
 		}
-
-		localStorage[uniqueName("uuid")] = localStorage[uniqueName("uuid")] || uuid();
+		
+		var _uuid = localStorage.uuid || uuid();
 
 		$.post(apiRoot + "account/login", {
 			username: username,
@@ -1289,13 +1294,15 @@ var DragDrop = (function() {
 			clientname: "Castcloud",
 			clientdescription: "Best",
 			clientversion: "1.0",
-			uuid: localStorage[uniqueName("uuid")]
+			uuid: _uuid
 		}, function(res) {
 			token = res.token;
 			console.log(token);
 			if (token !== undefined) {
-				sessionStorage.token = token;
-				sessionStorage.username = username;
+				localStorage.token = token;
+				localStorage.username = username;
+				localStorage.uuid = _uuid;
+				localStorage[uniqueName("apiTarget")] = apiRoot;
 				
 				finishLogin();
 
@@ -1307,7 +1314,6 @@ var DragDrop = (function() {
 			}
 		});
 
-		$("#input-username").val("");
 		$("#input-password").val("");
 	}
 
