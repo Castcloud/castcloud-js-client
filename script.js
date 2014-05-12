@@ -1012,6 +1012,7 @@ var DragDrop = (function() {
 
 		$("#pretty").click(function() {
 			if (selectedEpisodeId !== currentEpisodeId) {
+				autoplay = true;
 				playEpisode(selectedEpisodeId);
 			}
 			else {
@@ -1029,6 +1030,7 @@ var DragDrop = (function() {
 
 		$("#episode-bar-play").click(function() {
 			if (selectedEpisodeId !== currentEpisodeId) {
+				autoplay = true;
 				playEpisode(selectedEpisodeId);
 			}
 			else {
@@ -1154,7 +1156,8 @@ var DragDrop = (function() {
 			var reader = new FileReader();
 
 			reader.onload = function() {
-				$.post(apiRoot + "library/casts.opml", { opml: reader.result });
+				//$.post(apiRoot + "library/casts.opml", { opml: reader.result });
+				$.post("http://localhost:3000/opml", { opml: reader.result });
 			};
 
 			reader.readAsText(file);
@@ -1406,7 +1409,8 @@ var DragDrop = (function() {
 
 		$(".tab").hide();
 		$("#main-container").css("bottom", "60px");
-		$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
+
+		//$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
 
 		if (Backbone.history.fragment !== "now-playing") {
 			$("#vid-container").addClass("thumb");
