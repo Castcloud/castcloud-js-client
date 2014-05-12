@@ -573,7 +573,15 @@ a {
 }
 
 #episode-desc a {
-	color: #AAA;
+	color: #FFF;
+}
+
+#episode-desc a:hover {
+	color: #0099cc;
+}
+
+#episode-desc a:active {
+	color: #0066cc;
 }
 
 #events {
