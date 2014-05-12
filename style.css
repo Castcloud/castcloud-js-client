@@ -568,6 +568,14 @@ a {
 	color: #AAA;
 }
 
+#episode-desc figure, #episode-desc img {
+	display: none;
+}
+
+#episode-desc a {
+	color: #AAA;
+}
+
 #events {
 	position: absolute;
 	left: 100%;
