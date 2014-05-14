@@ -494,6 +494,7 @@ var DragDrop = (function() {
 		router.bind("all", function(route, router) {
 			positionThumb();
 			padCastOverlay();
+			$("#overlay-info").hide();
 		});
 
 		var page = 0;
@@ -638,6 +639,15 @@ var DragDrop = (function() {
 					$("#overlay-info").stop().fadeOut("fast");
 				}, 1000);
 			}
+			else if ($(this).parent().css("right") == "0px") {
+				$("#overlay-info").fadeIn("fast");
+				if (timer !== null) {
+					clearTimeout(timer);
+				}
+				timer = setTimeout(function() {
+					$("#overlay-info").stop().fadeOut("fast");
+				}, 1000);
+			}
 		});
 
 		$("#playbar").mouseover(function() {
@@ -674,13 +684,7 @@ var DragDrop = (function() {
 		});
 
 		$(".button-skipback").click(function() {
-			var video = el("vid");
-			pushEvent(Event.Pause);
-			video.currentTime = video.currentTime - 15;
-			pushEvent(Event.Play);
-			if (video.paused) {
-				pushEvent(Event.Pause);
-			}
+			skipBack();
 		});
 
 		$(".button-play").click(function() {
@@ -688,13 +692,7 @@ var DragDrop = (function() {
 		});
 
 		$(".button-skipforward").click(function() {
-			var video = el("vid");
-			pushEvent(Event.Pause);
-			video.currentTime = video.currentTime + 15;
-			pushEvent(Event.Play);
-			if (video.paused) {
-				pushEvent(Event.Pause);
-			}
+			skipForward();
 		});
 
 		$("#vid").on("loadstart", function() {
@@ -896,10 +894,6 @@ var DragDrop = (function() {
 		});
 
 		$(document).keydown(function(e) {
-			if (e.which === 179 || e.which === 32) {
-				playPauseToggle();
-			}
-
 			if (!(e.ctrlKey || e.metaKey)) {
 				return;
 			}
@@ -1173,6 +1167,10 @@ var DragDrop = (function() {
 				document.body.removeChild(a);
 			});			
 		});
+
+		Mousetrap.bind('space', playPauseToggle);
+		Mousetrap.bind('left', skipBack);
+		Mousetrap.bind('right', skipForward);
 
 		if (localStorage.token) {
 			token = localStorage.token;
@@ -1773,6 +1771,26 @@ var DragDrop = (function() {
 		Chromecast.seek(time);
 		var progress = 1 / video.duration * time;
 		$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
+	}
+
+	function skipBack() {
+		var video = el("vid");
+		pushEvent(Event.Pause);
+		video.currentTime = video.currentTime - 15;
+		pushEvent(Event.Play);
+		if (video.paused) {
+			pushEvent(Event.Pause);
+		}
+	}
+
+	function skipForward() {
+		var video = el("vid");
+		pushEvent(Event.Pause);
+		video.currentTime = video.currentTime + 15;
+		pushEvent(Event.Play);
+		if (video.paused) {
+			pushEvent(Event.Pause);
+		}
 	}
 
 	function toggleFullscreen() {

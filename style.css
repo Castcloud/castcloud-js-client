@@ -511,6 +511,11 @@ a {
 	background: rgba(0,0,0,0.75);
 }
 
+#vid-container:not(.fs) #overlay-info {
+	margin: 10px;
+	top: 60px;
+}
+
 #overlay-info h5 {
 	color: #AAA;
 }
