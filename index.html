@@ -181,5 +181,13 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js"></script>
 	<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
 	<script src="script.js"></script>
+
+	<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+	<script>
+	var socket = io.connect(window.location.origin + ':3000');
+	socket.on('change', function() {
+		window.location.reload();
+	});
+	</script>
 </body>
 </html>
