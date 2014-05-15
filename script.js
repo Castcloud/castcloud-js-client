@@ -329,7 +329,10 @@ var DragDrop = (function() {
 		videoLoading = false,
 		castHovered = null,
 		ctrlDown = false,
-		autoplay = false;
+		autoplay = false,
+		castScroll,
+		episodeScroll,
+		episodeinfoScroll;
 
 	var Event = {
 		Start: 10,
@@ -1080,10 +1083,12 @@ var DragDrop = (function() {
 				$(this).find("i").removeClass("fa-angle-up");
 				$(this).find("i").addClass("fa-angle-down");
 			}
+			setTimeout(function() { castScroll.refresh(); }, 0);
 			saveLabels();
 		});
 
-		$("#podcasts").on("click", ".cast", function() {
+
+		$("#podcasts").on("click", ".cast", function(e) {
 			if (ctrlDown) {
 				$(this).toggleClass("selected");
 			}
@@ -1185,7 +1190,7 @@ var DragDrop = (function() {
 				s += "meta+";
 			}
 
-			var herp = {
+			var special = {
 				8: 'backspace',
 				9: 'tab',
 				13: 'enter',
@@ -1204,29 +1209,39 @@ var DragDrop = (function() {
 				46: 'del'
 			};
 
-			var valid = 
+			var character = 
 		        (e.which > 47 && e.which < 58)   ||
 		        (e.which > 64 && e.which < 91)   ||
 		        (e.which > 95 && e.which < 112)  ||
 		        (e.which > 185 && e.which < 193) ||
 		        (e.which > 218 && e.which < 223);
 
-		    if (valid) {
+		    if (character) {
 		    	var k = String.fromCharCode(e.which).toLowerCase();
 		    	s += k;
 		    }
-		    else if (e.which in herp) {
-		    	var k = herp[e.which];
+		    else if (e.which in special) {
+		    	var k = special[e.which];
 		    	s += k;
 		    }
 			
-			$(this).val(s);
+			if (character) {
+				$(this).val(s);
+			}
 			return false;
 		});
 
 		Mousetrap.bind('space', playPauseToggle);
 		Mousetrap.bind('left', skipBack);
 		Mousetrap.bind('right', skipForward);
+
+		episodeinfoScroll = new IScroll('#episodeinfo', {
+			mouseWheel: true,
+			scrollbars: 'custom',
+			keyBindings: true,
+			interactiveScrollbars: true,
+			click: true
+		});
 
 		if (localStorage.token) {
 			token = localStorage.token;
@@ -1250,6 +1265,7 @@ var DragDrop = (function() {
 	}
 
 	function loadEpisodeInfo(id) {
+		console.log("loadEpisodeInfo called");
 		renderEvents(id);
 
 		var image = getEpisodeImage(id);
@@ -1269,18 +1285,13 @@ var DragDrop = (function() {
 		$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
 		$("#episode-bar").show();
 
-		var scroll = new IScroll('#episodeinfo', {
-			mouseWheel: true,
-			scrollbars: 'custom',
-			keyBindings: true,
-			interactiveScrollbars: true,
-			click: true
-		});
+		setTimeout(function() { episodeinfoScroll.refresh(); }, 0);
 
 		positionThumb();
 	}
 
 	function playEpisode(id) {
+		console.log("playEpisode called");
 		if (currentEpisodeId !== id) {
 			if (currentEpisodeId !== null) {
 				if (!el("vid").paused) {
@@ -1562,13 +1573,19 @@ var DragDrop = (function() {
 		$("#podcasts").empty().append(template({ labels: labels, casts: casts }));
 		positionThumb();
 
-		var scroll = new IScroll('#foo', {
-			mouseWheel: true,
-			scrollbars: 'custom',
-			keyBindings: true,
-			interactiveScrollbars: true,
-			click: true
-		});
+		if (castScroll) {
+			setTimeout(function() { castScroll.refresh(); }, 0);
+		}
+		else {
+			castScroll = new IScroll('#foo', {
+				mouseWheel: true,
+				scrollbars: 'custom',
+				keyBindings: true,
+				interactiveScrollbars: true,
+				click: true
+			});
+		}
+		
 
 		labels.root.forEach(function(label) {
 			if (label.type === "label") {
@@ -1578,13 +1595,13 @@ var DragDrop = (function() {
 			}
 		});
 
-		if (sessionStorage.lastepisode) {
-			var lastepisode = JSON.parse(sessionStorage.lastepisode);
-			renderEpisodes(lastepisode.castid);
-		}
 		if (sessionStorage.selectedcast) {
 			renderEpisodes(sessionStorage.selectedcast);
 			$("#cast-" + sessionStorage.selectedcast).addClass("current");
+		}
+		else if (sessionStorage.lastepisode) {
+			var lastepisode = JSON.parse(sessionStorage.lastepisode);
+			renderEpisodes(lastepisode.castid);
 		}
 	}
 
@@ -1596,7 +1613,6 @@ var DragDrop = (function() {
 		$.get(apiRoot + "library/newepisodes", { since: localStorage[uniqueName("since")] }, function(res) {
 			localStorage[uniqueName("since")] = res.timestamp;
 			console.log(res.episodes.length + " episodes fetched");
-			//var localEpisodes = JSON.parse(localStorage[uniqueName("episodes")] || "{}");
 			db.get("episodes", function(localEpisodes) {
 				localEpisodes = localEpisodes || {};
 				res.episodes.forEach(function(episode) {
@@ -1605,8 +1621,6 @@ var DragDrop = (function() {
 				});
 				db.put("episodes", localEpisodes);
 			});
-			
-			//localStorage[uniqueName("episodes")] = JSON.stringify(localEpisodes);
 		});
 	}
 
@@ -1626,20 +1640,25 @@ var DragDrop = (function() {
 		$("#episodes").empty().append(template({ episodes: e }));
 		positionThumb();
 
-		var scroll = new IScroll('#episodes', {
-			mouseWheel: true,
-			scrollbars: 'custom',
-			keyBindings: true,
-			interactiveScrollbars: true,
-			click: true
-		});
+		if (episodeScroll) {
+			setTimeout(function() { episodeScroll.refresh(); }, 0);
+		}
+		else {
+			episodeScroll = new IScroll('#foo2', {
+				mouseWheel: true,
+				scrollbars: 'custom',
+				keyBindings: true,
+				interactiveScrollbars: true,
+				click: true
+			});
+		}		
 
-		$(".iScrollVerticalScrollbar").hide();
+		/*$(".iScrollVerticalScrollbar").hide();
 		$("#episodes").hover(function() {
 			$(".iScrollVerticalScrollbar").show();
 		}, function() {
 			$(".iScrollVerticalScrollbar").hide();
-		});
+		});*/
 
 		updateEpisodeIndicators();
 

@@ -968,9 +968,16 @@ a {
 	width: 8px;
 	bottom: 2px;
 	top: 2px;
-	right: 33.333333%;
 	margin-right: 2px;
 	overflow: hidden;
+}
+
+#foo .iScrollVerticalScrollbar {
+	right: 66.666666%;
+}
+
+#foo2 .iScrollVerticalScrollbar {
+	right: 33.333333%
 }
 
 .iScrollVerticalScrollbar.iScrollBothScrollbars {

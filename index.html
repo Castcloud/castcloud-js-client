@@ -73,7 +73,7 @@
 					<div class="vmenu-toggle" id="tags"></div>
 					<div id="podcasts"></div></div>
 				</div>
-				<div class="col" id="episodes"></div>
+				<div class="col" id="foo2"><div id="episodes"></div></div>
 				<div class="col" id="episodeinfo">
 					<div>
 						<figure id="pretty">
@@ -155,11 +155,9 @@
 	</script>
 
 	<script type="text/template" class="episodes">
-	<div style="position:relative;z-index:0;width:100%">
 	<% episodes.forEach(function(episode) { %>
 		<div id="ep-<%= episode.id %>" class="episode"><%= episode.feed.title %><div class="delete">Delete</div></div>
 	<% }); %>
-	</div>
 	</script>
 
 	<script type="text/template" class="events">
