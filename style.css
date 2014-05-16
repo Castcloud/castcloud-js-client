@@ -970,6 +970,7 @@ a {
 	top: 2px;
 	margin-right: 2px;
 	overflow: hidden;
+	right: 0;
 }
 
 #foo .iScrollVerticalScrollbar {
@@ -986,7 +987,15 @@ a {
 
 .iScrollIndicator {
 	position: relative;
-	background: rgba(0,0,0,0.2);
+	background: rgba(0,0,0,0.35);
+}
+
+.iScrollIndicator:hover {
+	background: rgba(0,0,0,0.5);
+}
+
+.iScrollIndicator:active {
+	background: #0099cc;
 }
 
 .iScrollHorizontalScrollbar .iScrollIndicator {
