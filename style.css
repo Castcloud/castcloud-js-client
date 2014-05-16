@@ -796,13 +796,13 @@ a {
 	display: none;
 	position: fixed;
 	width: 200px;
-	background: #FFF;
-	color: #111;
+	background: #111;
+	color: #FFF;
 	top: 10px;
 	left: 10px;
-	z-index: 3;
+	z-index: 999999;
 	padding: 5px 0px;
-	border: 1px solid #AAA;
+	border: 1px solid #222;
 }
 
 .context-menu div {
@@ -1013,4 +1013,5 @@ a {
 
 #episodeinfo {
 	position: relative;
+	height: 100%;
 }
