@@ -332,7 +332,8 @@ var DragDrop = (function() {
 		autoplay = false,
 		castScroll,
 		episodeScroll,
-		episodeinfoScroll;
+		episodeinfoScroll,
+		poppedOut;
 
 	var Event = {
 		Start: 10,
@@ -596,8 +597,9 @@ var DragDrop = (function() {
 			video.setAttribute("src", "#");
 			video.load();
 
-			var poppedOut = window.open(root + "fullscreen");
+			poppedOut = window.open(root + "fullscreen", null, 'toolbar=0,menubar=0,location=0,status=0,scrollbars=1,resizable=1,left=0,top=0');
 			$(poppedOut).on("beforeunload", function() {
+				poppedOut = null;
 				currentEpisodeId = null;
 
 				// Possibly store lastevent in sessionstorage instead of this hack
@@ -607,6 +609,12 @@ var DragDrop = (function() {
 
 		$("#vid-thumb-bar .minimize").click(function() {
 			$("#vid-container").toggleClass("minimized");
+		});
+
+		$(window).on("message", function(e) {
+			if (e.originalEvent.data === "p") {
+				playPauseToggle();
+			}
 		});
 
 		$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {
@@ -749,6 +757,7 @@ var DragDrop = (function() {
 		});
 
 		$(document).mouseup(function() {
+			x = false;
 			if (seeking) {
 				seeking = false;
 				pushEvent(Event.Play);
@@ -759,6 +768,10 @@ var DragDrop = (function() {
 		});
 
 		$(document).mousemove(function(e) {
+			//$(".thumb").css("left", e.pageX+"px");
+			if (x) {
+				$(".thumb").css("width", (window.innerWidth - e.pageX - 15 + o)+"px");
+			}
 			if (seeking) {
 				seek(1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration);
 			}
@@ -1095,8 +1108,6 @@ var DragDrop = (function() {
 			else {
 				var id = $(this).prop("id").split("-")[1];
 
-				console.log("CastID: " + id);
-
 				renderEpisodes(id);
 				sessionStorage.selectedcast = id;
 
@@ -1247,6 +1258,15 @@ var DragDrop = (function() {
 			return false;
 		});
 
+		var x = false;
+		var o = 0;
+
+		$("#vid-thumb-bar").mousedown(function(e) {
+			x = true;
+			o = window.innerWidth - e.pageX;
+			$(".thumb").css("width", (window.innerWidth - e.pageX - 15 + o)+"px");
+		});
+
 		Mousetrap.bind('space', playPauseToggle);
 		Mousetrap.bind('left', skipBack);
 		Mousetrap.bind('right', skipForward);
@@ -1355,6 +1375,9 @@ var DragDrop = (function() {
 		}
 		else {
 			pause();
+		}
+		if (poppedOut) {
+			poppedOut.postMessage("p", "*");
 		}
 	}
 

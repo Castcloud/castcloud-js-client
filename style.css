@@ -11,6 +11,10 @@
 	user-select: none; 
 }
 
+html, body {
+	height: 100%;
+}
+
 body {
 	background: #222;
 	color: #FFF;
@@ -439,7 +443,7 @@ a {
 	left: 0;
 	top: 0;
 	bottom: 0;
-	width: 100%;
+	width: 100% !important;
 	background: #000;
 }
 
@@ -448,9 +452,11 @@ a {
 	right: 15px;
 	bottom: 60px;
 	top: auto;
-	width: 200px;
 	background: #111;
 	padding: 0 5px;
+	width: auto;
+	min-width: 160px;
+	max-width: 50%;
 }
 
 #vid-container.thumb.minimized {
@@ -838,6 +844,7 @@ a {
 #episodeinfo figure {
 	text-align: center;
 	background: #1A1A1A;
+	position: relative;
 }
 
 #pretty {
@@ -858,10 +865,6 @@ a {
 	max-height: 40%;
 	width: auto;
 	height: auto;
-}
-
-#episodeinfo figure {
-	position: relative;
 }
 
 .pretty-overlay {
@@ -1013,5 +1016,4 @@ a {
 
 #episodeinfo {
 	position: relative;
-	height: 100%;
 }
