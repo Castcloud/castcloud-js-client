@@ -472,6 +472,7 @@ a {
 	display: block;
 	height: 30px;
 	background: #111;
+	cursor: nwse-resize;
 }
 
 #vid-thumb-bar a {
@@ -796,6 +797,14 @@ a {
 	height: 10px;
 	width: 0px;
 	border-radius: 5px;
+}
+
+#seektime {
+	position: fixed;
+	display: none;
+	color: #FFF;
+	font-size: 12px;
+	bottom: 40px;
 }
 
 .context-menu {
