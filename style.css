@@ -464,6 +464,14 @@ a {
 	bottom: 60px;
 }
 
+.audio #vid {
+	display: none;
+}
+
+.audio #vid-art {
+	display:auto;
+}
+
 #vid-thumb-bar {
 	display: none;
 }
@@ -925,6 +933,14 @@ a {
 
 .thumb #cast-overlay h1 {
 	font-size: 18px;
+}
+
+.thumb img {
+	display: none;
+}
+
+.audio.thumb {
+	display: none !important;
 }
 
 #cast-overlay .name {

@@ -333,7 +333,8 @@ var DragDrop = (function() {
 		castScroll,
 		episodeScroll,
 		episodeinfoScroll,
-		poppedOut;
+		poppedOut,
+		mediaType;
 
 	var Event = {
 		Start: 10,
@@ -566,8 +567,10 @@ var DragDrop = (function() {
 			time += dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad();
 
 			$("#time").html(time);
-			$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
-			$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
+			if ($("#seekbar").is(":visible")) {
+				$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
+				$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
+			}
 		}
 
 		$("#vid").on("timeupdate", function() {
@@ -638,30 +641,35 @@ var DragDrop = (function() {
 		});
 
 		var timer = null;
-		$("#vid").mousemove(function() {
-			if ($(this).parent().hasClass("fs")) {
-				$("#playbar").show();
-				$("#overlay-info").fadeIn("fast");
-				if (timer !== null) {
-					clearTimeout(timer);
+		$("#vid-container").mousemove(function() {
+			if (!bar) {
+				if ($(this).hasClass("fs")) {
+					$("#playbar").show();
+					$("#overlay-info").fadeIn("fast");
+					if (timer !== null) {
+						clearTimeout(timer);
+					}
+					timer = setTimeout(function() { 
+						$("#playbar").hide();
+						$("#overlay-info").stop().fadeOut("fast");
+					}, 1000);
 				}
-				timer = setTimeout(function() { 
-					$("#playbar").hide();
-					$("#overlay-info").stop().fadeOut("fast");
-				}, 1000);
-			}
-			else if ($(this).parent().css("right") == "0px") {
-				$("#overlay-info").fadeIn("fast");
-				if (timer !== null) {
-					clearTimeout(timer);
+				else if ($(this).css("right") == "0px") {
+					$("#overlay-info").fadeIn("fast");
+					if (timer !== null) {
+						clearTimeout(timer);
+					}
+					timer = setTimeout(function() {
+						$("#overlay-info").stop().fadeOut("fast");
+					}, 1000);
 				}
-				timer = setTimeout(function() {
-					$("#overlay-info").stop().fadeOut("fast");
-				}, 1000);
 			}
 		});
 
+		var bar = false;
+
 		$("#playbar").mouseover(function() {
+			bar = true;
 			if ($(this).parent().hasClass("fs")) {
 				if (timer !== null) {
 					clearTimeout(timer);
@@ -670,6 +678,7 @@ var DragDrop = (function() {
 		});
 
 		$("#playbar").mouseout(function() {
+			bar = false;
 			if ($(this).parent().hasClass("fs")) {
 				timer = setTimeout(function() {
 					$("#playbar").hide();
@@ -710,10 +719,23 @@ var DragDrop = (function() {
 			if ($("#ep-" + currentEpisodeId + " i").length > 0) {
 				$("#ep-" + currentEpisodeId + " i").remove();
 			}
+			$("#vid-container").hide();
 			updateEpisodeIndicators();
 		});
 
 		$("#vid").on("canplay", function() {
+			if (el("vid").videoWidth > 0) {
+				mediaType = "video";
+				$("#vid-container").removeClass("audio");
+				$("#vid-container").show();
+			}
+			else {
+				$("#vid-art").prop("src", getEpisodeImage(currentEpisodeId));
+				mediaType = "audio";
+				$("#vid-container").show();
+				$("#vid-container").addClass("audio");
+			}
+
 			var lastevent = episodes[currentEpisodeId].lastevent;
 
 			if (lastevent && lastevent.type == Event.EndOfTrack) {
@@ -1386,7 +1408,7 @@ var DragDrop = (function() {
 			videoLoading = true;
 			ended = false;
 
-			$("#vid-container").show();
+			//$("#vid-container").show();
 			$("#vid-container").removeClass("minimized");
 		}
 	}
@@ -1508,8 +1530,6 @@ var DragDrop = (function() {
 
 		$(".tab").hide();
 		$("#main-container").css("bottom", "60px");
-
-		//$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
 
 		if (Backbone.history.fragment !== "now-playing") {
 			$("#vid-container").addClass("thumb");
