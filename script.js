@@ -1372,6 +1372,7 @@ var DragDrop = (function() {
 		$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
 		$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
 		$("#episode-desc").html(episodes[id].feed.description);
+		$("#episode-desc *").removeAttr("style");
 		$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
 		$("#episode-bar").show();
 
