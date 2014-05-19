@@ -139,9 +139,13 @@ It is useful for learning the basic concepts of the system.
 	.loading {
 		display: none;
 	}
-
+	
 	.loading h1 {
 		font-size: 64px;
+	}
+
+	.title {
+		font-size: 48px !important;
 	}
 
 	.description {
@@ -206,7 +210,7 @@ It is useful for learning the basic concepts of the system.
 		</div>
 		<div><img src="splash.png"></div>
 	</div>
-	<video id='vid' />
+	<video id='vid' class="page" />
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function() {
@@ -238,11 +242,13 @@ It is useful for learning the basic concepts of the system.
 		});
 
 		$("#vid").on("play", function() {
-			$("#pausebox").hide();
+			if ($("#vid")[0].videoHeight > 0){
+				$("#pausebox").hide();
+			}
 		});
 
 		$("#vid").on("loadstart", function() {
-			$("#pausebox").hide();
+			$(".page").hide();
 
 			var metadata = mediaManager.getMediaInformation().metadata;
 			$(".title").html(metadata.title);
@@ -251,19 +257,34 @@ It is useful for learning the basic concepts of the system.
 				metadata.description += "...";
 			}
 			$(".description").html(metadata.description);
-			$(".cover").prop("src", metadata.image);
+			if (metadata.image === $(".cover").prop("src")){
+				$(".loading").show();
+			} else {
+				$(".cover").prop("src", metadata.image);
+			}
 			$(".loading").css("margin-top", window.innerHeight / 2 - $(".loading").height() / 2);
 		});
 
 		$("#vid").on("canplay", function() {
 			$(".page").hide();
-			$("#vid").show();
+			if ($("#vid")[0].videoHeight > 0){
+				$("#vid").show();
+				$("#pausebox").css("background", "rgba(0,0,0,0.75)");
+			} else {
+				$("#pausebox").show();
+				$("#pausebox").css("background", "rgba(0,0,0,0)");
+			}
+			updateUI();
 		});
 
 		$("#vid").on("ended", function() {
 			$(".page").hide();
 			$(".splash").show();
 			$(".splash").css("margin-top", window.innerHeight / 2 - $(".splash").height() / 2);
+		});
+		
+		$("#vid").on("timeupdate", function() {
+			updateUI();
 		});
 
 		$(".cover").load(function() {
