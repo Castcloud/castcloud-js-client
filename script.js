@@ -1605,6 +1605,8 @@ var DragDrop = (function() {
 
 		events.unshift(event);
 
+		db.put("events", events);
+
 		if (id == selectedEpisodeId) {
 			renderEvents(id);
 		}
