@@ -318,6 +318,7 @@ var DragDrop = (function() {
 		casts = {},
 		labels,
 		events = [],
+		settings = {},
 		db,
 		rootLabelId,
 		root,
@@ -335,6 +336,17 @@ var DragDrop = (function() {
 		episodeinfoScroll,
 		poppedOut,
 		mediaType;
+
+	var DefaultSettings = {
+		General: {
+
+		},
+		Keybinds: {
+			PlayPause: 'space',
+			SkipBack: 'left',
+			SkipForward: 'right'
+		}
+	}
 
 	var Event = {
 		Start: 10,
@@ -433,8 +445,8 @@ var DragDrop = (function() {
 					$("#tab-login").show();
 				}
 				else {
-					$("#vid-container").addClass("thumb");
 					$("#tab-settings").show();
+					$("#vid-container").addClass("thumb");
 				}
 			},
 
@@ -1255,7 +1267,17 @@ var DragDrop = (function() {
 			});			
 		});
 
-		$(".magic").keydown(function(e) {
+		var settingTimerId;
+		$("#tab-settings").on("keyup", ".setting", function() {
+			clearTimeout(settingTimerId);
+			var id = $(this).prop("id").split("/");
+			var val = $(this).val();
+			settingTimerId = setTimeout(function() {
+				saveSetting(id[1], val, id[0]);
+			}, 500);
+		});
+
+		$("#tab-settings").on("keydown", ".keybind", function(e) {
 			e.preventDefault();
 			e.stopPropagation();
 			var s = "";
@@ -1307,7 +1329,7 @@ var DragDrop = (function() {
 		    	s += k;
 		    }
 			
-			if (character) {
+			if (character || e.which in special) {
 				$(this).val(s);
 			}
 			return false;
@@ -1521,6 +1543,15 @@ var DragDrop = (function() {
 					render();
 				}
 			});
+
+			db.get("settings", function(data) {
+				if (data) {
+					console.log("Settings loaded from IDB");
+					settings = data;
+
+					renderSettings();
+				}
+			});
 		});	
 
 		$("#userinfo span").html(username);
@@ -1658,6 +1689,21 @@ var DragDrop = (function() {
 			var lastepisode = JSON.parse(sessionStorage.lastepisode);
 			renderEpisodes(lastepisode.castid);
 		}
+
+		var n = {};
+		for (var i in episodes) {
+			var episode = episodes[i];
+			if (episode.castid in n) {
+				n[episode.castid]++;
+			}
+			else {
+				n[episode.castid] = 1;
+			}
+		}
+
+		for (var index in n) {
+			$("#cast-" + index + " .n").html(n[index]);
+		}
 	}
 
 	function loadEpisodes() {
@@ -1688,6 +1734,18 @@ var DragDrop = (function() {
 				}
 			}
 		}
+
+		e.sort(function(a, b) {
+			var d1 = new Date(a.feed.pubDate);
+			var d2 = new Date(b.feed.pubDate);
+			if (d1 > d2) {
+				return -1;
+			}
+			if (d1 < d2) {
+				return 1;
+			}
+			return 0;
+		});
 
 		var template = _.template($("script.episodes").html());
 		$("#episodes").empty().append(template({ episodes: e }));
@@ -1723,7 +1781,7 @@ var DragDrop = (function() {
 
 	function loadSettings() {
 		$.get(apiRoot + "account/settings", function(res) {
-			var settings = {};
+			settings = {};
 			res.forEach(function(setting) {
 				var category = setting.setting.split("/")[0];
 				var name = setting.setting.split("/")[1];
@@ -1736,15 +1794,38 @@ var DragDrop = (function() {
 				}
 				settings[category][name] = setting.value;
 			});
-			$("#tab-settings").empty();
-			for (var c in settings) {
-				$("#tab-settings").append($("<h2>").text(c));
-				for (var s in settings[c]) {
-					$("#tab-settings").append("<p><label>" + s + '</label><input type="text" value="' + settings[c][s] + '"></p>');
-				}
-			}
+
+			settings = $.extend(true, {}, DefaultSettings, settings);
+
+			renderSettings();
+
 			db.put("settings", settings);
 		});
+	}
+
+	function renderSettings() {
+		$("#tab-settings").empty();
+		for (var c in settings) {
+			$("#tab-settings").append($("<h2>").text(c));
+			for (var s in settings[c]) {
+				var id = c + "/" + s;
+				if (c === "Keybinds") {
+					$("#tab-settings").append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting keybind" value="' + settings[c][s] + '"></p>');
+				}
+				else {
+					$("#tab-settings").append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting" value="' + settings[c][s] + '"></p>');
+				}
+			}
+		}
+		console.log(JSON.stringify(s));
+	}
+
+	function saveSetting(key, value, category) {
+		settings[category || 'General'][key] = value;
+		var setting = {};
+		setting[(category || 'General') + "/" + key] = value;
+		$.post(apiRoot + "account/settings", setting);
+		db.put("settings", settings);
 	}
 
 	function loadLabels() {
@@ -1936,7 +2017,7 @@ var DragDrop = (function() {
 			$("#vid-container.thumb").css("right", "15px");
 		}
 		else {
-			$("#vid-container.thumb").css("right", "0px");
+			$("#vid-container.thumb").css("right", "1px");
 		}
 	}
 

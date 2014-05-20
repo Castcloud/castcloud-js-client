@@ -94,9 +94,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="tab" id="tab-settings">
-			<input type="text" class="magic">
-		</div>
+		<div class="tab" id="tab-settings"></div>
 		<div id="vid-container" class="thumb minimized">
 			<div id="vid-thumb-bar"><h4><a href="now-playing">Now playing</a></h4><button class="button minimize">_</button><button class="button popout"><i class="fa fa-external-link"></i></button></div>
 			<div id="cast-overlay"><h1>Playing on <span class="name">bitcast</span></h1></div>
@@ -137,7 +135,7 @@
 	<script type="text/template" class="podcasts">
 	<% 	labels.root.forEach(function(label) { 
 			if (label.type === "cast") { %>
-				<div id="cast-<%= label.id %>" class="cast drag"><%= casts[label.id].name %></div>
+				<div id="cast-<%= label.id %>" class="cast drag"><%= casts[label.id].name %><span class="n"></span></div>
 	<% 		}
 			else if (label.type === "label") { %>
 				<div id="label-<%= label.id %>" class="label drag">
@@ -146,7 +144,7 @@
 	<%					if (labels[label.id].name !== "root") { 
 							labels[labels[label.id].name].forEach(function(cast) {
 								if (cast.type === "cast") { %>
-									<div id="cast-<%= cast.id %>" class="cast drag"><%= casts[cast.id].name %></div>
+									<div id="cast-<%= cast.id %>" class="cast drag"><%= casts[cast.id].name %><span class="n"></span></div>
 	<%							}
 							});
 						} %>

@@ -394,6 +394,11 @@ a {
 	padding-left: 40px;
 }
 
+.cast .n {
+	float: right;
+	color: #AAA;
+}
+
 .episode {
 	position: relative;
 }
@@ -454,7 +459,7 @@ a {
 	top: auto;
 	background: #111;
 	padding: 0 5px;
-	width: auto;
+	width: 200px;
 	min-width: 160px;
 	max-width: 50%;
 }
