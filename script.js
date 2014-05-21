@@ -1421,7 +1421,7 @@ var DragDrop = (function() {
 
 			Chromecast.load(episodes[id].feed.enclosure.url, {
 				title: episodes[id].feed.title,
-				description: episodes[id].feed.description.replace(/(<([^>]+)>)/ig,""),
+				description: (episodes[id].feed.description || "").replace(/(<([^>]+)>)/ig,""),
 				image: getEpisodeImage(id)
 			});
 
@@ -1817,7 +1817,6 @@ var DragDrop = (function() {
 				}
 			}
 		}
-		console.log(JSON.stringify(s));
 	}
 
 	function saveSetting(key, value, category) {
