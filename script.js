@@ -343,8 +343,10 @@ var DragDrop = (function() {
 		},
 		Keybinds: {
 			PlayPause: 'space',
-			SkipBack: 'left',
-			SkipForward: 'right'
+			Next: 'pageup',
+			Previous: 'pagedown',
+			SkipForward: 'right',
+			SkipBack: 'left'
 		}
 	}
 
@@ -1249,14 +1251,13 @@ var DragDrop = (function() {
 			var reader = new FileReader();
 
 			reader.onload = function() {
-				//$.post(apiRoot + "library/casts.opml", { opml: reader.result });
-				$.post("http://localhost:3000/opml", { opml: reader.result });
+				$.post(apiRoot + "library/casts.opml", { opml: reader.result });
 			};
 
 			reader.readAsText(file);
 		});
 
-		$("#opml").click(function() {
+		$("#settings-panel").on("click", "#opml", function() {
 			$.get(apiRoot + "library/casts.opml", function(res) {
 				var a = window.document.createElement('a');
 				a.href = window.URL.createObjectURL(new Blob([res], {type: 'text/plain'}));
@@ -1293,6 +1294,7 @@ var DragDrop = (function() {
 			if (e.metaKey) {
 				s += "meta+";
 			}
+			console.log(e.which);
 
 			var special = {
 				8: 'backspace',
@@ -1342,6 +1344,14 @@ var DragDrop = (function() {
 			x = true;
 			o = window.innerWidth - e.pageX;
 			$(".thumb").css("width", (window.innerWidth - e.pageX - 15 + o)+"px");
+		});
+
+		$("#settings-menu").on("click", "p", function() {
+			var id = $(this).prop("id").split("-")[1];
+			$(".setting-panel").hide();
+			$(".setting-button").removeClass("selected");
+			$("#setting-"+ id).addClass("selected");
+			$("#setting-panel-" + id).show();
 		});
 
 		Mousetrap.bind('space', playPauseToggle);
@@ -1797,26 +1807,37 @@ var DragDrop = (function() {
 
 			settings = $.extend(true, {}, DefaultSettings, settings);
 
-			renderSettings();
+			//renderSettings();
 
 			db.put("settings", settings);
 		});
 	}
 
 	function renderSettings() {
-		$("#tab-settings").empty();
+		$("#settings-menu").empty();
+		$("#settings-panel").empty();
 		for (var c in settings) {
-			$("#tab-settings").append($("<h2>").text(c));
+			$("#settings-menu").append('<p class="setting-button" id="setting-' + c + '">' + c + '</p>');
+			var panel = $('<div class="setting-panel" id="setting-panel-' + c + '"><h2>' + c + "</h2></div>");
+
+			if (c === "General") {
+				panel.append('<button class="button" id="opml">OPML</button>');
+			}
+
 			for (var s in settings[c]) {
 				var id = c + "/" + s;
 				if (c === "Keybinds") {
-					$("#tab-settings").append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting keybind" value="' + settings[c][s] + '"></p>');
+					panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting keybind" value="' + settings[c][s] + '"></p>');
 				}
 				else {
-					$("#tab-settings").append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting" value="' + settings[c][s] + '"></p>');
+					panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting" value="' + settings[c][s] + '"></p>');
 				}
 			}
+
+			$("#settings-panel").append(panel);
 		}
+		$("#setting-General").addClass("selected");
+		$("#setting-panel-General").show();
 	}
 
 	function saveSetting(key, value, category) {
@@ -1907,6 +1928,8 @@ var DragDrop = (function() {
 			if (selectedEpisodeId !== null) {
 				renderEvents(selectedEpisodeId);
 			}
+
+			console.log("Fetched " + res.events.length + " events");
 
 			db.put("events", res.events);
 		});

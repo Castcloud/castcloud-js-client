@@ -432,7 +432,7 @@ a {
 }
 
 #vid {
-	width: 100%;
+	width: 100% !important;
 }
 
 #vid-container {
@@ -843,17 +843,54 @@ a {
 	color: #FFF;
 }
 
-#tab-settings h2 {
-	padding: 10px;
-}
-
-#tab-settings p {
-	margin: 5px 10px;
+#tab-settings .button {
+	margin: 0;
 }
 
 #tab-settings label {
 	display: inline-block;
 	width: 100px;
+}
+
+#settings-menu {
+	float: left;
+	background: #1A1A1A;
+	height: 100%;
+}
+
+#settings-menu p {
+	padding: 10px;
+	padding-right: 50px;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+#settings-menu p:hover {
+	background: #0066cc;
+	color: #FFF !important;
+}
+
+#settings-menu p.selected {
+	color: #0099cc;
+}
+
+#settings-panel {
+	float: left;
+	margin: 10px;
+}
+
+#settings-panel h2 {
+	margin-bottom: 10px;
+}
+
+#settings-panel div {
+	display: none;
+}
+
+#settings-panel .keybind {
+	background: none;
+	color: #0099cc;
+	cursor: pointer;
 }
 
 #clip {
