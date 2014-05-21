@@ -395,21 +395,6 @@ var DragDrop = (function() {
 	});
 
 	$(document).ready(function() {
-		console.log("Local Storage Usage:");
-		var total = 0;
-		for(var x in localStorage) {
-			var amount = (localStorage[x].length * 2) / 1024 / 1024;
-			total += amount;
-			console.log( x + " = " + amount.toFixed(2) + " MB");
-		}
-		console.log( "Total: " + total.toFixed(2) + " MB");
-
-		/*window.webkitStorageInfo.queryUsageAndQuota(webkitStorageInfo.TEMPORARY, 
-			function(used, remaining) {
-				console.log("IndexedDB, Used: " + (used / 1024 / 1024).toFixed(2) + "MB, Remaining: " + (remaining / 1024 / 1024 / 1024).toFixed(2) + "GB");
-			}
-		);*/	
-
 		//DragDrop.init("#podcasts", ".drag");
 		//DragDrop.ended(saveLabels);
 
@@ -1429,9 +1414,14 @@ var DragDrop = (function() {
 				pushEvent(Event.Start, id, 0);
 			}
 
+            var desc = "";
+            if (_.isString(episodes[id].feed.description)) {
+                desc = episodes[id].feed.description.replace(/(<([^>]+)>)/ig,"");
+            }
+
 			Chromecast.load(episodes[id].feed.enclosure.url, {
 				title: episodes[id].feed.title,
-				description: (episodes[id].feed.description || "").replace(/(<([^>]+)>)/ig,""),
+				description: desc,
 				image: getEpisodeImage(id)
 			});
 
@@ -1441,17 +1431,15 @@ var DragDrop = (function() {
 			videoLoading = true;
 			ended = false;
 
-			//$("#vid-container").show();
 			$("#vid-container").removeClass("minimized");
 		}
 	}
 
 	function deleteEpisode(id) {
-		console.log("del " + id);
 		$("#ep-" + id).remove();
 		pushEvent(Event.Delete, id);
-		//delete episodes[contextEpisodeID];
-		//localStorage[uniqueName("episodes")] = JSON.stringify(episodes);
+		delete episodes[contextEpisodeID];
+		db.put("episodes", episodes);
 	}
 
 	var paused = false;
