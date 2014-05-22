@@ -327,6 +327,7 @@ var DragDrop = (function() {
 		contextEpisodeID,
 		currentEpisodeId = null,
 		selectedEpisodeId = null,
+		selectedCastId = null,
 		videoLoading = false,
 		castHovered = null,
 		ctrlDown = false,
@@ -1161,12 +1162,12 @@ var DragDrop = (function() {
 			}
 			else {
 				var id = $(this).prop("id").split("-")[1];
-
+				selectedCastId = id;
 				renderEpisodes(id);
-				sessionStorage.selectedcast = id;
-
 				$(".cast").removeClass("current");
 				$(this).addClass("current");
+
+				sessionStorage.selectedcast = id;
 			}
 		});
 
@@ -1680,7 +1681,10 @@ var DragDrop = (function() {
 		});
 
 		if (sessionStorage.selectedcast) {
-			renderEpisodes(sessionStorage.selectedcast);
+			if (selectedCastId === null) {
+				renderEpisodes(sessionStorage.selectedcast);
+			}
+			selectedCastId = sessionStorage.selectedcast;
 			$("#cast-" + sessionStorage.selectedcast).addClass("current");
 		}
 		else if (sessionStorage.lastepisode) {
@@ -1712,14 +1716,25 @@ var DragDrop = (function() {
 		$.get(apiRoot + "library/newepisodes", { since: localStorage[uniqueName("since")] }, function(res) {
 			localStorage[uniqueName("since")] = res.timestamp;
 			console.log(res.episodes.length + " episodes fetched");
-			db.get("episodes", function(localEpisodes) {
-				localEpisodes = localEpisodes || {};
+			if (res.episodes.length > 0) {
+				db.get("episodes", function(localEpisodes) {
+					localEpisodes = localEpisodes || {};
+					res.episodes.forEach(function(episode) {
+						localEpisodes[episode.id] = episode;
+					});
+					db.put("episodes", localEpisodes);
+				});
+
 				res.episodes.forEach(function(episode) {
 					episodes[episode.id] = episode;
-					localEpisodes[episode.id] = episode;
+					if (selectedCastId == episode.castid) {
+						$("#cast-" + selectedCastId).prepend('<div id="ep-' + episode.id + '" class="episode">' + episode.feed.title + '<div class="delete">Delete</div></div>');
+					}
 				});
-				db.put("episodes", localEpisodes);
-			});
+				if (selectedCastId == episode.castid) {
+					setTimeout(function() { episodeScroll.refresh(); }, 0);
+				}
+			}			
 		});
 	}
 
@@ -1747,7 +1762,6 @@ var DragDrop = (function() {
 
 		var template = _.template($("script.episodes").html());
 		$("#episodes").empty().append(template({ episodes: e }));
-		positionThumb();
 
 		if (episodeScroll) {
 			setTimeout(function() { episodeScroll.refresh(); }, 0);
