@@ -136,7 +136,7 @@
 	<script type="text/template" class="podcasts">
 	<% 	labels.root.forEach(function(label) { 
 			if (label.type === "cast") { %>
-				<div id="cast-<%= label.id %>" class="cast drag"><%= casts[label.id].name %><span class="n"></span></div>
+				<div id="cast-<%= label.id %>" class="cast drag"><span class="name"><%= casts[label.id].name %></span><span class="n"></span></div>
 	<% 		}
 			else if (label.type === "label") { %>
 				<div id="label-<%= label.id %>" class="label drag">
@@ -145,7 +145,7 @@
 	<%					if (labels[label.id].name !== "root") { 
 							labels[labels[label.id].name].forEach(function(cast) {
 								if (cast.type === "cast") { %>
-									<div id="cast-<%= cast.id %>" class="cast drag"><%= casts[cast.id].name %><span class="n"></span></div>
+									<div id="cast-<%= cast.id %>" class="cast drag"><span class="name"><%= casts[cast.id].name %></span><span class="n"></span></div>
 	<%							}
 							});
 						} %>

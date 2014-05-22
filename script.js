@@ -989,8 +989,8 @@ var DragDrop = (function() {
 		});
 
 		$("#cast-context-rename").click(function() {
-			var name = $("#cast-" + contextEpisodeID).html();
-			$("#cast-" + contextEpisodeID).html('<input type="text">');
+			var name = $("#cast-" + contextEpisodeID + " .name").html();
+			$("#cast-" + contextEpisodeID + " .name").html('<input type="text">');
 			$(".cast input").focus();
 			$(".cast input").val(name);
 			$(".cast input").keydown(function(e) {
