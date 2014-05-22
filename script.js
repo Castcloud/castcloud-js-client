@@ -1,3 +1,5 @@
+(function(){var e=function(e,t){var o=e[0],u=e[1],a=e[2],f=e[3];o=n(o,u,a,f,t[0],7,-680876936);f=n(f,o,u,a,t[1],12,-389564586);a=n(a,f,o,u,t[2],17,606105819);u=n(u,a,f,o,t[3],22,-1044525330);o=n(o,u,a,f,t[4],7,-176418897);f=n(f,o,u,a,t[5],12,1200080426);a=n(a,f,o,u,t[6],17,-1473231341);u=n(u,a,f,o,t[7],22,-45705983);o=n(o,u,a,f,t[8],7,1770035416);f=n(f,o,u,a,t[9],12,-1958414417);a=n(a,f,o,u,t[10],17,-42063);u=n(u,a,f,o,t[11],22,-1990404162);o=n(o,u,a,f,t[12],7,1804603682);f=n(f,o,u,a,t[13],12,-40341101);a=n(a,f,o,u,t[14],17,-1502002290);u=n(u,a,f,o,t[15],22,1236535329);o=r(o,u,a,f,t[1],5,-165796510);f=r(f,o,u,a,t[6],9,-1069501632);a=r(a,f,o,u,t[11],14,643717713);u=r(u,a,f,o,t[0],20,-373897302);o=r(o,u,a,f,t[5],5,-701558691);f=r(f,o,u,a,t[10],9,38016083);a=r(a,f,o,u,t[15],14,-660478335);u=r(u,a,f,o,t[4],20,-405537848);o=r(o,u,a,f,t[9],5,568446438);f=r(f,o,u,a,t[14],9,-1019803690);a=r(a,f,o,u,t[3],14,-187363961);u=r(u,a,f,o,t[8],20,1163531501);o=r(o,u,a,f,t[13],5,-1444681467);f=r(f,o,u,a,t[2],9,-51403784);a=r(a,f,o,u,t[7],14,1735328473);u=r(u,a,f,o,t[12],20,-1926607734);o=i(o,u,a,f,t[5],4,-378558);f=i(f,o,u,a,t[8],11,-2022574463);a=i(a,f,o,u,t[11],16,1839030562);u=i(u,a,f,o,t[14],23,-35309556);o=i(o,u,a,f,t[1],4,-1530992060);f=i(f,o,u,a,t[4],11,1272893353);a=i(a,f,o,u,t[7],16,-155497632);u=i(u,a,f,o,t[10],23,-1094730640);o=i(o,u,a,f,t[13],4,681279174);f=i(f,o,u,a,t[0],11,-358537222);a=i(a,f,o,u,t[3],16,-722521979);u=i(u,a,f,o,t[6],23,76029189);o=i(o,u,a,f,t[9],4,-640364487);f=i(f,o,u,a,t[12],11,-421815835);a=i(a,f,o,u,t[15],16,530742520);u=i(u,a,f,o,t[2],23,-995338651);o=s(o,u,a,f,t[0],6,-198630844);f=s(f,o,u,a,t[7],10,1126891415);a=s(a,f,o,u,t[14],15,-1416354905);u=s(u,a,f,o,t[5],21,-57434055);o=s(o,u,a,f,t[12],6,1700485571);f=s(f,o,u,a,t[3],10,-1894986606);a=s(a,f,o,u,t[10],15,-1051523);u=s(u,a,f,o,t[1],21,-2054922799);o=s(o,u,a,f,t[8],6,1873313359);f=s(f,o,u,a,t[15],10,-30611744);a=s(a,f,o,u,t[6],15,-1560198380);u=s(u,a,f,o,t[13],21,1309151649);o=s(o,u,a,f,t[4],6,-145523070);f=s(f,o,u,a,t[11],10,-1120210379);a=s(a,f,o,u,t[2],15,718787259);u=s(u,a,f,o,t[9],21,-343485551);e[0]=c(o,e[0]);e[1]=c(u,e[1]);e[2]=c(a,e[2]);e[3]=c(f,e[3])};var t=function(e,t,n,r,i,s){t=c(c(t,e),c(r,s));return c(t<<i|t>>>32-i,n)};var n=function(e,n,r,i,s,o,u){return t(n&r|~n&i,e,n,s,o,u)};var r=function(e,n,r,i,s,o,u){return t(n&i|r&~i,e,n,s,o,u)};var i=function(e,n,r,i,s,o,u){return t(n^r^i,e,n,s,o,u)};var s=function(e,n,r,i,s,o,u){return t(r^(n|~i),e,n,s,o,u)};var o=function(t){txt="";var n=t.length,r=[1732584193,-271733879,-1732584194,271733878],i;for(i=64;i<=t.length;i+=64){e(r,u(t.substring(i-64,i)))}t=t.substring(i-64);var s=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];for(i=0;i<t.length;i++)s[i>>2]|=t.charCodeAt(i)<<(i%4<<3);s[i>>2]|=128<<(i%4<<3);if(i>55){e(r,s);for(i=0;i<16;i++)s[i]=0}s[14]=n*8;e(r,s);return r};var u=function(e){var t=[],n;for(n=0;n<64;n+=4){t[n>>2]=e.charCodeAt(n)+(e.charCodeAt(n+1)<<8)+(e.charCodeAt(n+2)<<16)+(e.charCodeAt(n+3)<<24)}return t};var a="0123456789abcdef".split("");var f=function(e){var t="",n=0;for(;n<4;n++)t+=a[e>>n*8+4&15]+a[e>>n*8&15];return t};var l=function(e){for(var t=0;t<e.length;t++)e[t]=f(e[t]);return e.join("")};window.md5=function(e){return l(o(e))};var c=function(e,t){return e+t&4294967295};if(md5("hello")!="5d41402abc4b2a76b9719d911017c592"){var c=function(e,t){var n=(e&65535)+(t&65535),r=(e>>16)+(t>>16)+(n>>16);return r<<16|n&65535}}})()
+
 //
 // chromecast.js
 //
@@ -1280,7 +1282,6 @@ var DragDrop = (function() {
 			if (e.metaKey) {
 				s += "meta+";
 			}
-			console.log(e.which);
 
 			var special = {
 				8: 'backspace',
@@ -1654,57 +1655,75 @@ var DragDrop = (function() {
 		});
 	}
 
+	var castsHash;
+	var firstCastsRender = true;
+
 	function renderCasts() {
-		var template = _.template($("script.podcasts").html());
-		$("#podcasts").empty().append(template({ labels: labels, casts: casts }));
-		positionThumb();
-
-		if (castScroll) {
-			setTimeout(function() { castScroll.refresh(); }, 0);
+		var hash = "";
+		if (!firstCastsRender) {
+			hash = md5(JSON.stringify(labels) + JSON.stringify(casts));
 		}
-		else {
-			castScroll = new IScroll('#foo', {
-				mouseWheel: true,
-				scrollbars: 'custom',
-				keyBindings: true,
-				interactiveScrollbars: true,
-				click: true
-			});
-		}
+		if (hash !== castsHash) {
+			castsHash = hash;
 
-		labels.root.forEach(function(label) {
-			if (label.type === "label") {
-				if (labels[label.id].expanded) {
-					$("#label-" + label.id + " .content").show();
-				}
-			}
-		});
+			var template = _.template($("script.podcasts").html());
+			$("#podcasts").empty().append(template({ labels: labels, casts: casts }));
+			positionThumb();
 
-		if (sessionStorage.selectedcast) {
-			if (selectedCastId === null) {
-				renderEpisodes(sessionStorage.selectedcast);
-			}
-			selectedCastId = sessionStorage.selectedcast;
-			$("#cast-" + sessionStorage.selectedcast).addClass("current");
-		}
-		else if (sessionStorage.lastepisode) {
-			var lastepisode = JSON.parse(sessionStorage.lastepisode);
-			renderEpisodes(lastepisode.castid);
-		}
-
-		var n = {};
-		for (var i in episodes) {
-			var episode = episodes[i];
-			if (episode.castid in n) {
-				n[episode.castid]++;
+			if (castScroll) {
+				setTimeout(function() { castScroll.refresh(); }, 0);
 			}
 			else {
-				n[episode.castid] = 1;
+				castScroll = new IScroll('#foo', {
+					mouseWheel: true,
+					scrollbars: 'custom',
+					keyBindings: true,
+					interactiveScrollbars: true,
+					click: true
+				});
 			}
-		}
 
-		for (var index in n) {
-			$("#cast-" + index + " .n").html(n[index]);
+			labels.root.forEach(function(label) {
+				if (label.type === "label") {
+					if (labels[label.id].expanded) {
+						$("#label-" + label.id + " .content").show();
+					}
+				}
+			});
+
+			if (sessionStorage.selectedcast) {
+				if (selectedCastId === null) {
+					renderEpisodes(sessionStorage.selectedcast);
+				}
+				selectedCastId = sessionStorage.selectedcast;
+				$("#cast-" + sessionStorage.selectedcast).addClass("current");
+			}
+			else if (sessionStorage.lastepisode) {
+				var lastepisode = JSON.parse(sessionStorage.lastepisode);
+				renderEpisodes(lastepisode.castid);
+			}
+
+			var n = {};
+			for (var i in episodes) {
+				var episode = episodes[i];
+				if (episode.castid in n) {
+					n[episode.castid]++;
+				}
+				else {
+					n[episode.castid] = 1;
+				}
+			}
+
+			for (var index in n) {
+				$("#cast-" + index + " .n").html(n[index]);
+			}
+
+			if (firstCastsRender) {
+				firstCastsRender = false;
+				setTimeout(function() {
+					castsHash = md5(JSON.stringify(labels) + JSON.stringify(casts));
+				}, 0);
+			}
 		}
 	}
 
@@ -1809,37 +1828,55 @@ var DragDrop = (function() {
 
 			settings = $.extend(true, {}, DefaultSettings, settings);
 
-			//renderSettings();
+			renderSettings();
 
 			db.put("settings", settings);
 		});
 	}
 
+	var settingsHash;
+	var firstSettingsRender = true;
+
 	function renderSettings() {
-		$("#settings-menu").empty();
-		$("#settings-panel").empty();
-		for (var c in settings) {
-			$("#settings-menu").append('<p class="setting-button" id="setting-' + c + '">' + c + '</p>');
-			var panel = $('<div class="setting-panel" id="setting-panel-' + c + '"><h2>' + c + "</h2></div>");
-
-			if (c === "General") {
-				panel.append('<button class="button" id="opml">OPML</button>');
-			}
-
-			for (var s in settings[c]) {
-				var id = c + "/" + s;
-				if (c === "Keybinds") {
-					panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting keybind" value="' + settings[c][s] + '"></p>');
-				}
-				else {
-					panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting" value="' + settings[c][s] + '"></p>');
-				}
-			}
-
-			$("#settings-panel").append(panel);
+		var hash = "";
+		if (!firstSettingsRender) {
+			hash = md5(JSON.stringify(settings));
 		}
-		$("#setting-General").addClass("selected");
-		$("#setting-panel-General").show();
+		if (hash !== settingsHash) {
+			settingsHash = hash;
+
+			$("#settings-menu").empty();
+			$("#settings-panel").empty();
+			for (var c in settings) {
+				$("#settings-menu").append('<p class="setting-button" id="setting-' + c + '">' + c + '</p>');
+				var panel = $('<div class="setting-panel" id="setting-panel-' + c + '"><h2>' + c + "</h2></div>");
+
+				if (c === "General") {
+					panel.append('<button class="button" id="opml">OPML</button>');
+				}
+
+				for (var s in settings[c]) {
+					var id = c + "/" + s;
+					if (c === "Keybinds") {
+						panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting keybind" value="' + settings[c][s] + '"></p>');
+					}
+					else {
+						panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting" value="' + settings[c][s] + '"></p>');
+					}
+				}
+
+				$("#settings-panel").append(panel);
+			}
+			$("#setting-General").addClass("selected");
+			$("#setting-panel-General").show();
+
+			if (firstSettingsRender) {
+				firstSettingsRender = false;
+				setTimeout(function() {
+					settingsHash = md5(JSON.stringify(settings));
+				}, 0);
+			}
+		}
 	}
 
 	function saveSetting(key, value, category) {
