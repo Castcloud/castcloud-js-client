@@ -1486,7 +1486,6 @@ var DragDrop = (function() {
 				
 				finishLogin();
 
-				$("#vid-container").show();
 				$("#tab-podcasts").fadeIn("fast");
 				$("#playbar").slideDown("fast");
 				$("#topbar nav").fadeIn("fast");
@@ -1499,6 +1498,14 @@ var DragDrop = (function() {
 
 	function finishLogin() {
 		loggedIn = true;
+
+		$("#userinfo span").html(username);
+		$(".tab").hide();
+		$("#main-container").css("bottom", "60px");
+
+		if (Backbone.history.fragment !== "now-playing") {
+			$("#vid-container").addClass("thumb");
+		}
 
 		var render = _.after(4, renderCasts);
 
@@ -1554,20 +1561,10 @@ var DragDrop = (function() {
 			});
 		});	
 
-		$("#userinfo span").html(username);
-
 		$.ajaxSetup({
 			headers: { Authorization: token }
 		});
-
-		$(".tab").hide();
-		$("#main-container").css("bottom", "60px");
-
-		if (Backbone.history.fragment !== "now-playing") {
-			$("#vid-container").addClass("thumb");
-		}
 		
-		loadSettings();
 		sync();
 	}
 
@@ -1670,6 +1667,14 @@ var DragDrop = (function() {
 			$("#podcasts").empty().append(template({ labels: labels, casts: casts }));
 			positionThumb();
 
+			labels.root.forEach(function(label) {
+				if (label.type === "label") {
+					if (labels[label.id].expanded) {
+						$("#label-" + label.id + " .content").show();
+					}
+				}
+			});
+
 			if (castScroll) {
 				setTimeout(function() { castScroll.refresh(); }, 0);
 			}
@@ -1682,14 +1687,6 @@ var DragDrop = (function() {
 					click: true
 				});
 			}
-
-			labels.root.forEach(function(label) {
-				if (label.type === "label") {
-					if (labels[label.id].expanded) {
-						$("#label-" + label.id + " .content").show();
-					}
-				}
-			});
 
 			if (sessionStorage.selectedcast) {
 				if (selectedCastId === null) {
