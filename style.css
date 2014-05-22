@@ -572,7 +572,7 @@ a {
 	color: #0066cc;
 }
 
-#episodeinfo p {
+#episodeinfo p, #events p {
 	margin: 5px 0;
 	line-height: 1.5;
 }
@@ -615,7 +615,7 @@ a {
 	left: 100%;
 	top: 0;
 	bottom: 0;
-	width: 100%;
+	width: 33.333333%;
 	background: #1A1A1A;
 	z-index: 1;
 	-webkit-transition: left .2s;

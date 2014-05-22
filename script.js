@@ -1092,7 +1092,7 @@ var DragDrop = (function() {
 		});
 
 		$("#episode-bar-events").click(function() {
-			$("#events").css("left", 0);
+			$("#events").css("left", "66.666666%");
 		});
 
 		$("#episode-bar-play").click(function() {
@@ -2147,9 +2147,9 @@ var DragDrop = (function() {
 	}
 
 	$.fn.isOverflowing = function() {
-	    var $el = $(this).get(0);
-	    var overflowing = false; 
-	    if (($el.clientHeight < $el.scrollHeight) || ($el.clientWidth < $el.scrollWidth)) {
+	    var el = $(this).get(0);
+	    var overflowing = false;
+	    if (el.clientHeight < el.scrollHeight) {
 	        overflowing = true;
 	    }
 	    return overflowing;
