@@ -1744,7 +1744,7 @@ var DragDrop = (function() {
 				res.episodes.forEach(function(episode) {
 					episodes[episode.id] = episode;
 					if (selectedCastId == episode.castid) {
-						$("#cast-" + selectedCastId).prepend('<div id="ep-' + episode.id + '" class="episode">' + episode.feed.title + '<div class="delete">Delete</div></div>');
+						$("#episodes").prepend('<div id="ep-' + episode.id + '" class="episode">' + episode.feed.title + '<div class="delete">Delete</div></div>');
 					}
 				});
 				if (selectedCastId == episode.castid) {
