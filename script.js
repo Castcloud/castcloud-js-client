@@ -371,8 +371,9 @@ var DragDrop = (function() {
 	};
 
 	var buffer = {
-		events: []
-	}
+		events: [],
+		settings: {}
+	};
 	
 	var custom = true;
 	var styledReceiver = "17DC56DD";
@@ -1569,6 +1570,12 @@ var DragDrop = (function() {
 					buffer.events = data;
 				}
 			});
+
+			db.get("buffer_settings", function(data) {
+				if (data) {
+					buffer.settings = data;
+				}
+			});
 		});	
 
 		$.ajaxSetup({
@@ -1586,6 +1593,9 @@ var DragDrop = (function() {
 
 		if (buffer.events.length > 0) {
 			flushEvents();
+		}
+		if (_.size(buffer.settings) > 0) {
+			flushSettings();
 		}
 
 		if (!onDemand) {
@@ -1902,10 +1912,17 @@ var DragDrop = (function() {
 
 	function saveSetting(key, value, category) {
 		settings[category || 'General'][key] = value;
-		var setting = {};
-		setting[(category || 'General') + "/" + key] = value;
-		$.post(apiRoot + "account/settings", setting);
+		buffer.settings[(category || 'General') + "/" + key] = value;
+		db.put("buffer_settings", buffer.settings);
+		flushSettings();
 		db.put("settings", settings);
+	}
+
+	function flushSettings() {
+		$.post(apiRoot + "account/settings", buffer.settings, function() {
+			buffer.settings = {};
+			db.remove("buffer_settings");
+		});
 	}
 
 	function loadLabels() {
