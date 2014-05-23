@@ -351,7 +351,7 @@ var DragDrop = (function() {
 			SkipForward: 'right',
 			SkipBack: 'left'
 		}
-	}
+	};
 
 	var Event = {
 		Start: 10,
@@ -368,6 +368,10 @@ var DragDrop = (function() {
 		50: "Sleep Ended",
 		60: "End Of Track",
 		70: "Delete"
+	};
+
+	var buffer = {
+		events: []
 	}
 	
 	var custom = true;
@@ -1559,6 +1563,12 @@ var DragDrop = (function() {
 					renderSettings();
 				}
 			});
+
+			db.get("buffer_events", function(data) {
+				if (data) {
+					buffer.events = data;
+				}
+			});
 		});	
 
 		$.ajaxSetup({
@@ -1573,6 +1583,10 @@ var DragDrop = (function() {
 		loadEpisodes();
 		loadEvents();
 		loadSettings();
+
+		if (buffer.events.length > 0) {
+			flushEvents();
+		}
 
 		if (!onDemand) {
 			setTimeout(sync, 10000);
@@ -1594,13 +1608,16 @@ var DragDrop = (function() {
 
 		var id = id === undefined ? currentEpisodeId : id;
 
-		$.post(apiRoot + "library/events", { json: [{
+		buffer.events.push({
 			type: type,
 			episodeid: id,
 			positionts: time === undefined ? el("vid").currentTime | 0 : time,
 			concurrentorder: currentOrder,
 			clientts: eventTS				
-		}] });	
+		});
+		db.put("buffer_events", buffer.events);
+
+		flushEvents();
 
 		episodes[id].lastevent = {
 			type: type,
@@ -1638,6 +1655,13 @@ var DragDrop = (function() {
 		if (id == selectedEpisodeId) {
 			renderEvents(id);
 		}
+	}
+
+	function flushEvents() {
+		$.post(apiRoot + "library/events", { json: buffer.events }, function() {
+			buffer.events = [];
+			db.remove("buffer_events");
+		});	
 	}
 
 	function loadCasts(tag) {
