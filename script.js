@@ -1940,34 +1940,66 @@ var DragDrop = (function() {
 	}
 
 	function loadEvents() {
-		$.get(apiRoot + "library/events", function(res) {
-			res.events.forEach(function(event) {
-				var position = new Date(event.positionts * 1000);
-				position.setHours(position.getHours() - 1);
-				event.position = "";
-				if (position.getHours() > 0) {
-					event.position += position.getHours() + "h ";
+		if (!localStorage[uniqueName("since-events")]) {
+			localStorage[uniqueName("since-events")] = 0;
+		}
+		console.log("fetching events since " + localStorage[uniqueName("since-events")]);
+		$.get(apiRoot + "library/events", { since: localStorage[uniqueName("since-events")] }, function(res) {
+			localStorage[uniqueName("since-events")] = res.timestamp;
+			if (res.events.length > 0) {
+				var instanceid = md5(localStorage.uuid);
+				var added = 0;
+
+				res.events.forEach(function(event) {
+					if (event.clientinstanceid != instanceid) {
+						var position = new Date(event.positionts * 1000);
+						position.setHours(position.getHours() - 1);
+						event.position = "";
+						if (position.getHours() > 0) {
+							event.position += position.getHours() + "h ";
+						}
+						event.position += position.getMinutes() + "m " + position.getSeconds() + "s";
+						var date = new Date(event.clientts * 1000);
+						date.setHours(date.getHours() - 1);
+						event.date = date.toLocaleString();
+						event.name = Event[event.type];
+
+						if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
+							episodes[event.episodeid].lastevent = event;
+						}
+
+						events.unshift(event);
+						added++;
+					}
+				});
+
+				if (added > 0) {
+					events.sort(function(a, b) {
+						if (a.clientts > b.clientts) {
+							return -1;
+						}
+						if (a.clientts < b.clientts) {
+							return 1;
+						}
+
+						if (a.concurrentorder > b.concurrentorder) {
+							return -1;
+						}
+						if (a.concurrentorder < b.concurrentorder) {
+							return 1;
+						}
+						return 0;
+					});
+
+					db.put("events", events);
+
+					if (selectedEpisodeId !== null) {
+						renderEvents(selectedEpisodeId);
+					}
 				}
-				event.position += position.getMinutes() + "m " + position.getSeconds() + "s";
-				var date = new Date(event.clientts * 1000);
-				date.setHours(date.getHours() - 1);
-				event.date = date.toLocaleString();
-				event.name = Event[event.type];
-
-				if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
-					episodes[event.episodeid].lastevent = event;
-				}
-			});
-
-			events = res.events;
-
-			if (selectedEpisodeId !== null) {
-				renderEvents(selectedEpisodeId);
+				console.log(added + " new events");
 			}
-
-			console.log("Fetched " + res.events.length + " events");
-
-			db.put("events", res.events);
+			console.log(res.events.length + " events fetched");
 		});
 	}
 
