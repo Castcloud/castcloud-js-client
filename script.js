@@ -880,6 +880,9 @@ var DragDrop = (function() {
 			$("#vmenu-add-results").toggle();
 			prev.hide();
 			$("#input-vmenu-add").focus();
+			if ($("#input-vmenu-add:visible").length > 0) {
+				castScroll.scrollTo(0, 0);
+			}
 		});
 
 		$("#button-vmenu-add").click(function() {
@@ -1173,12 +1176,7 @@ var DragDrop = (function() {
 			}
 			else {
 				var id = $(this).prop("id").split("-")[1];
-				selectedCastId = id;
-				renderEpisodes(id);
-				$(".cast").removeClass("current");
-				$(this).addClass("current");
-
-				sessionStorage.selectedcast = id;
+				selectCast(id);
 			}
 		});
 
@@ -1374,8 +1372,13 @@ var DragDrop = (function() {
 		Backbone.history.start({ pushState: true, root: root });
 	});
 
+	var addingFeed = false;
+
 	function addFeed(feedurl) {
-		$.post(apiRoot + "library/casts", { feedurl: feedurl }, function() { loadLabels(); });
+		$.post(apiRoot + "library/casts", { feedurl: feedurl }, function() {
+			addingFeed = true;
+			loadEpisodes();
+		});
 
 		$("#input-vmenu-add").val("");
 		$("#input-vmenu-add").toggle();
@@ -1753,6 +1756,14 @@ var DragDrop = (function() {
 				$("#cast-" + index + " .n").html(n[index]);
 			}
 
+			if (addingFeed) {
+				addingFeed = false;
+				selectCast($("#podcasts > .cast:last-child").prop("id").split("-")[1]);
+				setTimeout(function() {
+					castScroll.scrollTo(0, castScroll.maxScrollY, 0); 
+				}, 0);
+			}
+
 			if (firstCastsRender) {
 				firstCastsRender = false;
 				setTimeout(function() {
@@ -1760,6 +1771,14 @@ var DragDrop = (function() {
 				}, 0);
 			}
 		}
+	}
+
+	function selectCast(id) {
+		selectedCastId = id;
+		renderEpisodes(id);
+		$(".cast").removeClass("current");
+		$("#cast-" + id).addClass("current");
+		sessionStorage.selectedcast = id;
 	}
 
 	function loadEpisodes() {
@@ -1785,8 +1804,11 @@ var DragDrop = (function() {
 						$("#episodes").prepend('<div id="ep-' + episode.id + '" class="episode">' + episode.feed.title + '<div class="delete">Delete</div></div>');
 					}
 				});
-				if (selectedCastId == episode.castid) {
+				if (selectedCastId == res.episodes[0].castid) {
 					setTimeout(function() { episodeScroll.refresh(); }, 0);
+				}
+				if (addingFeed) {
+					loadLabels();
 				}
 			}			
 		});
