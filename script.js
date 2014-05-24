@@ -501,7 +501,7 @@ var DragDrop = (function() {
 			$("#input-username").val(username);
 		}
 		
-		apiRoot = localStorage[uniqueName("apiTarget")] || window.location.origin + root.replace("client", "api");
+		apiRoot = localStorage[uniqueName("apiTarget")] || window.location.protocol + "//" + window.location.host + root.replace("client", "api");
 
 		$("#input-target").val(apiRoot);
 
