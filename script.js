@@ -1264,6 +1264,8 @@ var DragDrop = (function() {
 			});			
 		});
 
+		$("#settings-panel").on("click", "#reset-settings", resetSettings);
+
 		var settingTimerId;
 		$("#tab-settings").on("keyup", ".setting", function() {
 			clearTimeout(settingTimerId);
@@ -1895,12 +1897,12 @@ var DragDrop = (function() {
 	var settingsHash;
 	var firstSettingsRender = true;
 
-	function renderSettings() {
+	function renderSettings(forceRender) {
 		var hash = "";
-		if (!firstSettingsRender) {
+		if (forceRender === undefined && !firstSettingsRender) {
 			hash = md5(JSON.stringify(settings));
 		}
-		if (hash !== settingsHash) {
+		if (forceRender || hash !== settingsHash) {
 			settingsHash = hash;
 
 			$("#settings-menu").empty();
@@ -1910,7 +1912,8 @@ var DragDrop = (function() {
 				var panel = $('<div class="setting-panel" id="setting-panel-' + c + '"><h2>' + c + "</h2></div>");
 
 				if (c === "General") {
-					panel.append('<button class="button" id="opml">OPML</button>');
+					panel.append('<button class="button" id="opml">OPML</button>' +
+						'<button class="button" id="reset-settings">Reset</button>');
 				}
 
 				for (var s in settings[c]) {
@@ -1956,6 +1959,21 @@ var DragDrop = (function() {
 			buffer.settings = {};
 			db.remove("buffer_settings");
 		});
+	}
+
+	function resetSettings() {
+		settings = DefaultSettings;
+		for (var c in settings) {
+			for (var s in settings[c]) {
+				buffer.settings[c + "/" + s] = settings[c][s];
+			}
+		}
+		db.put("buffer_settings", buffer.settings);
+		flushSettings();
+		db.put("settings", settings);
+
+		renderSettings(true);
+		setKeybinds();
 	}
 
 	function setKeybinds() {
