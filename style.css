@@ -210,7 +210,7 @@ a {
 	font-size: 20px;
 }
 
-#input-vmenu-add {
+input.vmenu-toggle {
 	display: none;
 	font: 16px "Lato";
 	height: 50px;
@@ -221,7 +221,7 @@ a {
 	z-index: 1;
 }
 
-#button-vmenu-add {
+button.vmenu-toggle {
 	display: none;
 	width: 100px;
 	float: right;
@@ -236,7 +236,7 @@ a {
 	z-index: 2;
 }
 
-#button-vmenu-add:hover {
+button.vmenu-toggle:hover {
 	background: #0099cc;
 }
 

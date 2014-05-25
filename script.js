@@ -618,7 +618,7 @@ var DragDrop = (function() {
 				currentEpisodeId = null;
 
 				// Possibly store lastevent in sessionstorage instead of this hack
-				setTimeout(function() { loadEpisodes(JSON.parse(sessionStorage.lastepisode).castid); }, 500);
+				setTimeout(function() { renderEpisodes(JSON.parse(sessionStorage.lastepisode).castid); }, 500);
 			});
 		});
 
@@ -892,7 +892,7 @@ var DragDrop = (function() {
 
 		$("#input-vmenu-add").keydown(function(e) {
 			if (e.which === 13) {
-				addFeed($("#input-vmenu-add").val());
+				addFeed($(this).val());
 			}
 		});
 
@@ -925,10 +925,25 @@ var DragDrop = (function() {
 			$(this).parent().empty();
 		});
 
-		$("#vmenu-tags").click(function() {
+		$("#vmenu-label").click(function() {
 			var prev = $(".vmenu-toggle:visible");
-			$("#tags").toggle();
+			$("#input-vmenu-label").toggle();
+			$("#button-vmenu-label").toggle();
 			prev.hide();
+			$("#input-vmenu-label").focus();
+			if ($("#input-vmenu-label:visible").length > 0) {
+				castScroll.scrollTo(0, 0);
+			}
+		});
+
+		$("#button-vmenu-label").click(function() {
+			addLabel($("#input-vmenu-label").val());
+		});
+
+		$("#input-vmenu-label").keydown(function(e) {
+			if (e.which === 13) {
+				addLabel($(this).val());
+			}
 		});
 
 		$("#vmenu-sync").click(function() {
@@ -1387,6 +1402,16 @@ var DragDrop = (function() {
 		$("#vmenu-add-results").toggle();
 	}
 
+	function addLabel(name) {
+		$("#input-vmenu-label").val("");
+		$("#input-vmenu-label").toggle();
+		$("#button-vmenu-label").toggle();
+
+		$.post(apiRoot + "library/labels", { name: name }, function() {
+			loadLabels();
+		});
+	}
+
 	function loadEpisodeInfo(id) {
 		renderEvents(id);
 
@@ -1420,6 +1445,8 @@ var DragDrop = (function() {
 					pushEvent(Event.Play);
 				}
 			}
+
+			console.log(episodes[id].lastevent);
 
 			loadEpisodeInfo(id);
 
@@ -1521,6 +1548,13 @@ var DragDrop = (function() {
 		}
 
 		var render = _.after(4, renderCasts);
+		var updateLastEvent =_.after(2, function() {
+			events.forEach(function(event) {
+				if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
+					episodes[event.episodeid].lastevent = event;
+				}
+			});
+		});
 
 		db = new IDBStore({
 			storeName: uniqueName("db"),
@@ -1546,6 +1580,8 @@ var DragDrop = (function() {
 				if (data) {
 					console.log("Episodes loaded from IDB");
 					episodes = data;
+
+					updateLastEvent();
 					render();
 				}
 			});
@@ -1555,11 +1591,7 @@ var DragDrop = (function() {
 					console.log("Events loaded from IDB");
 					events = data;
 
-					events.forEach(function(event) {
-						if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
-							episodes[event.episodeid].lastevent = event;
-						}
-					});
+					updateLastEvent();
 					render();
 				}
 			});
