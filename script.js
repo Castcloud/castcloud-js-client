@@ -1940,6 +1940,7 @@ var DragDrop = (function() {
 	function saveSetting(key, value, category) {
 		category = category || 'General'
 		settings[category][key] = value;
+		settingsHash = md5(JSON.stringify(settings));
 		buffer.settings[category + "/" + key] = value;
 		db.put("buffer_settings", buffer.settings);
 		flushSettings();
