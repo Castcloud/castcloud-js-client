@@ -324,7 +324,6 @@ var DragDrop = (function() {
 		casts = {},
 		labels,
 		events = [],
-		settings = {},
 		db,
 		rootLabelId,
 		root,
@@ -356,6 +355,8 @@ var DragDrop = (function() {
 			SkipBack: 'left'
 		}
 	};
+
+	var settings = DefaultSettings;
 
 	var Event = {
 		Start: 10,
@@ -1348,9 +1349,7 @@ var DragDrop = (function() {
 			$("#setting-panel-" + id).show();
 		});
 
-		Mousetrap.bind('space', playPauseToggle);
-		Mousetrap.bind('left', skipBack);
-		Mousetrap.bind('right', skipForward);
+		setKeybinds();
 
 		episodeinfoScroll = new IScroll('#episodeinfo', {
 			mouseWheel: true,
@@ -1568,6 +1567,7 @@ var DragDrop = (function() {
 					console.log("Settings loaded from IDB");
 					settings = data;
 
+					setKeybinds();
 					renderSettings();
 				}
 			});
@@ -1885,6 +1885,7 @@ var DragDrop = (function() {
 
 			settings = $.extend(true, {}, DefaultSettings, settings);
 
+			setKeybinds();
 			renderSettings();
 
 			db.put("settings", settings);
@@ -1937,11 +1938,16 @@ var DragDrop = (function() {
 	}
 
 	function saveSetting(key, value, category) {
-		settings[category || 'General'][key] = value;
-		buffer.settings[(category || 'General') + "/" + key] = value;
+		category = category || 'General'
+		settings[category][key] = value;
+		buffer.settings[category + "/" + key] = value;
 		db.put("buffer_settings", buffer.settings);
 		flushSettings();
 		db.put("settings", settings);
+
+		if (category === "Keybinds") {
+			setKeybinds();		
+		}
 	}
 
 	function flushSettings() {
@@ -1949,6 +1955,15 @@ var DragDrop = (function() {
 			buffer.settings = {};
 			db.remove("buffer_settings");
 		});
+	}
+
+	function setKeybinds() {
+		Mousetrap.reset();
+		Mousetrap.bind(settings.Keybinds.PlayPause, playPauseToggle);
+		Mousetrap.bind(settings.Keybinds.Next, nextEpisode);
+		Mousetrap.bind(settings.Keybinds.Previous, previousEpisode);
+		Mousetrap.bind(settings.Keybinds.SkipForward, skipForward);
+		Mousetrap.bind(settings.Keybinds.SkipBack, skipBack);
 	}
 
 	function loadLabels() {
@@ -2131,6 +2146,14 @@ var DragDrop = (function() {
 		if (video.paused) {
 			pushEvent(Event.Pause);
 		}
+	}
+
+	function nextEpisode() {
+		console.log("nextEpisode called");
+	}
+
+	function previousEpisode() {
+		console.log("previousEpisode called");
 	}
 
 	function toggleFullscreen() {
