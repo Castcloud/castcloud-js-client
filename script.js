@@ -2025,17 +2025,19 @@ var DragDrop = (function() {
 					rootLabelId = label.id;
 				}
 				labels[label.name] = [];
-				label.content.split(",").forEach(function(item) {
-					var split = item.split("/");
-					labels[label.name].push({
-						type: split[0],
-						id: parseInt(split[1])
+				if (label.content) {
+					label.content.split(",").forEach(function(item) {
+						var split = item.split("/");
+						labels[label.name].push({
+							type: split[0],
+							id: parseInt(split[1])
+						});
+						labels[label.id] = {
+							name: label.name,
+							expanded: label.expanded
+						};
 					});
-					labels[label.id] = {
-						name: label.name,
-						expanded: label.expanded
-					};
-				});
+				}
 			});
 			db.put("labels", labels);
 
