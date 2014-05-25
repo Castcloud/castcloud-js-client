@@ -2032,12 +2032,12 @@ var DragDrop = (function() {
 							type: split[0],
 							id: parseInt(split[1])
 						});
-						labels[label.id] = {
-							name: label.name,
-							expanded: label.expanded
-						};
 					});
 				}
+				labels[label.id] = {
+					name: label.name,
+					expanded: label.expanded
+				};
 			});
 			db.put("labels", labels);
 
