@@ -443,6 +443,10 @@ a {
 	width: 100%;
 }
 
+#vid-container:not(.thumb) {
+	width: 100% !important;
+}
+
 #vid-container.fs {
 	height: auto;
 	left: 0;
