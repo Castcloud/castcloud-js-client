@@ -341,7 +341,8 @@ var DragDrop = (function() {
 		episodeScroll,
 		episodeinfoScroll,
 		poppedOut,
-		mediaType;
+		mediaType,
+		idbReady = false;
 
 	var DefaultSettings = {
 		General: {
@@ -377,7 +378,8 @@ var DragDrop = (function() {
 
 	var buffer = {
 		events: [],
-		settings: {}
+		settings: {},
+		idb: {}
 	};
 	
 	var custom = true;
@@ -1560,6 +1562,8 @@ var DragDrop = (function() {
 			storeName: uniqueName("db"),
 			keyPath: null
 		}, function() {
+			idbReady = true;
+
 			db.get("labels", function(data) {
 				if (data) {
 					console.log("Labels loaded from IDB");
@@ -1617,12 +1621,17 @@ var DragDrop = (function() {
 					buffer.settings = data;
 				}
 			});
+
+			for (var key in buffer.idb) {
+				db.put(key, buffer.idb[key]);
+				console.log("Flushed " + key + " from IDB buffer");
+			}
 		});	
 
 		$.ajaxSetup({
 			headers: { Authorization: token }
 		});
-		
+
 		sync();
 	}
 
@@ -1721,7 +1730,12 @@ var DragDrop = (function() {
 				casts[cast.id] = cast;
 			});
 
-			db.put("casts", casts);
+			if (idbReady) {
+				db.put("casts", casts);				
+			}
+			else {
+				buffer.idb.casts = casts;
+			}
 
 			renderCasts();
 		});
@@ -1922,7 +1936,12 @@ var DragDrop = (function() {
 			setKeybinds();
 			renderSettings();
 
-			db.put("settings", settings);
+			if (idbReady) {
+				db.put("settings", settings);
+			}
+			else {
+				buffer.idb.settings = settings;
+			}
 		});
 	}
 
@@ -2039,8 +2058,12 @@ var DragDrop = (function() {
 					expanded: label.expanded
 				};
 			});
-			db.put("labels", labels);
-
+			if (idbReady) {
+				db.put("labels", labels);
+			}
+			else {
+				buffer.idb.labels = labels;
+			}
 			loadCasts();
 		});
 	}
@@ -2119,7 +2142,12 @@ var DragDrop = (function() {
 					return 0;
 				});
 
-				db.put("events", events);
+				if (idbReady) {
+					db.put("events", events);
+				}
+				else {
+					buffer.idb.events = events;
+				}
 
 				if (selectedEpisodeId !== null) {
 					renderEvents(selectedEpisodeId);
