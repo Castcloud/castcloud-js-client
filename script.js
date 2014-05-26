@@ -704,7 +704,11 @@ var DragDrop = (function() {
 		$(window).on("beforeunload", function() {
 			if (currentEpisodeId !== null) {
 				if (!paused && !ended) {
-					pushEvent(Event.Play);
+					localStorage.beforeunloadevent = JSON.stringify({
+						type: Event.Play,
+						id: currentEpisodeId,
+						time: el("vid").currentTime | 0
+					});
 				}
 			}
 		});
@@ -712,7 +716,11 @@ var DragDrop = (function() {
 		$(window).on("unload", function() {
 			if (currentEpisodeId !== null) {
 				if (!paused && !ended) {
-					pushEvent(Event.Play);
+					localStorage.unloadevent = JSON.stringify({
+						type: Event.Play,
+						id: currentEpisodeId,
+						time: el("vid").currentTime | 0
+					});
 				}
 			}
 		});
@@ -1594,6 +1602,19 @@ var DragDrop = (function() {
 				if (data) {
 					console.log("Events loaded from IDB");
 					events = data;
+					
+					if (localStorage.beforeunloadevent) {
+						var ev = JSON.parse(localStorage.beforeunloadevent);
+						console.log("pushing beforeunloadevent");
+						pushEvent(ev.type, ev.id, ev.time);
+						localStorage.removeItem("beforeunloadevent");
+					}
+					if (localStorage.unloadevent) {
+						var ev = JSON.parse(localStorage.unloadevent);
+						console.log("pushing unloadevent");
+						pushEvent(ev.type, ev.id, ev.time);
+						localStorage.removeItem("unloadevent");
+					}
 
 					updateLastEvent();
 					render();
@@ -1666,7 +1687,7 @@ var DragDrop = (function() {
 		}
 		lastEventTS = eventTS;
 
-		var id = id === undefined ? currentEpisodeId : id;
+		id = id || currentEpisodeId;
 
 		buffer.events.push({
 			type: type,
