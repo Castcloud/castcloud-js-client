@@ -914,33 +914,63 @@ var DragDrop = (function() {
 		});
 
 		$("#input-vmenu-add").keydown(function(e) {
+			e.stopPropagation();
+
+			var selected = $("#vmenu-add-results p.selected");
 			if (e.which === 13) {
-				addFeed($(this).val());
+				if (selected.length > 0) {
+					addFeed(selected.attr("feed-url"));
+					selected.parent().empty();
+				}
+				else {
+					addFeed($(this).val());
+				}
+			}
+			else if (e.which === 40) {
+				var el = $("#vmenu-add-results p");
+				var i = selected.removeClass("selected").index();
+				i++;
+				if (i > el.length - 1) {
+					i = 0;
+				}
+				$(el.get(i)).addClass("selected");
+			}
+			else if (e.which === 38) {
+				var el = $("#vmenu-add-results p");
+				var i = selected.removeClass("selected").index();
+				i--;
+				if (i < 0) {
+					i = el.length - 1;
+				}
+				$(el.get(i)).addClass("selected");
 			}
 		});
 
 		var searchTimerId;
 		$("#input-vmenu-add").keyup(function(e) {
-			clearTimeout(searchTimerId);
-			var term = $(this).val();
-			searchTimerId = setTimeout(function() {				
-				$.ajax({
-					url: "http://itunes.apple.com/search",
-					jsonp: "callback",
-					dataType: "jsonp",
-					data: {
-						media: "podcast",
-						term: term,
-						limit: 5
-					},
-					success: function(res) {
-						$("#vmenu-add-results").empty();
-						res.results.forEach(function(result) {
-							$("#vmenu-add-results").append('<p feed-url="' + result.feedUrl + '">' + result.trackName + '</p>');
-						});
-					}
-				});
-			}, 100);
+			if (e.which !== 40 && e.which !== 38) {
+				clearTimeout(searchTimerId);
+				var term = $(this).val();
+				searchTimerId = setTimeout(function() {				
+					$.ajax({
+						url: "http://itunes.apple.com/search",
+						jsonp: "callback",
+						dataType: "jsonp",
+						data: {
+							media: "podcast",
+							term: term,
+							limit: 5
+						},
+						success: function(res) {
+							$("#vmenu-add-results").empty();
+							res.results.forEach(function(result) {
+								$("#vmenu-add-results").append('<p feed-url="' + result.feedUrl + '">' + result.trackName + '</p>');
+							});
+							$("#vmenu-add-results p:first-child").addClass("selected");
+						}
+					});
+				}, 100);
+			}
 		});
 
 		$("#vmenu-add-results").on("click", "p", function() {

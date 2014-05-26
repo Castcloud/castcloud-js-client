@@ -256,6 +256,11 @@ button.vmenu-toggle:hover {
 	color: #0099cc;
 }
 
+#vmenu-add-results p.selected {
+	background: #0099cc;
+	color: #FFF;
+}
+
 #tags {
 	display: none;
 }
