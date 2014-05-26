@@ -548,6 +548,7 @@ var DragDrop = (function() {
 				$("#podcast-cols").css("left", "50px");
 			}
 			$(".pretty-button").css("line-height", $("#pretty img").height() + "px");
+			$("#pretty img").css("max-height", $("#main-container").height() * 0.4 + "px");
 			prevSmall = small;
 		});
 
@@ -1137,7 +1138,8 @@ var DragDrop = (function() {
 			}
 		});
 
-		$("#pretty img").load(function() {
+		$("#pretty img").load(function() {			
+			$("#pretty img").css("max-height", $("#main-container").height() * 0.4 + "px");
 			$(".pretty-button").css("line-height", $(this).height() + "px");
 		});
 
@@ -1374,11 +1376,11 @@ var DragDrop = (function() {
 		var x = false;
 		var o = 0;
 
-		$("#vid-thumb-bar").mousedown(function(e) {
+		/*$("#vid-thumb-bar").mousedown(function(e) {
 			x = true;
 			o = window.innerWidth - e.pageX;
 			$(".thumb").css("width", (window.innerWidth - e.pageX - 15 + o)+"px");
-		});
+		});*/
 
 		$("#settings-menu").on("click", "p", function() {
 			var id = $(this).prop("id").split("-")[1];
