@@ -609,18 +609,30 @@ var DragDrop = (function() {
 		$("#vid-thumb-bar .popout").click(function() {
 			var video = el("vid");
 			if (paused) {
+				pushEvent(Event.Pause);
+			}
+			else {
 				pushEvent(Event.Play);
 			}
 			video.setAttribute("src", "#");
 			video.load();
 
-			poppedOut = window.open(root + "fullscreen", null, 'toolbar=0,menubar=0,location=0,status=0,scrollbars=1,resizable=1,left=0,top=0');
-			$(poppedOut).on("beforeunload", function() {
+			poppedOut = window.open(root + "fullscreen", "popout", 'toolbar=0,menubar=0,location=0,status=0,scrollbars=1,resizable=1,left=0,top=0');
+			$(poppedOut).on("beforeunload", function() {				
 				poppedOut = null;
+				var id = currentEpisodeId;
 				currentEpisodeId = null;
 
-				// Possibly store lastevent in sessionstorage instead of this hack
-				setTimeout(function() { renderEpisodes(JSON.parse(sessionStorage.lastepisode).castid); }, 500);
+				playEpisode(id);
+			});
+
+			$(poppedOut).on("unload", function() {
+				if (localStorage.beforeunloadevent) {
+					var ev = JSON.parse(localStorage.beforeunloadevent);
+					pushEvent(ev.type, ev.id, ev.time);
+					localStorage.removeItem("unloadevent");
+					localStorage.removeItem("beforeunloadevent");
+				}
 			});
 		});
 
@@ -1603,17 +1615,19 @@ var DragDrop = (function() {
 					console.log("Events loaded from IDB");
 					events = data;
 					
-					if (localStorage.beforeunloadevent) {
-						var ev = JSON.parse(localStorage.beforeunloadevent);
-						console.log("pushing beforeunloadevent");
-						pushEvent(ev.type, ev.id, ev.time);
-						localStorage.removeItem("beforeunloadevent");
-					}
-					if (localStorage.unloadevent) {
-						var ev = JSON.parse(localStorage.unloadevent);
-						console.log("pushing unloadevent");
-						pushEvent(ev.type, ev.id, ev.time);
-						localStorage.removeItem("unloadevent");
+					if (window.name !== "popout") {
+						if (localStorage.beforeunloadevent) {
+							var ev = JSON.parse(localStorage.beforeunloadevent);
+							console.log("pushing beforeunloadevent");
+							pushEvent(ev.type, ev.id, ev.time);
+							localStorage.removeItem("beforeunloadevent");
+						}
+						if (localStorage.unloadevent) {
+							var ev = JSON.parse(localStorage.unloadevent);
+							console.log("pushing unloadevent");
+							pushEvent(ev.type, ev.id, ev.time);
+							localStorage.removeItem("unloadevent");
+						}
 					}
 
 					updateLastEvent();
