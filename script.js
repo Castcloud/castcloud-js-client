@@ -331,6 +331,7 @@ var DragDrop = (function() {
 		loggedIn = false,
 		contextEpisodeID,
 		currentEpisodeId = null,
+		currentEpisodeDuration,
 		selectedEpisodeId = null,
 		selectedCastId = null,
 		videoLoading = false,
@@ -563,10 +564,9 @@ var DragDrop = (function() {
 		});
 
 		function updateTime(currentTime) {
-			var video = el("vid");
 			var date = new Date(currentTime * 1000);
-			var dateTotal = new Date(video.duration * 1000);
-			var progress = 1 / video.duration * currentTime;
+			var dateTotal = new Date(currentEpisodeDuration * 1000);
+			var progress = 1 / currentEpisodeDuration * currentTime;
 
 			date.setHours(date.getHours() - 1);
 			dateTotal.setHours(dateTotal.getHours() - 1);
@@ -580,6 +580,12 @@ var DragDrop = (function() {
 				time += dateTotal.getHours().pad() + ":";
 			}
 			time += dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad();
+
+			if (window.name === "popout" && currentTime > 0) {
+				var ev = new window.Event('timeupdate');
+				ev.data = { time: currentTime };
+				window.dispatchEvent(ev);
+			}
 
 			$("#time").html(time);
 			if ($("#seekbar").is(":visible")) {
@@ -627,6 +633,10 @@ var DragDrop = (function() {
 				playEpisode(id);
 			});
 
+			$(poppedOut).on("timeupdate", function(e) {
+				updateTime(e.originalEvent.data.time);
+			});
+
 			$(poppedOut).on("unload", function() {
 				if (localStorage.beforeunloadevent) {
 					var ev = JSON.parse(localStorage.beforeunloadevent);
@@ -637,14 +647,19 @@ var DragDrop = (function() {
 			});
 		});
 
+		if (window.name !== "popout") {
+			window.magicstick = function(msg) {
+				console.log(msg);
+			}
+		}
+
 		$("#vid-thumb-bar .minimize").click(function() {
 			$("#vid-container").toggleClass("minimized");
 		});
 
 		$(window).on("message", function(e) {
-			var message = e.originalEvent.data;
-			console.log(message);
-			switch (message) {
+			var message = JSON.parse(e.originalEvent.data);
+			switch (message.action) {
 				case "playPause":
 					playPauseToggle();
 					break;
@@ -658,6 +673,7 @@ var DragDrop = (function() {
 					break;
 
 				case "seek":
+					seek(message.time);
 					break;
 			}
 		});
@@ -774,7 +790,8 @@ var DragDrop = (function() {
 		});
 
 		$("#vid").on("canplay", function() {
-			if (el("vid").videoWidth > 0) {
+			var video = el("vid");
+			if (video.videoWidth > 0) {
 				mediaType = "video";
 				$("#vid-container").removeClass("audio");
 				$("#vid-container").show();
@@ -786,6 +803,8 @@ var DragDrop = (function() {
 				$("#vid-container").addClass("audio");
 			}
 
+			currentEpisodeDuration = video.duration;
+
 			var lastevent = episodes[currentEpisodeId].lastevent;
 
 			if (lastevent && lastevent.type == Event.EndOfTrack) {
@@ -794,7 +813,7 @@ var DragDrop = (function() {
 			}
 
 			if (lastevent !== null && videoLoading && lastevent.type != Event.EndOfTrack) {
-				el("vid").currentTime = lastevent.positionts;
+				video.currentTime = lastevent.positionts;
 
 				if (lastevent.type == Event.Play) {
 					play();
@@ -824,7 +843,7 @@ var DragDrop = (function() {
 		var seeking = false;
 		$("#seekbar").mousedown(function(e) {
 			pushEvent(Event.Pause);
-			seek(1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration);
+			seek(1 / $("#seekbar").width() * (e.pageX - 170) * currentEpisodeDuration);
 			seeking = true;
 		});
 
@@ -839,7 +858,7 @@ var DragDrop = (function() {
 		});
 
 		function updateSeektime(x) {
-			var currentTime = 1 / $("#seekbar").width() * (x - 170) * el("vid").duration;
+			var currentTime = 1 / $("#seekbar").width() * (x - 170) * currentEpisodeDuration;
 
 			var date = new Date(currentTime * 1000);
 
@@ -877,7 +896,7 @@ var DragDrop = (function() {
 				$(".thumb").css("width", (window.innerWidth - e.pageX - 15 + o)+"px");
 			}
 			if (seeking) {
-				seek(1 / $("#seekbar").width() * (e.pageX - 170) * el("vid").duration);
+				seek(1 / $("#seekbar").width() * (e.pageX - 170) * currentEpisodeDuration);
 				updateSeektime(e.pageX);
 			}
 		});
@@ -2248,7 +2267,9 @@ var DragDrop = (function() {
 			pause();
 		}
 		if (poppedOut) {
-			poppedOut.postMessage("playPause", "*");
+			popoutMessage({
+				action: "playPause"
+			});
 		}
 	}
 
@@ -2286,16 +2307,27 @@ var DragDrop = (function() {
 	}
 
 	function seek(time) {
-		var video = el("vid");
-		video.currentTime = time;
-		Chromecast.seek(time);
-		var progress = 1 / video.duration * time;
+		console.log(time);
+		if (poppedOut) {
+			popoutMessage({
+				action: "seek",
+				time: time
+			});
+		}
+		else {
+			var video = el("vid");
+			video.currentTime = time;
+			Chromecast.seek(time);
+		}
+		var progress = 1 / currentEpisodeDuration * time;
 		$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
 	}
 
 	function skipBack() {
 		if (poppedOut) {
-			poppedOut.postMessage("skipBack", "*");
+			popoutMessage({
+				action: "skipBack"
+			});
 		}
 		else {
 			var video = el("vid");
@@ -2310,7 +2342,9 @@ var DragDrop = (function() {
 
 	function skipForward() {
 		if (poppedOut) {
-			poppedOut.postMessage("skipForward", "*");
+			popoutMessage({
+				action: "skipForward"
+			});
 		}
 		else {
 			var video = el("vid");
@@ -2391,6 +2425,10 @@ var DragDrop = (function() {
 				}
 			}
 		}
+	}
+
+	function popoutMessage(obj) {
+		poppedOut.postMessage(JSON.stringify(obj), "*");
 	}
 
 	function padCastOverlay() {
