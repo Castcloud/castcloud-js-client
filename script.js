@@ -642,8 +642,23 @@ var DragDrop = (function() {
 		});
 
 		$(window).on("message", function(e) {
-			if (e.originalEvent.data === "p") {
-				playPauseToggle();
+			var message = e.originalEvent.data;
+			console.log(message);
+			switch (message) {
+				case "playPause":
+					playPauseToggle();
+					break;
+
+				case "skipForward":
+					skipForward();
+					break;
+
+				case "skipBack":
+					skipBack();
+					break;
+
+				case "seek":
+					break;
 			}
 		});
 
@@ -1540,21 +1555,6 @@ var DragDrop = (function() {
 		db.put("episodes", episodes);
 	}
 
-	var paused = false;
-	var ended = false;
-
-	function playPauseToggle() {
-		if (paused) {
-			play();
-		}
-		else {
-			pause();
-		}
-		if (poppedOut) {
-			poppedOut.postMessage("p", "*");
-		}
-	}
-
 	function login() {
 		username = $("#input-username").val();
 		apiRoot = $("#input-target").val();
@@ -2237,6 +2237,21 @@ var DragDrop = (function() {
 		$("#events").empty().append(template({ events: e }));
 	}
 
+	var paused = false;
+	var ended = false;
+
+	function playPauseToggle() {
+		if (paused) {
+			play();
+		}
+		else {
+			pause();
+		}
+		if (poppedOut) {
+			poppedOut.postMessage("playPause", "*");
+		}
+	}
+
 	function play() {
 		if (Chromecast.running()) {
 			Chromecast.play();
@@ -2279,22 +2294,32 @@ var DragDrop = (function() {
 	}
 
 	function skipBack() {
-		var video = el("vid");
-		pushEvent(Event.Pause);
-		video.currentTime = video.currentTime - 15;
-		pushEvent(Event.Play);
-		if (video.paused) {
+		if (poppedOut) {
+			poppedOut.postMessage("skipBack", "*");
+		}
+		else {
+			var video = el("vid");
 			pushEvent(Event.Pause);
+			video.currentTime = video.currentTime - 15;
+			pushEvent(Event.Play);
+			if (video.paused) {
+				pushEvent(Event.Pause);
+			}
 		}
 	}
 
 	function skipForward() {
-		var video = el("vid");
-		pushEvent(Event.Pause);
-		video.currentTime = video.currentTime + 15;
-		pushEvent(Event.Play);
-		if (video.paused) {
+		if (poppedOut) {
+			poppedOut.postMessage("skipForward", "*");
+		}
+		else {
+			var video = el("vid");
 			pushEvent(Event.Pause);
+			video.currentTime = video.currentTime + 15;
+			pushEvent(Event.Play);
+			if (video.paused) {
+				pushEvent(Event.Pause);
+			}
 		}
 	}
 
