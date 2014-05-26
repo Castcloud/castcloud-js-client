@@ -1473,6 +1473,8 @@ var DragDrop = (function() {
 		if (image) {
 			$("#pretty img").prop("src", image);
 			$("#pretty").show();
+			$(".pretty-button").css("line-height", $("#pretty img").height() + "px");
+			$("#pretty img").css("max-height", $("#main-container").height() * 0.4 + "px");
 		}
 		else {
 			$("#pretty").hide();
