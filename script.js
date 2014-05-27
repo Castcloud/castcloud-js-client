@@ -2402,7 +2402,7 @@ var DragDrop = (function() {
 	}
 
 	function nextEpisode() {
-		if (settings.Playback.KeepPlaying) {
+		if (String(settings.Playback.KeepPlaying) == "true") {
 			c++;
 			if (c < q.length) {
 				autoplay = true;
