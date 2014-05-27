@@ -857,6 +857,7 @@ button.vmenu-toggle:hover {
 
 #tab-settings .button {
 	margin: 0;
+	margin-right: 5px;
 }
 
 #tab-settings label {
@@ -893,6 +894,14 @@ button.vmenu-toggle:hover {
 
 #settings-panel h2 {
 	margin-bottom: 10px;
+}
+
+#settings-panel h3 {
+	margin-top: 20px;
+	margin-bottom: 10px;
+	color: #EEE;
+	font-weight: 400;
+	font-size: 16px;
 }
 
 #settings-panel div {

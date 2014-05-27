@@ -349,6 +349,9 @@ var DragDrop = (function() {
 		General: {
 
 		},
+		Playback: {
+			KeepPlaying: true
+		},
 		Keybinds: {
 			PlayPause: 'space',
 			Next: 'pageup',
@@ -647,36 +650,32 @@ var DragDrop = (function() {
 			});
 		});
 
-		if (window.name !== "popout") {
-			window.magicstick = function(msg) {
-				console.log(msg);
-			}
-		}
-
 		$("#vid-thumb-bar .minimize").click(function() {
 			$("#vid-container").toggleClass("minimized");
 		});
 
-		$(window).on("message", function(e) {
-			var message = JSON.parse(e.originalEvent.data);
-			switch (message.action) {
-				case "playPause":
-					playPauseToggle();
-					break;
+		if (window.name === "popout") {
+			$(window).on("message", function(e) {
+				var message = JSON.parse(e.originalEvent.data);
+				switch (message.action) {
+					case "playPause":
+						playPauseToggle();
+						break;
 
-				case "skipForward":
-					skipForward();
-					break;
+					case "skipForward":
+						skipForward();
+						break;
 
-				case "skipBack":
-					skipBack();
-					break;
+					case "skipBack":
+						skipBack();
+						break;
 
-				case "seek":
-					seek(message.time);
-					break;
-			}
-		});
+					case "seek":
+						seek(message.time);
+						break;
+				}
+			});
+		}
 
 		$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {
 			$("#vid-container").toggleClass("fs");
@@ -835,9 +834,10 @@ var DragDrop = (function() {
 
 		$("#vid").on("ended", function() {
 			pushEvent(Event.EndOfTrack);
-			$("#vid-container").addClass("minimized");
+			$("#vid-container").hide();
 			ended = true;
-			updateEpisodeIndicators();			
+			updateEpisodeIndicators();
+			nextEpisode();
 		});
 
 		var seeking = false;
@@ -1367,6 +1367,21 @@ var DragDrop = (function() {
 			});			
 		});
 
+		$("#settings-panel").on("click", "#import-opml", function() {
+			$("#hax").click();
+		});
+
+		$("#settings-panel").on("change", "#hax", function(e) {
+			var file = e.target.files[0];
+			var reader = new FileReader();
+
+			reader.onload = function() {
+				$.post(apiRoot + "library/casts.opml", { opml: reader.result });
+			};
+
+			reader.readAsText(file);
+		});
+
 		$("#settings-panel").on("click", "#reset-settings", resetSettings);
 
 		var settingTimerId;
@@ -1528,6 +1543,9 @@ var DragDrop = (function() {
 		positionThumb();
 	}
 
+	var c = 0;
+	var q = [];
+
 	function playEpisode(id) {
 		if (currentEpisodeId !== id) {
 			if (currentEpisodeId !== null) {
@@ -1535,8 +1553,6 @@ var DragDrop = (function() {
 					pushEvent(Event.Play);
 				}
 			}
-
-			console.log(episodes[id].lastevent);
 
 			loadEpisodeInfo(id);
 
@@ -1562,6 +1578,32 @@ var DragDrop = (function() {
 			video.load();
 			videoLoading = true;
 			ended = false;
+
+			id = episodes[id].castid;
+
+			q = [];
+			for (var x in episodes) {
+				if (episodes[x].castid == id) {
+					if (!(episodes[x].lastevent && episodes[x].lastevent.type == Event.Delete)) {
+						q.push(episodes[x]);
+						if (x == currentEpisodeId) {
+							c = q.length - 1;
+						}
+					}
+				}
+			}
+
+			q.sort(function(a, b) {
+				var d1 = new Date(a.feed.pubDate);
+				var d2 = new Date(b.feed.pubDate);
+				if (d1 > d2) {
+					return -1;
+				}
+				if (d1 < d2) {
+					return 1;
+				}
+				return 0;
+			});
 
 			$("#vid-container").removeClass("minimized");
 		}
@@ -1636,6 +1678,7 @@ var DragDrop = (function() {
 			keyPath: null
 		}, function() {
 			idbReady = true;
+			console.log("IDB ready");
 
 			db.get("labels", function(data) {
 				if (data) {
@@ -1691,7 +1734,7 @@ var DragDrop = (function() {
 			db.get("settings", function(data) {
 				if (data) {
 					console.log("Settings loaded from IDB");
-					settings = data;
+					settings = $.extend(true, {}, DefaultSettings, data);
 
 					setKeybinds();
 					renderSettings();
@@ -2051,8 +2094,9 @@ var DragDrop = (function() {
 				var panel = $('<div class="setting-panel" id="setting-panel-' + c + '"><h2>' + c + "</h2></div>");
 
 				if (c === "General") {
-					panel.append('<button class="button" id="opml">OPML</button>' +
-						'<button class="button" id="reset-settings">Reset</button>');
+					panel.append('<h3>OPML</h3><p><button class="button" id="import-opml">Import</button><input type="file" id="hax" style="display:none">' +
+						'<button class="button" id="opml">Export</button></p>' +
+						'<h3>Default settings</h3><button class="button" id="reset-settings">Reset</button>');
 				}
 
 				for (var s in settings[c]) {
@@ -2358,7 +2402,13 @@ var DragDrop = (function() {
 	}
 
 	function nextEpisode() {
-		console.log("nextEpisode called");
+		if (settings.Playback.KeepPlaying) {
+			c++;
+			if (c < q.length) {
+				autoplay = true;
+				playEpisode(q[c].id);
+			}
+		}
 	}
 
 	function previousEpisode() {
