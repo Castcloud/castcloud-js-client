@@ -345,19 +345,43 @@ var DragDrop = (function() {
 		mediaType,
 		idbReady = false;
 
+	var Setting = {
+		Text: 0,
+		Bool: 1,
+		Keybind: 2
+	}
+
 	var DefaultSettings = {
 		General: {
 
 		},
 		Playback: {
-			KeepPlaying: true
+			KeepPlaying: {
+				type: Setting.Bool,
+				value: true
+			}
 		},
 		Keybinds: {
-			PlayPause: 'space',
-			Next: 'pageup',
-			Previous: 'pagedown',
-			SkipForward: 'right',
-			SkipBack: 'left'
+			PlayPause: {
+				type: Setting.Keybind,
+				value: 'space'
+			},
+			Next: {
+				type: Setting.Keybind,
+				value: 'pageup'
+			},
+			Previous: {
+				type: Setting.Keybind, 
+				value: 'pagedown'
+			},
+			SkipForward: {
+				type: Setting.Keybind,
+				value: 'right'
+			},
+			SkipBack: {
+				type: Setting.Keybind,
+				value: 'left'
+			}
 		}
 	};
 
@@ -1387,11 +1411,17 @@ var DragDrop = (function() {
 		var settingTimerId;
 		$("#tab-settings").on("keyup", ".setting", function() {
 			clearTimeout(settingTimerId);
-			var id = $(this).prop("id").split("/");
+			var id = $(this).prop("id").split(":");
 			var val = $(this).val();
 			settingTimerId = setTimeout(function() {
 				saveSetting(id[1], val, id[0]);
 			}, 500);
+		});
+
+		$("#tab-settings").on("change", ".setting", function() {
+			var id = $(this).prop("id").split("_");
+			var val = $(this).prop("checked");
+			saveSetting(id[1], val, id[0]);
 		});
 
 		$("#tab-settings").on("keydown", ".keybind", function(e) {
@@ -2059,7 +2089,9 @@ var DragDrop = (function() {
 				if (settings[category] === undefined) {
 					settings[category] = {};
 				}
-				settings[category][name] = setting.value;
+				settings[category][name] = {
+					value: setting.value
+				};
 			});
 
 			settings = $.extend(true, {}, DefaultSettings, settings);
@@ -2100,12 +2132,17 @@ var DragDrop = (function() {
 				}
 
 				for (var s in settings[c]) {
-					var id = c + "/" + s;
-					if (c === "Keybinds") {
-						panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting keybind" value="' + settings[c][s] + '"></p>');
+					var id = c + "_" + s;
+					var setting = settings[c][s];
+					if (setting.type === Setting.Keybind) {
+						panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting keybind" value="' + setting.value + '"></p>');
+					}
+					else if (setting.type === Setting.Bool) {
+						panel.append("<p><label>" + s + '</label><input type="checkbox" id="' + id + '" class="setting"></p>');
+						panel.find("#" + id).prop("checked", String(setting.value) == "true");
 					}
 					else {
-						panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting" value="' + settings[c][s] + '"></p>');
+						panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting" value="' + setting.value + '"></p>');
 					}
 				}
 
@@ -2125,7 +2162,7 @@ var DragDrop = (function() {
 
 	function saveSetting(key, value, category) {
 		category = category || 'General'
-		settings[category][key] = value;
+		settings[category][key].value = value;
 		settingsHash = md5(JSON.stringify(settings));
 		buffer.settings[category + "/" + key] = value;
 		db.put("buffer_settings", buffer.settings);
@@ -2161,11 +2198,11 @@ var DragDrop = (function() {
 
 	function setKeybinds() {
 		Mousetrap.reset();
-		Mousetrap.bind(settings.Keybinds.PlayPause, playPauseToggle);
-		Mousetrap.bind(settings.Keybinds.Next, nextEpisode);
-		Mousetrap.bind(settings.Keybinds.Previous, previousEpisode);
-		Mousetrap.bind(settings.Keybinds.SkipForward, skipForward);
-		Mousetrap.bind(settings.Keybinds.SkipBack, skipBack);
+		Mousetrap.bind(settings.Keybinds.PlayPause.value, playPauseToggle);
+		Mousetrap.bind(settings.Keybinds.Next.value, nextEpisode);
+		Mousetrap.bind(settings.Keybinds.Previous.value, previousEpisode);
+		Mousetrap.bind(settings.Keybinds.SkipForward.value, skipForward);
+		Mousetrap.bind(settings.Keybinds.SkipBack.value, skipBack);
 	}
 
 	function loadLabels() {
@@ -2402,7 +2439,7 @@ var DragDrop = (function() {
 	}
 
 	function nextEpisode() {
-		if (String(settings.Playback.KeepPlaying) == "true") {
+		if (String(settings.Playback.KeepPlaying.value) == "true") {
 			c++;
 			if (c < q.length) {
 				autoplay = true;
