@@ -409,12 +409,8 @@ var DragDrop = (function() {
 		settings: {},
 		idb: {}
 	};
-	
-	var custom = true;
-	var styledReceiver = "17DC56DD";
-	var customReceiver = "3EC703A8";
 
-	Chromecast.init(custom ? customReceiver : styledReceiver);
+	Chromecast.init("3EC703A8");
 	Chromecast.session(function() {
 		$(".cc img").prop("src", "cast_on.png");
 		el("vid").pause();
@@ -456,6 +452,7 @@ var DragDrop = (function() {
 				$(".tab").hide();
 				if (!loggedIn) {
 					$("#tab-login").show();
+					$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 				}
 				else {
 					$("#tab-podcasts").show();
@@ -473,6 +470,7 @@ var DragDrop = (function() {
 				$(".tab").hide();
 				if (!loggedIn) {
 					$("#tab-login").show();
+					$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 				}
 				else {
 					$("#tab-settings").show();
@@ -484,6 +482,7 @@ var DragDrop = (function() {
 				$(".tab").hide();
 				if (!loggedIn) {
 					$("#tab-login").show();
+					$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 				}
 				else {
 					$("#tab-podcasts").show();
@@ -509,6 +508,7 @@ var DragDrop = (function() {
 				$(".tab").hide();
 				if (!loggedIn) {
 					$("#tab-login").show();
+					$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 				}
 				else {
 					$("#vid-container").removeClass("thumb");
@@ -1061,16 +1061,16 @@ var DragDrop = (function() {
 			sync(true);
 		});
 
-		$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2 - 60) + "px");
+		
 		positionThumb();
 		$(window).resize(function() {
 			$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 			positionThumb();
 		});
 
-		$("#input-username").focus(function() {
+		/*$("#input-username").focus(function() {
 			$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
-		});
+		});*/
 
 		$(document).click(function() {
 			$(".context-menu").hide();
