@@ -329,7 +329,7 @@ var DragDrop = (function() {
 		root,
 		apiRoot,
 		loggedIn = false,
-		contextEpisodeID,
+		contextItemID,
 		currentEpisodeId = null,
 		currentEpisodeDuration,
 		selectedEpisodeId = null,
@@ -1069,10 +1069,6 @@ var DragDrop = (function() {
 			positionThumb();
 		});
 
-		/*$("#input-username").focus(function() {
-			$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
-		});*/
-
 		$(document).click(function() {
 			$(".context-menu").hide();
 		});
@@ -1149,15 +1145,15 @@ var DragDrop = (function() {
 		});
 
 		$("#cast-context-rename").click(function() {
-			var name = $("#cast-" + contextEpisodeID + " .name").html();
-			$("#cast-" + contextEpisodeID + " .name").html('<input type="text">');
+			var name = $("#cast-" + contextItemID + " .name").html();
+			$("#cast-" + contextItemID + " .name").html('<input type="text">');
 			$(".cast input").focus();
 			$(".cast input").val(name);
 			$(".cast input").keydown(function(e) {
 				if (e.which === 13) {
 					var name = $(this).val();
 					$(this).parent().html(name);
-					$.ajax(apiRoot + "library/casts/" + contextEpisodeID, {
+					$.ajax(apiRoot + "library/casts/" + contextItemID, {
 						type: "PUT",
 						data: {
 							name: name
@@ -1173,8 +1169,8 @@ var DragDrop = (function() {
 				$("#cast-" + id).remove();
 				$.ajax(apiRoot + "library/casts/" + id, { type: "DELETE" });
 			});
-			$("#cast-" + contextEpisodeID).remove();
-			$.ajax(apiRoot + "library/casts/" + contextEpisodeID, { 
+			$("#cast-" + contextItemID).remove();
+			$.ajax(apiRoot + "library/casts/" + contextItemID, { 
 				type: "DELETE",
 				success: function(res) {
 					loadLabels();
@@ -1183,15 +1179,15 @@ var DragDrop = (function() {
 		});
 
 		$("#label-context-rename").click(function() {
-			var name = $("#label-" + contextEpisodeID + " .name span").html();
-			$("#label-" + contextEpisodeID + " .name span").html('<input type="text">');
+			var name = $("#label-" + contextItemID + " .name span").html();
+			$("#label-" + contextItemID + " .name span").html('<input type="text">');
 			$(".label input").focus();
 			$(".label input").val(name);
 			$(".label input").keydown(function(e) {
 				if (e.which === 13) {
 					var name = $(this).val();
 					$(this).parent().html(name);
-					$.ajax(apiRoot + "library/labels/" + contextEpisodeID, {
+					$.ajax(apiRoot + "library/labels/" + contextItemID, {
 						type: "PUT",
 						data: {
 							name: name
@@ -1202,15 +1198,20 @@ var DragDrop = (function() {
 		});
 
 		$("#episode-context-delete").click(function() {
-			deleteEpisode(contextEpisodeID);
+			if (!$("#" + contextItemID).hasClass("selected")) {
+				deleteEpisode(contextItemID);
+			}
+			$(".episode.selected").each(function() {
+				deleteEpisode($(this).prop("id").split("-")[1]);
+			});
 		});
 
 		$("#episode-context-reset").click(function() {
-			if (contextEpisodeID === currentEpisodeId) {
+			if (contextItemID === currentEpisodeId) {
 				seek(0);
 			}
 			else {
-				pushEvent(Event.Pause, contextEpisodeID, 0);
+				pushEvent(Event.Pause, contextItemID, 0);
 				updateEpisodeIndicators();
 			}
 		});
@@ -1661,7 +1662,7 @@ var DragDrop = (function() {
 	function deleteEpisode(id) {
 		$("#ep-" + id).remove();
 		pushEvent(Event.Delete, id);
-		delete episodes[contextEpisodeID];
+		delete episodes[contextItemID];
 		db.put("episodes", episodes);
 	}
 
@@ -2546,7 +2547,7 @@ var DragDrop = (function() {
 	}
 
 	function showContextMenu(id, target, e) {
-		contextEpisodeID = $(target).prop("id").split("-")[1];
+		contextItemID = $(target).prop("id").split("-")[1];
 
 		$(id).css("left", e.pageX + "px");
 		$(id).css("top", e.pageY + "px");
