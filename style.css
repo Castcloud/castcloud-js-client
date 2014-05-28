@@ -467,7 +467,7 @@ button.vmenu-toggle:hover {
 #vid-container.thumb {
 	position: fixed;
 	right: 15px;
-	bottom: 60px;
+	bottom: 55px;
 	top: auto;
 	background: #111;
 	padding: 0 5px;
@@ -478,7 +478,7 @@ button.vmenu-toggle:hover {
 
 #vid-container.thumb.minimized {
 	height: 30px;
-	bottom: 60px;
+	bottom: 55px;
 }
 
 .audio #vid {
@@ -501,7 +501,7 @@ button.vmenu-toggle:hover {
 }
 
 #vid-thumb-bar a {
-	color: #444;
+	color: #666;
 }
 
 #vid-thumb-bar a:hover {
@@ -511,7 +511,7 @@ button.vmenu-toggle:hover {
 #vid-thumb-bar h4 {
 	float: left;
 	line-height: 30px;
-	color: #444;
+	color: #666;
 }
 
 #vid-thumb-bar .button {
@@ -521,7 +521,7 @@ button.vmenu-toggle:hover {
 	width: 30px;
 	background: #111;
 	float: right;
-	color: #444;
+	color: #666;
 }
 
 #vid-thumb-bar .button:hover {
@@ -678,32 +678,28 @@ button.vmenu-toggle:hover {
 #playbar {
 	display: none;
 	background: #111;
-	height: 60px;
+	height: 55px;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	position: fixed;
-	color: #333;
-}
-
-#playbar-controls {
-
+	color: #666;
+	padding-left: 5px;
 }
 
 #playbar .button {
 	float: left;
-	background: #222;
-	margin: 10px;
-	margin-right: 0px;
+	background: none;
 	width: 40px;
-	height: 40px;
-	border-radius: 20px;
+	height: 50px;
+	margin: 0;
+	margin-top: 5px;
+	padding: 0;
 	color: #666;
 }
 
 #playbar .button:hover {
-	background: #0066cc;
-	color: #FFF;
+	color: #0099cc;
 }
 
 #playbar .button:active {
@@ -768,7 +764,6 @@ button.vmenu-toggle:hover {
 
 #volume {
 	float: left;
-	color: #FFF;
 	height: 40px;
 	margin: 10px 15px;
 	font-size: 24px;
@@ -778,6 +773,10 @@ button.vmenu-toggle:hover {
 
 #volume i {
 	width: 20px;
+}
+
+#volume i:hover {
+	color: #0099cc;
 }
 
 #volume i, #volume .bar {
@@ -815,14 +814,13 @@ button.vmenu-toggle:hover {
 }
 
 #seekbar {
-	display: inline-block;
 	position: absolute;
-	left: 280px;
-	right: 221px;
-	top: 25px;
-	height: 10px;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	height: 5px;
 	background: #FFF;
-	border-radius: 5px;
+	-webkit-transition: height 0.1s;
 }
 
 #seekbar:hover {
@@ -831,9 +829,29 @@ button.vmenu-toggle:hover {
 
 #seekbar div {
 	background: #0099cc;
-	height: 10px;
+	height: 100%;
 	width: 0px;
-	border-radius: 5px;
+}
+
+#badeball {
+	position: absolute;
+	background: #FFF;
+	top: -5px;
+	z-index: 1;
+	width: 0px;
+	height: 0px;
+	border-radius: 50%;
+	cursor: pointer;
+	-webkit-transition: width 0.1s;
+	-webkit-transition: height 0.1s;
+}
+
+#badeball div {
+	width: 50%;
+	height: 50%;
+	margin: 25%;
+	background: #0099cc;
+	border-radius: 50%;
 }
 
 #seektime {

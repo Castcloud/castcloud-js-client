@@ -421,7 +421,7 @@ var DragDrop = (function() {
 	Chromecast.receiver(function(n) {
 		if (n > 0) {
 			$(".cc").show();
-			$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
+			//$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
 		}
 		else {
 			$(".cc").hide();
@@ -617,8 +617,9 @@ var DragDrop = (function() {
 
 			$("#time").html(time);
 			if ($("#seekbar").is(":visible")) {
-				$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
+				//$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
 				$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
+				$("#badeball").css("left", $("#seekbar").width() * progress - 10 + "px");
 			}
 		}
 
@@ -757,6 +758,8 @@ var DragDrop = (function() {
 					clearTimeout(timer);
 				}
 			}
+			$("#badeball").css("height", "20px").css("width", "20px");
+			$("#seekbar").css("height", "10px");
 		});
 
 		$("#playbar").mouseout(function() {
@@ -766,6 +769,10 @@ var DragDrop = (function() {
 					$("#playbar").hide();
 					$("#overlay-info").fadeOut("fast");
 				}, 1000);
+			}
+			if (!seeking) {
+				$("#seekbar").css("height", "5px");
+				$("#badeball").css("height", "0px").css("width", "0px");
 			}
 		});
 
@@ -872,8 +879,14 @@ var DragDrop = (function() {
 			seeking = true;
 		});
 
+		$("#badeball").mousedown(function(e) {
+			pushEvent(Event.Pause);
+			seek(1 / $("#seekbar").width() * (e.pageX - $("#seekbar").position().left) * currentEpisodeDuration);
+			seeking = true;
+		});
+
 		$("#seekbar").mouseover(function() {
-			$("#seektime").show();
+			//$("#seektime").show();
 		});
 
 		$("#seekbar").mouseout(function() {
@@ -907,6 +920,8 @@ var DragDrop = (function() {
 			x = false;
 			if (seeking) {
 				$("#seektime").hide();
+				$("#seekbar").css("height", "5px");
+				$("#badeball").css("height", "0px").css("width", "0px");
 				seeking = false;
 				pushEvent(Event.Play);
 				if (el("vid").paused) {
@@ -915,6 +930,9 @@ var DragDrop = (function() {
 			}
 			if (volumizing) {
 				volumizing = false;
+				if (!volumeMousedOver) {
+					$("#volume .bar").hide();
+				}
 			}
 		});
 
@@ -1081,6 +1099,19 @@ var DragDrop = (function() {
 
 		$("#volume i").click(function() {
 			muteToggle();
+		});
+
+		var volumeMousedOver = false;
+		$("#volume").mouseover(function() {
+			$("#volume .bar").show();
+			volumeMousedOver = true;
+		});
+
+		$("#volume").mouseout(function() {
+			if (!volumizing) {
+				$("#volume .bar").hide();
+			}
+			volumeMousedOver = false;
 		});
 
 		var volumizing = false;
@@ -1720,7 +1751,7 @@ var DragDrop = (function() {
 
 		$("#userinfo span").html(username);
 		$(".tab").hide();
-		$("#main-container").css("bottom", "60px");
+		$("#main-container").css("bottom", "55px");
 
 		if (Backbone.history.fragment !== "now-playing") {
 			$("#vid-container").addClass("thumb");
@@ -2438,6 +2469,7 @@ var DragDrop = (function() {
 		}
 		var progress = 1 / currentEpisodeDuration * time;
 		$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
+		$("#badeball").css("left", $("#seekbar").width() * progress - 10 + "px");
 	}
 
 	function skipBack() {
