@@ -1670,6 +1670,10 @@ var DragDrop = (function() {
 	function deleteEpisode(id) {
 		$("#ep-" + id).remove();
 		pushEvent(Event.Delete, id);
+
+		var count = $("#cast-" + episodes[contextItemID].castid + " .n");
+		count.html(count.html() - 1);
+
 		delete episodes[contextItemID];
 		db.put("episodes", episodes);
 	}
