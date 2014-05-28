@@ -336,6 +336,7 @@ var DragDrop = (function() {
 		selectedCastId = null,
 		videoLoading = false,
 		castHovered = null,
+		episodeHovered = null,
 		ctrlDown = false,
 		autoplay = false,
 		castScroll,
@@ -1105,6 +1106,14 @@ var DragDrop = (function() {
 			castHovered = null;
 		});
 
+		$("#episodes").on("mouseover", ".episode", function() {
+			episodeHovered = $(this).prop("id").split("-")[1];
+		});
+
+		$("#episodes").on("mouseout", ".episode", function() {
+			episodeHovered = null;
+		});
+
 		var ctrlClearId;
 
 		$(document).keydown(function(e) {
@@ -1129,6 +1138,9 @@ var DragDrop = (function() {
 
 			if (castHovered !== null) {
 				$("#clip").val(casts[castHovered].url).focus().select();
+			}
+			else if (episodeHovered !== null) {
+				$("#clip").val(episodes[episodeHovered].feed.enclosure.url).focus().select();
 			}
 		});
 
@@ -1828,7 +1840,7 @@ var DragDrop = (function() {
 		if (poppedOut) {
 			return;
 		}
-		
+
 		var eventTS = unix();
 		if (lastEventTS === eventTS) {
 			currentOrder++;
