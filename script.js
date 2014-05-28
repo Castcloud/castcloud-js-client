@@ -1105,10 +1105,17 @@ var DragDrop = (function() {
 			castHovered = null;
 		});
 
+		var ctrlClearId;
+
 		$(document).keydown(function(e) {
 			if (!(e.ctrlKey || e.metaKey)) {
 				return;
 			}
+
+			clearTimeout(ctrlClearId);
+			ctrlClearId = setTimeout(function() {
+				ctrlDown = false;
+			}, 1000);
 
 			ctrlDown = true;
 
@@ -1516,8 +1523,8 @@ var DragDrop = (function() {
 			$("#playbar").show();
 			$("#topbar nav").show();
 			$("#userinfo").show();
-		}
-
+		
+}
 		Backbone.history.start({ pushState: true, root: root });
 	});
 
