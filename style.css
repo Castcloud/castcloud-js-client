@@ -767,26 +767,38 @@ button.vmenu-toggle:hover {
 }
 
 #volume {
-	display: none;
-	position: fixed;
-	bottom: 20px;
-	right: 200px;
-	width: 0;
-	height: 0;
-	border-top: 40px solid transparent;
-	border-left: 150px solid #222;
+	float: left;
+	color: #FFF;
+	height: 40px;
+	margin: 10px 15px;
+	font-size: 24px;
+	line-height: 40px;
+	color: #666;
 }
 
-#volume-top {
-	display: none;
-	position: fixed;
-	bottom: 20px;
-	right: 200px;
-	width: 0;
-	height: 0;
-	border-top: 20px solid transparent;
-	border-left: 75px solid #333;
-	z-index: 10;
+#volume i {
+	width: 20px;
+}
+
+#volume i, #volume .bar {
+	cursor: pointer;
+}
+
+#volume .bar {
+	float: right;
+	background: #FFF;
+	width: 60px;
+	height: 6px;
+	margin-top: 17px;
+	margin-left: 10px;
+	border-radius: 3px;
+}
+
+#volume .bar .inner {
+	background: #0099cc;
+	width: 60px;
+	height: 6px;
+	border-radius: 3px;
 }
 
 #playbar-info {
@@ -805,7 +817,7 @@ button.vmenu-toggle:hover {
 #seekbar {
 	display: inline-block;
 	position: absolute;
-	left: 170px;
+	left: 280px;
 	right: 221px;
 	top: 25px;
 	height: 10px;

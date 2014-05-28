@@ -868,7 +868,7 @@ var DragDrop = (function() {
 		var seeking = false;
 		$("#seekbar").mousedown(function(e) {
 			pushEvent(Event.Pause);
-			seek(1 / $("#seekbar").width() * (e.pageX - 170) * currentEpisodeDuration);
+			seek(1 / $("#seekbar").width() * (e.pageX - $("#seekbar").position().left) * currentEpisodeDuration);
 			seeking = true;
 		});
 
@@ -883,7 +883,7 @@ var DragDrop = (function() {
 		});
 
 		function updateSeektime(x) {
-			var currentTime = 1 / $("#seekbar").width() * (x - 170) * currentEpisodeDuration;
+			var currentTime = 1 / $("#seekbar").width() * (x - $("#seekbar").position().left) * currentEpisodeDuration;
 
 			var date = new Date(currentTime * 1000);
 
@@ -913,6 +913,9 @@ var DragDrop = (function() {
 					pushEvent(Event.Pause);
 				}
 			}
+			if (volumizing) {
+				volumizing = false;
+			}
 		});
 
 		$(document).mousemove(function(e) {
@@ -921,8 +924,11 @@ var DragDrop = (function() {
 				$(".thumb").css("width", (window.innerWidth - e.pageX - 15 + o)+"px");
 			}
 			if (seeking) {
-				seek(1 / $("#seekbar").width() * (e.pageX - 170) * currentEpisodeDuration);
+				seek(1 / $("#seekbar").width() * (e.pageX - $("#seekbar").position().left) * currentEpisodeDuration);
 				updateSeektime(e.pageX);
+			}
+			if (volumizing) {
+				volume(1 / 60 * (e.pageX - $("#volume .bar .inner").position().left));
 			}
 		});
 
@@ -1073,12 +1079,14 @@ var DragDrop = (function() {
 			$(".context-menu").hide();
 		});
 
-		$("#volume").mousemove(function(e) {
-			var width = window.innerWidth - e.pageX - 200;
-			var height = 40 / 150 * width;
-			el("vid").volume = width / 150;
-			$("#volume-top").css("border-left-width", width+"px");
-			$("#volume-top").css("border-top-width", height+"px");
+		$("#volume i").click(function() {
+			muteToggle();
+		});
+
+		var volumizing = false;
+		$("#volume .bar").mousedown(function(e) {
+			volume(1 / 60 * (e.pageX - $("#volume .bar .inner").position().left));
+			volumizing = true;
 		});
 
 		$("#podcasts").on("contextmenu", ".cast", function(e) {
@@ -2458,6 +2466,54 @@ var DragDrop = (function() {
 			pushEvent(Event.Play);
 			if (video.paused) {
 				pushEvent(Event.Pause);
+			}
+		}
+	}
+
+	function muteToggle() {
+		if (poppedOut) {
+			popoutMessage({
+				action: "muteToggle"
+			});
+		}
+		else {
+			var video = el("vid");
+			video.muted = !video.muted;
+			if (video.muted) {
+				$("#volume i").removeClass("fa-volume-up");
+				$("#volume i").addClass("fa-volume-off");
+				$("#volume .bar .inner").css("width", 0);
+			}
+			else {
+				$("#volume i").removeClass("fa-volume-off");
+				$("#volume i").addClass("fa-volume-up");
+				$("#volume .bar .inner").css("width", (60 * video.volume) + "px");
+			}
+		}
+	}
+
+	function volume(vol) {
+		if (vol < 0) {
+			vol = 0;
+		}
+		else if (vol > 1) {
+			vol = 1;
+		}
+		if (poppedOut) {
+
+		}
+		else {
+			var video = el("vid");
+			video.volume = vol;
+			$("#volume .bar .inner").css("width", (60 * video.volume) + "px");
+
+			if (vol === 0) {
+				$("#volume i").removeClass("fa-volume-up");
+				$("#volume i").addClass("fa-volume-off");
+			}
+			else {
+				$("#volume i").removeClass("fa-volume-off");
+				$("#volume i").addClass("fa-volume-up");
 			}
 		}
 	}
