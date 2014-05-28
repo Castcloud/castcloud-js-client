@@ -1523,8 +1523,8 @@ var DragDrop = (function() {
 			$("#playbar").show();
 			$("#topbar nav").show();
 			$("#userinfo").show();
-		
-}
+		}
+
 		Backbone.history.start({ pushState: true, root: root });
 	});
 
@@ -1825,6 +1825,10 @@ var DragDrop = (function() {
 	var currentOrder = 0;
 
 	function pushEvent(type, id, time) {
+		if (poppedOut) {
+			return;
+		}
+		
 		var eventTS = unix();
 		if (lastEventTS === eventTS) {
 			currentOrder++;
