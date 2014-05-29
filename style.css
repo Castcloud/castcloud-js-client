@@ -512,6 +512,7 @@ button.vmenu-toggle:hover {
 	float: left;
 	line-height: 30px;
 	color: #666;
+	font-weight: 400;
 }
 
 #vid-thumb-bar .button {
@@ -784,6 +785,7 @@ button.vmenu-toggle:hover {
 }
 
 #volume .bar {
+	display: none;
 	float: right;
 	background: #FFF;
 	width: 60px;
@@ -811,6 +813,7 @@ button.vmenu-toggle:hover {
 	margin: 0 20px;
 	line-height: 60px;
 	float: right;
+	font-weight: 400;
 }
 
 #seekbar {
@@ -836,14 +839,15 @@ button.vmenu-toggle:hover {
 #badeball {
 	position: absolute;
 	background: #FFF;
-	top: -5px;
+	top: 2.5px;
 	z-index: 1;
 	width: 0px;
 	height: 0px;
+	left: -20px;
 	border-radius: 50%;
 	cursor: pointer;
-	-webkit-transition: width 0.1s;
-	-webkit-transition: height 0.1s;
+	margin-left: 10px;
+	-webkit-transition: width 0.1s, height 0.1s, top 0.1s, margin 0.1s;
 }
 
 #badeball div {

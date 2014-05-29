@@ -758,7 +758,7 @@ var DragDrop = (function() {
 					clearTimeout(timer);
 				}
 			}
-			$("#badeball").css("height", "20px").css("width", "20px");
+			$("#badeball").css("height", "20px").css("width", "20px").css("top", "-5px").css("margin-left", "0px");
 			$("#seekbar").css("height", "10px");
 		});
 
@@ -772,7 +772,7 @@ var DragDrop = (function() {
 			}
 			if (!seeking) {
 				$("#seekbar").css("height", "5px");
-				$("#badeball").css("height", "0px").css("width", "0px");
+				$("#badeball").css("height", "0px").css("width", "0px").css("top", "2.5px").css("margin-left", "10px");
 			}
 		});
 
@@ -921,7 +921,7 @@ var DragDrop = (function() {
 			if (seeking) {
 				$("#seektime").hide();
 				$("#seekbar").css("height", "5px");
-				$("#badeball").css("height", "0px").css("width", "0px");
+				$("#badeball").css("height", "0px").css("width", "0px").css("top", "5px");
 				seeking = false;
 				pushEvent(Event.Play);
 				if (el("vid").paused) {
@@ -2548,6 +2548,7 @@ var DragDrop = (function() {
 				$("#volume i").addClass("fa-volume-off");
 			}
 			else {
+				video.muted = false;
 				$("#volume i").removeClass("fa-volume-off");
 				$("#volume i").addClass("fa-volume-up");
 			}
