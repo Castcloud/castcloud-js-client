@@ -342,6 +342,7 @@ var DragDrop = (function() {
 		castScroll,
 		episodeScroll,
 		episodeinfoScroll,
+		episodeFeedScroll,
 		poppedOut,
 		mediaType,
 		idbReady = false;
@@ -442,6 +443,7 @@ var DragDrop = (function() {
 			routes: {
 				"": "podcasts",
 				"podcasts": "podcasts",
+				"episodes": "episodes",
 				"settings": "settings",
 				"now-playing": "nowPlaying",
 				"fullscreen":  "fullscreen",
@@ -457,12 +459,29 @@ var DragDrop = (function() {
 				}
 				else {
 					$("#tab-podcasts").show();
+					setTimeout(function() { 
+						castScroll.refresh();
+						episodeScroll.refresh(); 
+					}, 0);
 					if (small) {
 						page = 0;
 						$(".col").hide();
 						$("#playbar").show();
 						$(".col:eq(0)").show();
 					}
+					$("#vid-container").addClass("thumb");
+				}
+			},
+
+			episodes: function() {
+				$(".tab").hide();
+				if (!loggedIn) {
+					$("#tab-login").show();
+					$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
+				}
+				else {
+					$("#tab-episodes").show();
+					setTimeout(function() { episodeFeedScroll.refresh(); }, 0);
 					$("#vid-container").addClass("thumb");
 				}
 			},
@@ -487,6 +506,10 @@ var DragDrop = (function() {
 				}
 				else {
 					$("#tab-podcasts").show();
+					setTimeout(function() { 
+						castScroll.refresh();
+						episodeScroll.refresh(); 
+					}, 0);
 					page = n;
 					if (small) {
 						$(".col").hide();
@@ -1757,7 +1780,10 @@ var DragDrop = (function() {
 			$("#vid-container").addClass("thumb");
 		}
 
-		var render = _.after(4, renderCasts);
+		var render = _.after(4, function() {
+			renderCasts();
+			renderEpisodeFeed();
+		});
 		var updateLastEvent =_.after(2, function() {
 			events.forEach(function(event) {
 				if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
@@ -2140,6 +2166,46 @@ var DragDrop = (function() {
 		else if (sessionStorage.selectedepisode) {
 			loadEpisodeInfo(sessionStorage.selectedepisode);
 			$("#ep-" + sessionStorage.selectedepisode).addClass("current");
+		}
+	}
+
+	function renderEpisodeFeed() {
+		var e = [];
+		for (var id in episodes) {
+			if (!(episodes[id].lastevent && episodes[id].lastevent.type == Event.Delete)) {
+				e.push(episodes[id]);
+			}
+		}
+
+		e.sort(function(a, b) {
+			var d1 = new Date(a.feed.pubDate);
+			var d2 = new Date(b.feed.pubDate);
+			if (d1 > d2) {
+				return -1;
+			}
+			if (d1 < d2) {
+				return 1;
+			}
+			return 0;
+		});
+
+		$("#tab-episodes .list").empty();
+		e.forEach(function(episode) {
+			var url = getEpisodeImage(episode.id);
+			$("#tab-episodes .list").append("<div><h2>" + casts[episode.castid].feed.title + '</h2><img src="' + url + '"><h1>' + episode.feed.title + '</h1></div>');
+		});
+
+		if (episodeFeedScroll) {
+			setTimeout(function() { episodeFeedScroll.refresh(); }, 0);
+		}
+		else {
+			episodeFeedScroll = new IScroll('#tab-episodes', {
+				mouseWheel: true,
+				scrollbars: 'custom',
+				keyBindings: true,
+				interactiveScrollbars: true,
+				click: true
+			});
 		}
 	}
 

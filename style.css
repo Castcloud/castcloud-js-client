@@ -447,7 +447,7 @@ button.vmenu-toggle:hover {
 	display: none;
 	position: fixed;
 	top: 60px;
-	bottom: 60px;
+	bottom: 55px;
 	width: 100%;
 }
 
@@ -572,6 +572,7 @@ button.vmenu-toggle:hover {
 #episode-bar .button {
 	background: none;
 	color: #AAA;
+	font-weight: 400;
 	width: auto;
 	margin: 0;
 	padding: 0 10px;
@@ -579,10 +580,6 @@ button.vmenu-toggle:hover {
 
 #episode-bar .button:hover {
 	color: #0099cc;
-}
-
-#episode-bar .button:active {
-	color: #0066cc;
 }
 
 #episodeinfo p, #events p {
@@ -685,7 +682,6 @@ button.vmenu-toggle:hover {
 	right: 0;
 	position: fixed;
 	color: #666;
-	padding-left: 5px;
 }
 
 #playbar .button {
@@ -697,6 +693,11 @@ button.vmenu-toggle:hover {
 	margin-top: 5px;
 	padding: 0;
 	color: #666;
+}
+
+#playbar .button:first-child {
+	padding-left: 10px;
+	width: 50px;
 }
 
 #playbar .button:hover {
@@ -732,35 +733,40 @@ button.vmenu-toggle:hover {
 #playbar-gear-menu {
 	display: none;
 	position: fixed;
-	bottom: 60px;
+	bottom: 55px;
 	right: 0;
-	width: 200px;
-	height: 200px;
-	background: #FFF;
+	width: 180px;
+	height: 150px;
+	background: #111;
+	color: #666;
 }
 
 #playbar-gear-menu * {
-	margin: 10px;
 	margin-bottom: 5px;
 }
 
+#playbar-gear-menu p {
+	margin: 10px;
+}
+
 #playbar-gear-menu .button {
-	width: 50px !important;
+	width: 60px !important;
+	margin-top: -10px;
 	border-radius: 0px;
-	background: #0066cc;
+	background: none;
 	color: #FFF;
 }
 
 #playbar-gear-menu .button.selected {
-	background: #0099cc;
+	color: #0099cc;
 }
 
 #playbar-gear-menu .button:hover {
-	background: #0099cc;
+	color: #0099cc;
 }
 
 #playbar-gear-menu .button:active {
-	background: #0066cc;
+	background: none;
 }
 
 #volume {
@@ -822,7 +828,7 @@ button.vmenu-toggle:hover {
 	right: 0px;
 	top: 0px;
 	height: 5px;
-	background: #FFF;
+	background: #333;
 	-webkit-transition: height 0.1s;
 }
 
@@ -887,6 +893,46 @@ button.vmenu-toggle:hover {
 .context-menu div:hover {
 	background: #0066cc;
 	color: #FFF;
+}
+
+#tab-episodes .list {
+	text-align: center;
+}
+
+#tab-episodes .list div {
+	position: relative;
+	min-height: 280px;
+	width: 300px;
+	display: inline-block;
+	vertical-align: top;
+	padding: 10px;
+	background: #111;
+	margin: 10px;
+	cursor: pointer;
+	text-align: center;
+}
+
+#tab-episodes .list div:hover {
+	background: #1a1a1a;
+}
+
+#tab-episodes img {
+	max-height: 160px;
+	max-width: 280px;
+}
+
+#tab-episodes h1 {
+	color: #0099cc;
+	font-size: 16px;
+	margin: 10px 0;
+	font-weight: 400;
+}
+
+#tab-episodes h2 {
+	color: #666;
+	font-size: 14px;
+	margin: 10px 0;
+	font-weight: 400;
 }
 
 #tab-settings .button {
