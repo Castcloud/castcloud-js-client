@@ -1730,6 +1730,8 @@ var DragDrop = (function() {
 
 		delete episodes[contextItemID];
 		db.put("episodes", episodes);
+
+		console.log(_.size(episodes));
 	}
 
 	function login() {
@@ -2057,6 +2059,12 @@ var DragDrop = (function() {
 			for (var index in n) {
 				$("#cast-" + index + " .n").html(n[index]);
 			}
+
+			$(".cast .n").each(function(index, el) {
+				if ($(el).html().length < 1) {
+					$(el).width(0);
+				}
+			});
 
 			if (addingFeed) {
 				addingFeed = false;

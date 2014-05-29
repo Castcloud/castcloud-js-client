@@ -368,8 +368,29 @@ button.vmenu-toggle:hover {
 }
 
 .cast, .episode, .label .name {
-	padding: 10px 20px;
+	padding-right: 20px;
 	cursor: pointer;
+
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.episode, .name {
+	padding: 10px 20px;
+}
+
+.cast .name {
+	display: table-cell;
+
+	overflow: hidden;
+    white-space: nowrap;
+	text-overflow: ellipsis;
+
+	padding-right: 0;
 }
 
 .cast:hover, .episode:hover, .label .name:hover {
@@ -395,16 +416,17 @@ button.vmenu-toggle:hover {
 	outline: none;
 	background: rgba(0,0,0,0);
 	color: #FFF;
-	width: 90%;
 }
 
 .label .content .cast {
-	padding-left: 40px;
+	padding-left: 20px;
 }
 
 .cast .n {
-	float: right;
+	display: table-cell;
+	text-align: right;
 	color: #AAA;
+	width: 30px;
 }
 
 .episode {
