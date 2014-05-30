@@ -393,7 +393,7 @@ button.vmenu-toggle:hover {
 	padding-right: 0;
 }
 
-.cast:hover, .episode:hover, .label .name:hover {
+.cast:hover, .episode:hover, .label > .name:hover {
 	background: #0066cc;
 }
 

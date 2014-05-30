@@ -1280,13 +1280,10 @@ var DragDrop = (function() {
 			});
 		});
 
-		$("#episode-context-delete").click(function() {
-			if (!$("#" + contextItemID).hasClass("selected")) {
-				deleteEpisode(contextItemID);
-			}
-			$(".episode.selected").each(function() {
-				deleteEpisode($(this).prop("id").split("-")[1]);
-			});
+		$("#episode-context-play").click(function() {
+			autoplay = true;
+			selectEpisode(contextItemID);
+			playEpisode(contextItemID);
 		});
 
 		$("#episode-context-reset").click(function() {
@@ -1297,6 +1294,15 @@ var DragDrop = (function() {
 				pushEvent(Event.Pause, contextItemID, 0);
 				updateEpisodeIndicators();
 			}
+		});
+
+		$("#episode-context-delete").click(function() {
+			if (!$("#" + contextItemID).hasClass("selected")) {
+				deleteEpisode(contextItemID);
+			}
+			$(".episode.selected").each(function() {
+				deleteEpisode($(this).prop("id").split("-")[1]);
+			});
 		});
 
 		$("#input-target").keyup(function(e) {
@@ -1455,25 +1461,7 @@ var DragDrop = (function() {
 				});
 			}
 			else {
-				var id = $(this).prop("id").split("-")[1];
-				selectedEpisodeId = id;
-				loadEpisodeInfo(id);
-				sessionStorage.selectedepisode = id;
-
-				if (currentEpisodeId === id) {
-					if (paused) {
-						$("#episode-bar-play").html("Play");
-					}
-					else {
-						$("#episode-bar-play").html("Pause");
-					}
-				}
-				else {
-					$("#episode-bar-play").html("Play");
-				}
-
-				$(".episode").removeClass("selected");
-				$(this).addClass("selected");
+				selectEpisode($(this).prop("id").split("-")[1]);
 			}
 		});
 
@@ -1717,6 +1705,27 @@ var DragDrop = (function() {
 	var c = 0;
 	var q = [];
 
+	function selectEpisode(id) {
+		selectedEpisodeId = id;
+		loadEpisodeInfo(id);
+		sessionStorage.selectedepisode = id;
+
+		if (currentEpisodeId === id) {
+			if (paused) {
+				$("#episode-bar-play").html("Play");
+			}
+			else {
+				$("#episode-bar-play").html("Pause");
+			}
+		}
+		else {
+			$("#episode-bar-play").html("Play");
+		}
+
+		$(".episode").removeClass("selected");
+		$("#ep-" + id).addClass("selected");
+	}
+
 	function playEpisode(id) {
 		if (currentEpisodeId !== id) {
 			if (currentEpisodeId !== null) {
@@ -1724,6 +1733,8 @@ var DragDrop = (function() {
 					pushEvent(Event.Play);
 				}
 			}
+
+			sessionStorage.lastepisode = JSON.stringify({ id: id, castid: episodes[id].castid });
 
 			loadEpisodeInfo(id);
 
@@ -1789,8 +1800,6 @@ var DragDrop = (function() {
 
 		delete episodes[contextItemID];
 		db.put("episodes", episodes);
-
-		console.log(_.size(episodes));
 	}
 
 	function login() {
