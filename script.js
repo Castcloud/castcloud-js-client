@@ -1395,7 +1395,24 @@ var DragDrop = (function() {
 				$(this).toggleClass("selected");
 			}
 			else if (shiftDown) {
+				if ($(this).parent()[0] == $("#cast-" + selectedCastId).parent()[0]) {
+					var start = $("#cast-" + selectedCastId).index();
+					var end = $(this).index();
+					var casts = $(this).parent().find(".cast");
 
+					if (start > end) {
+						end--;
+					}
+					else {
+						end++;
+					}
+
+					casts.removeClass("selected");
+
+					_.range(start, end, start > end ? -1 : 1).forEach(function(i) {
+						$(casts.get(i)).addClass("selected");
+					});
+				}
 			}
 			else {
 				var id = $(this).prop("id").split("-")[1];
