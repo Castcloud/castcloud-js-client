@@ -1559,7 +1559,7 @@ var DragDrop = (function() {
 		var settingTimerId;
 		$("#tab-settings").on("keyup", ".setting", function() {
 			clearTimeout(settingTimerId);
-			var id = $(this).prop("id").split(":");
+			var id = $(this).prop("id").split("_");
 			var val = $(this).val();
 			settingTimerId = setTimeout(function() {
 				saveSetting(id[1], val, id[0]);
@@ -1882,7 +1882,7 @@ var DragDrop = (function() {
 
 		var render = _.after(4, function() {
 			renderCasts();
-			renderEpisodeFeed();
+			//renderEpisodeFeed();
 		});
 		var updateLastEvent =_.after(2, function() {
 			events.forEach(function(event) {
@@ -2461,7 +2461,7 @@ var DragDrop = (function() {
 	}
 
 	function saveSetting(key, value, category) {
-		category = category || 'General'
+		category = category || 'General';
 		settings[category][key].value = value;
 		settingsHash = md5(JSON.stringify(settings));
 		buffer.settings.push({
@@ -2479,7 +2479,7 @@ var DragDrop = (function() {
 	}
 
 	function flushSettings() {
-		$.post(apiRoot + "account/settings", buffer.settings, function() {
+		$.post(apiRoot + "account/settings", { json: buffer.settings }, function() {
 			buffer.settings = [];
 			db.remove("buffer_settings");
 		});
