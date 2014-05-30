@@ -2074,7 +2074,7 @@ var DragDrop = (function() {
 	}
 
 	function flushEvents() {
-		$.post(apiRoot + "library/events", { json: buffer.events }, function() {
+		$.post(apiRoot + "library/events", { json: JSON.stringify(buffer.events) }, function() {
 			buffer.events = [];
 			db.remove("buffer_events");
 		});	
@@ -2479,7 +2479,7 @@ var DragDrop = (function() {
 	}
 
 	function flushSettings() {
-		$.post(apiRoot + "account/settings", { json: buffer.settings }, function() {
+		$.post(apiRoot + "account/settings", { json: JSON.stringify(buffer.settings) }, function() {
 			buffer.settings = [];
 			db.remove("buffer_settings");
 		});
