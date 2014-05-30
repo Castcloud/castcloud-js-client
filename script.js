@@ -1269,6 +1269,17 @@ var DragDrop = (function() {
 			});
 		});
 
+		$("#label-context-delete").click(function() {
+			$("#label-" + contextItemID + " .cast").detach().appendTo("#podcasts");
+			$("#label-" + contextItemID).remove();
+			setTimeout(function() {
+				castScroll.refresh();
+			}, 0);
+			$.ajax(apiRoot + "labels/" + contextItemID, {
+				type: "DELETE"
+			});
+		});
+
 		$("#episode-context-delete").click(function() {
 			if (!$("#" + contextItemID).hasClass("selected")) {
 				deleteEpisode(contextItemID);

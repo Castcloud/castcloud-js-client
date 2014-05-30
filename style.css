@@ -453,8 +453,14 @@ button.vmenu-toggle:hover {
 	display: none;
 }
 
+.episode .delete:hover {
+	background: #F00;
+	color: #FFF;
+}
+
 .episode .delete:active {
-	background: #0066cc;
+	background: #FFF;
+	color: #F00;
 }
 
 #vid {
