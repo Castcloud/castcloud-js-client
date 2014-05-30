@@ -398,16 +398,12 @@ button.vmenu-toggle:hover {
 }
 
 .cast.selected, .episode.selected {
-	background: #0099cc;
-	color: #FFF !important;
-}
-
-.cast.current, .episode.current {
 	color: #0099cc;
 }
 
-.cast.current:hover, .episode.current:hover {
+.cast.selected:hover, .episode.selected:hover {
 	color: #FFF;
+	background: #0099cc;
 }
 
 .cast input, .label input {

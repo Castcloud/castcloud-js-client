@@ -459,10 +459,12 @@ var DragDrop = (function() {
 				}
 				else {
 					$("#tab-podcasts").show();
-					setTimeout(function() { 
-						castScroll.refresh();
-						episodeScroll.refresh(); 
-					}, 0);
+					if (castScroll) {
+						setTimeout(function() { 
+							castScroll.refresh();
+							episodeScroll.refresh(); 
+						}, 0);
+					}
 					if (small) {
 						page = 0;
 						$(".col").hide();
@@ -481,7 +483,9 @@ var DragDrop = (function() {
 				}
 				else {
 					$("#tab-episodes").show();
-					setTimeout(function() { episodeFeedScroll.refresh(); }, 0);
+					if (episodeScroll) {
+						setTimeout(function() { episodeFeedScroll.refresh(); }, 0);
+					}
 					$("#vid-container").addClass("thumb");
 				}
 			},
@@ -506,10 +510,12 @@ var DragDrop = (function() {
 				}
 				else {
 					$("#tab-podcasts").show();
-					setTimeout(function() { 
-						castScroll.refresh();
-						episodeScroll.refresh(); 
-					}, 0);
+					if (castScroll) {
+						setTimeout(function() { 
+							castScroll.refresh();
+							episodeScroll.refresh(); 
+						}, 0);
+					}
 					page = n;
 					if (small) {
 						$(".col").hide();
@@ -1174,7 +1180,10 @@ var DragDrop = (function() {
 
 		var ctrlClearId;
 
+		var shiftDown = false;
+
 		$(document).keydown(function(e) {
+			shiftDown = e.shiftKey;
 			if (!(e.ctrlKey || e.metaKey)) {
 				return;
 			}
@@ -1204,6 +1213,7 @@ var DragDrop = (function() {
 
 		$(document).keyup(function(e) {
 			ctrlDown = false;
+			shiftDown = false;
 		});
 
 		$("#cast-context-rename").click(function() {
@@ -1384,6 +1394,9 @@ var DragDrop = (function() {
 			if (ctrlDown) {
 				$(this).toggleClass("selected");
 			}
+			else if (shiftDown) {
+
+			}
 			else {
 				var id = $(this).prop("id").split("-")[1];
 				selectCast(id);
@@ -1413,8 +1426,8 @@ var DragDrop = (function() {
 					$("#episode-bar-play").html("Play");
 				}
 
-				$(".episode").removeClass("current");
-				$(this).addClass("current");
+				$(".episode").removeClass("selected");
+				$(this).addClass("selected");
 			}
 		});
 
@@ -1981,19 +1994,32 @@ var DragDrop = (function() {
 	}
 
 	function loadCasts(tag) {
-		$.get(apiRoot + (tag === undefined ? "library/casts" : "library/casts/" + tag), function(res) {
-			res.forEach(function(cast) {
-				casts[cast.id] = cast;
-			});
+		var url = apiRoot + (tag === undefined ? "library/casts" : "library/casts/" + tag);
+		$.ajax(url, {
+			headers: {
+				"If-None-Match": localStorage.etag_casts
+			},
+			success: function(res, status, xhr) {
+				if (xhr.status === 200) {
+					var etag = xhr.getResponseHeader("etag");
+					if (etag) {
+						localStorage.etag_casts = etag;
+					}
 
-			if (idbReady) {
-				db.put("casts", casts);				
-			}
-			else {
-				buffer.idb.casts = casts;
-			}
+					res.forEach(function(cast) {
+						casts[cast.id] = cast;
+					});
 
-			renderCasts();
+					if (idbReady) {
+						db.put("casts", casts);				
+					}
+					else {
+						buffer.idb.casts = casts;
+					}
+
+					renderCasts();
+				}
+			}
 		});
 	}
 
@@ -2038,7 +2064,7 @@ var DragDrop = (function() {
 					renderEpisodes(sessionStorage.selectedcast);
 				}
 				selectedCastId = sessionStorage.selectedcast;
-				$("#cast-" + sessionStorage.selectedcast).addClass("current");
+				$("#cast-" + sessionStorage.selectedcast).addClass("selected");
 			}
 			else if (sessionStorage.lastepisode) {
 				var lastepisode = JSON.parse(sessionStorage.lastepisode);
@@ -2086,8 +2112,8 @@ var DragDrop = (function() {
 	function selectCast(id) {
 		selectedCastId = id;
 		renderEpisodes(id);
-		$(".cast").removeClass("current");
-		$("#cast-" + id).addClass("current");
+		$(".cast").removeClass("selected");
+		$("#cast-" + id).addClass("selected");
 		sessionStorage.selectedcast = id;
 	}
 
@@ -2169,11 +2195,11 @@ var DragDrop = (function() {
 			if (lastepisode.id in episodes) {
 				playEpisode(lastepisode.id);
 			}
-			$("#ep-" + lastepisode.id).addClass("current");
+			$("#ep-" + lastepisode.id).addClass("selected");
 		}
 		else if (sessionStorage.selectedepisode) {
 			loadEpisodeInfo(sessionStorage.selectedepisode);
-			$("#ep-" + sessionStorage.selectedepisode).addClass("current");
+			$("#ep-" + sessionStorage.selectedepisode).addClass("selected");
 		}
 	}
 
@@ -2218,33 +2244,46 @@ var DragDrop = (function() {
 	}
 
 	function loadSettings() {
-		$.get(apiRoot + "account/settings", function(res) {
-			settings = {};
-			res.forEach(function(setting) {
-				var category = setting.setting.split("/")[0];
-				var name = setting.setting.split("/")[1];
-				if (name === undefined) {
-					name = category;
-					category = "General";
+		var url = apiRoot + "account/settings";
+		$.ajax(url, {
+			headers: {
+				"If-None-Match": localStorage.etag_settings
+			},
+			success: function(res, status, xhr) {
+				if (xhr.status === 200) {
+					var etag = xhr.getResponseHeader("etag");
+					if (etag) {
+						localStorage.etag_settings = etag;
+					}
+
+					settings = {};
+					res.forEach(function(setting) {
+						var category = setting.setting.split("/")[0];
+						var name = setting.setting.split("/")[1];
+						if (name === undefined) {
+							name = category;
+							category = "General";
+						}
+						if (settings[category] === undefined) {
+							settings[category] = {};
+						}
+						settings[category][name] = {
+							value: setting.value
+						};
+					});
+
+					settings = $.extend(true, {}, DefaultSettings, settings);
+
+					setKeybinds();
+					renderSettings();
+
+					if (idbReady) {
+						db.put("settings", settings);
+					}
+					else {
+						buffer.idb.settings = settings;
+					}
 				}
-				if (settings[category] === undefined) {
-					settings[category] = {};
-				}
-				settings[category][name] = {
-					value: setting.value
-				};
-			});
-
-			settings = $.extend(true, {}, DefaultSettings, settings);
-
-			setKeybinds();
-			renderSettings();
-
-			if (idbReady) {
-				db.put("settings", settings);
-			}
-			else {
-				buffer.idb.settings = settings;
 			}
 		});
 	}
@@ -2347,34 +2386,47 @@ var DragDrop = (function() {
 	}
 
 	function loadLabels() {
-		$.get(apiRoot + "library/labels", function(res) {
-			labels = {};
-			res.forEach(function(label) {
-				if (label.name === "root") {
-					rootLabelId = label.id;
-				}
-				labels[label.name] = [];
-				if (label.content) {
-					label.content.split(",").forEach(function(item) {
-						var split = item.split("/");
-						labels[label.name].push({
-							type: split[0],
-							id: parseInt(split[1])
-						});
+		var url = apiRoot + "library/labels";
+		$.ajax(url, {
+			headers: {
+				"If-None-Match": localStorage.etag_labels
+			},
+			success: function(res, status, xhr) {
+				if (xhr.status === 200) {
+					var etag = xhr.getResponseHeader("etag");
+					if (etag) {
+						localStorage.etag_labels = etag;
+					}
+
+					labels = {};
+					res.forEach(function(label) {
+						if (label.name === "root") {
+							rootLabelId = label.id;
+						}
+						labels[label.name] = [];
+						if (label.content) {
+							label.content.split(",").forEach(function(item) {
+								var split = item.split("/");
+								labels[label.name].push({
+									type: split[0],
+									id: parseInt(split[1])
+								});
+							});
+						}
+						labels[label.id] = {
+							name: label.name,
+							expanded: label.expanded
+						};
 					});
+					if (idbReady) {
+						db.put("labels", labels);
+					}
+					else {
+						buffer.idb.labels = labels;
+					}
+					loadCasts();
 				}
-				labels[label.id] = {
-					name: label.name,
-					expanded: label.expanded
-				};
-			});
-			if (idbReady) {
-				db.put("labels", labels);
 			}
-			else {
-				buffer.idb.labels = labels;
-			}
-			loadCasts();
 		});
 	}
 
