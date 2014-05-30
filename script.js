@@ -361,6 +361,10 @@ var DragDrop = (function() {
 			KeepPlaying: {
 				type: Setting.Bool,
 				value: true
+			},
+			PlaybackRate: {
+				type: Setting.Text,
+				value: 1.0
 			}
 		},
 		Keybinds: {
@@ -986,9 +990,11 @@ var DragDrop = (function() {
 		$("#playbar-fullscreen").click(toggleFullscreen);
 
 		$(".playback-rate").click(function() {
+			var rate = $(this).attr("rate");
 			$(".playback-rate").removeClass("selected");
 			$(this).addClass("selected");
-			el("vid").playbackRate = $(this).attr("rate");
+			el("vid").playbackRate = rate;
+			saveSetting("PlaybackRate", rate, "Playback");
 		});
 
 		$("#button-login").click(login);
@@ -1760,6 +1766,8 @@ var DragDrop = (function() {
 			video.load();
 			videoLoading = true;
 			ended = false;
+
+			video.playbackRate = settings.Playback.PlaybackRate.value;
 
 			id = episodes[id].castid;
 
