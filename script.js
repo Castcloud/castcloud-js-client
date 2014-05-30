@@ -321,6 +321,7 @@ var DragDrop = (function() {
 	var token,
 		username,
 		episodes = {},
+		tempEpisodes = {},
 		casts = {},
 		labels,
 		events = [],
@@ -1222,6 +1223,10 @@ var DragDrop = (function() {
 			shiftDown = false;
 		});
 
+		$("#cast-context-show-all").click(function() {
+			showAllEpisodes(contextItemID);
+		});
+
 		$("#cast-context-rename").click(function() {
 			var name = $("#cast-" + contextItemID + " .name").html();
 			$("#cast-" + contextItemID + " .name").html('<input type="text">');
@@ -1297,6 +1302,11 @@ var DragDrop = (function() {
 				seek(0);
 			}
 			else {
+				if (!(contextItemID in episodes) && contextItemID in tempEpisodes) {
+					episodes[contextItemID] = tempEpisodes[contextItemID]
+					delete tempEpisodes[contextItemID];
+					db.put("episodes", episodes);
+				}
 				pushEvent(Event.Pause, contextItemID, 0);
 				updateEpisodeIndicators();
 			}
@@ -1473,7 +1483,6 @@ var DragDrop = (function() {
 
 		$("#episodes").on("dblclick", ".episode", function() {
 			var id = $(this).prop("id").split("-")[1];
-			sessionStorage.lastepisode = JSON.stringify({ id: id, castid: episodes[id].castid });
 			autoplay = true;
 			playEpisode(id);
 		});
@@ -1494,6 +1503,10 @@ var DragDrop = (function() {
 		$("#episodes").on("mouseout", ".episode", function() {
 			$(this).children(".progress").css("color", "#666");
 			$(this).children(".delete").hide();
+		});
+
+		$("#episodes").on("click", "#show-all-episodes", function() {
+			showAllEpisodes(selectedCastId);
 		});
 
 		$("body").on("dragover", function(e) {
@@ -1696,11 +1709,13 @@ var DragDrop = (function() {
 
 		selectedEpisodeId = id;
 
-		$("#episode-title, #overlay-info h2").html(episodes[id].feed.title);
-		$("#episode-date").html(new Date(episodes[id].feed.pubDate).toLocaleString());
-		$("#episode-desc").html(episodes[id].feed.description);
+		var episode = id in episodes ? episodes[id] : tempEpisodes[id];
+
+		$("#episode-title, #overlay-info h2").html(episode.feed.title);
+		$("#episode-date").html(new Date(episode.feed.pubDate).toLocaleString());
+		$("#episode-desc").html(episode.feed.description);
 		$("#episode-desc *").removeAttr("style");
-		$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
+		$("#overlay-info h5").html(casts[episode.castid].feed.title);
 		$("#episode-bar").show();
 
 		setTimeout(function() { episodeinfoScroll.refresh(); }, 0);
@@ -1740,62 +1755,70 @@ var DragDrop = (function() {
 				}
 			}
 
-			sessionStorage.lastepisode = JSON.stringify({ id: id, castid: episodes[id].castid });
-
-			loadEpisodeInfo(id);
-
-			currentEpisodeId = id;
-
-			if (episodes[id].lastevent === null) {
-				pushEvent(Event.Start, id, 0);
+			if (!(id in episodes) && id in tempEpisodes) {
+				episodes[id] = tempEpisodes[id];
+				delete tempEpisodes[id];
+				db.put("episodes", episodes);
 			}
 
-            var desc = "";
-            if (_.isString(episodes[id].feed.description)) {
-                desc = episodes[id].feed.description.replace(/(<([^>]+)>)/ig,"");
-            }
+			if (id in episodes) {
+				sessionStorage.lastepisode = JSON.stringify({ id: id, castid: episodes[id].castid });
 
-			Chromecast.load(episodes[id].feed.enclosure.url, {
-				title: episodes[id].feed.title,
-				description: desc,
-				image: getEpisodeImage(id)
-			});
+				loadEpisodeInfo(id);
 
-			var video = el("vid");
-			video.setAttribute("src", episodes[id].feed.enclosure.url);
-			video.load();
-			videoLoading = true;
-			ended = false;
+				currentEpisodeId = id;
 
-			video.playbackRate = settings.Playback.PlaybackRate.value;
+				if (episodes[id].lastevent === null) {
+					pushEvent(Event.Start, id, 0);
+				}
 
-			id = episodes[id].castid;
+	            var desc = "";
+	            if (_.isString(episodes[id].feed.description)) {
+	                desc = episodes[id].feed.description.replace(/(<([^>]+)>)/ig,"");
+	            }
 
-			q = [];
-			for (var x in episodes) {
-				if (episodes[x].castid == id) {
-					if (!(episodes[x].lastevent && episodes[x].lastevent.type == Event.Delete)) {
-						q.push(episodes[x]);
-						if (x == currentEpisodeId) {
-							c = q.length - 1;
+				Chromecast.load(episodes[id].feed.enclosure.url, {
+					title: episodes[id].feed.title,
+					description: desc,
+					image: getEpisodeImage(id)
+				});
+
+				var video = el("vid");
+				video.setAttribute("src", episodes[id].feed.enclosure.url);
+				video.load();
+				videoLoading = true;
+				ended = false;
+
+				video.playbackRate = settings.Playback.PlaybackRate.value;
+
+				id = episodes[id].castid;
+
+				q = [];
+				for (var x in episodes) {
+					if (episodes[x].castid == id) {
+						if (!(episodes[x].lastevent && episodes[x].lastevent.type == Event.Delete)) {
+							q.push(episodes[x]);
+							if (x == currentEpisodeId) {
+								c = q.length - 1;
+							}
 						}
 					}
 				}
+
+				q.sort(function(a, b) {
+					var d1 = new Date(a.feed.pubDate);
+					var d2 = new Date(b.feed.pubDate);
+					if (d1 > d2) {
+						return -1;
+					}
+					if (d1 < d2) {
+						return 1;
+					}
+					return 0;
+				});
+
+				$("#vid-container").removeClass("minimized");
 			}
-
-			q.sort(function(a, b) {
-				var d1 = new Date(a.feed.pubDate);
-				var d2 = new Date(b.feed.pubDate);
-				if (d1 > d2) {
-					return -1;
-				}
-				if (d1 < d2) {
-					return 1;
-				}
-				return 0;
-			});
-
-			$("#vid-container").removeClass("minimized");
 		}
 	}
 
@@ -2010,12 +2033,14 @@ var DragDrop = (function() {
 
 		flushEvents();
 
-		episodes[id].lastevent = {
-			type: type,
-			positionts: time === undefined ? el("vid").currentTime | 0 : time,
-			clientts: eventTS,
-			clientname: null,
-			clientdescription: null
+		if (id in episodes) {
+			episodes[id].lastevent = {
+				type: type,
+				positionts: time === undefined ? el("vid").currentTime | 0 : time,
+				clientts: eventTS,
+				clientname: null,
+				clientdescription: null
+			}
 		}
 
 		var event = {
@@ -2237,19 +2262,6 @@ var DragDrop = (function() {
 
 			var template = _.template($("script.episodes").html());
 			$("#episodes").empty().append(template({ episodes: e }));
-
-			if (episodeScroll) {
-				setTimeout(function() { episodeScroll.refresh(); }, 0);
-			}
-			else {
-				episodeScroll = new IScroll('#foo2', {
-					mouseWheel: true,
-					scrollbars: 'custom',
-					keyBindings: true,
-					interactiveScrollbars: true,
-					click: true
-				});
-			}
 			
 			updateEpisodeIndicators();
 
@@ -2268,12 +2280,25 @@ var DragDrop = (function() {
 		else {
 			$("#episodes").empty().append('<div class="episodes-empty"><h2>There are no episodes left</h2><button id="show-all-episodes" class="button">Show me everything!</button></div>');
 		}
+
+		if (episodeScroll) {
+			setTimeout(function() { episodeScroll.refresh(); }, 0);
+		}
+		else {
+			episodeScroll = new IScroll('#foo2', {
+				mouseWheel: true,
+				scrollbars: 'custom',
+				keyBindings: true,
+				interactiveScrollbars: true,
+				click: true
+			});
+		}
 	}
 
 	function renderEpisodeFeed() {
 		var e = [];
 		for (var id in episodes) {
-			if (!(episodes[id].lastevent && episodes[id].lastevent.type == Event.Delete)) {
+			if (!(episodes[id].lastevent && episodes[id].lastevent.type == Event.Delete) && episodes[id].feed) {
 				e.push(episodes[id]);
 			}
 		}
@@ -2308,6 +2333,33 @@ var DragDrop = (function() {
 				click: true
 			});
 		}
+	}
+
+	function showAllEpisodes(id) {
+		$.get(apiRoot + "library/episodes/" + id, function(res) {
+			tempEpisodes = {};
+			res.forEach(function(episode) {
+				tempEpisodes[episode.id] = episode;
+			});
+
+			var template = _.template($("script.episodes").html());
+			$("#episodes").empty().append(template({ episodes: res }));
+
+			if (episodeScroll) {
+				setTimeout(function() { episodeScroll.refresh(); }, 0);
+			}
+			else {
+				episodeScroll = new IScroll('#foo2', {
+					mouseWheel: true,
+					scrollbars: 'custom',
+					keyBindings: true,
+					interactiveScrollbars: true,
+					click: true
+				});
+			}
+			
+			updateEpisodeIndicators();
+		});
 	}
 
 	function loadSettings() {
@@ -2783,10 +2835,13 @@ var DragDrop = (function() {
 	}
 
 	function getEpisodeImage(id) {
-		return episodes[id].feed["media:thumbnail"] ? episodes[id].feed["media:thumbnail"].url : null ||
-			episodes[id].feed["itunes:image"] ? episodes[id].feed["itunes:image"].href : null ||
-			casts[episodes[id].castid].feed["itunes:image"] ? casts[episodes[id].castid].feed["itunes:image"].href : null ||
-			casts[episodes[id].castid].feed.image ? casts[episodes[id].castid].feed.image.url : null;
+		var episode = id in episodes ? episodes[id] : tempEpisodes[id];
+		var cast = casts[episode.castid];
+
+		return episode.feed["media:thumbnail"] ? episode.feed["media:thumbnail"].url : null ||
+			episode.feed["itunes:image"] ? episode.feed["itunes:image"].href : null ||
+			cast.feed["itunes:image"] ? cast.feed["itunes:image"].href : null ||
+			cast.feed.image ? cast.feed.image.url : null;
 	}
 
 	function positionThumb() {
