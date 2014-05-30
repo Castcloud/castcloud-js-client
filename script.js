@@ -1326,7 +1326,8 @@ var DragDrop = (function() {
 			if (url.indexOf("/", url.length - 1) === -1) {
 				url += "/";
 			}
-			$.ajax(url + "account/ping", { 
+			$.ajax(url + "account/ping", {
+				type: "GET",
 				error: function(res) { 
 					if (res.responseText === "Bad token") {
 						$("#input-target-container i").show();
@@ -2086,6 +2087,7 @@ var DragDrop = (function() {
 			headers: {
 				"If-None-Match": localStorage.etag_casts
 			},
+			type: "GET",
 			success: function(res, status, xhr) {
 				if (xhr.status === 200) {
 					var etag = xhr.getResponseHeader("etag");
@@ -2368,6 +2370,7 @@ var DragDrop = (function() {
 			headers: {
 				"If-None-Match": localStorage.etag_settings
 			},
+			type: "GET",
 			success: function(res, status, xhr) {
 				if (xhr.status === 200) {
 					var etag = xhr.getResponseHeader("etag");
@@ -2516,6 +2519,7 @@ var DragDrop = (function() {
 	function loadLabels() {
 		var url = apiRoot + "library/labels";
 		$.ajax(url, {
+			type: "GET",
 			headers: {
 				"If-None-Match": localStorage.etag_labels
 			},
@@ -2554,6 +2558,9 @@ var DragDrop = (function() {
 					}
 					loadCasts();
 				}
+			},
+			error: function() {
+				loadCasts();
 			}
 		});
 	}
