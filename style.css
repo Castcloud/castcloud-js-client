@@ -137,7 +137,6 @@ a {
 	background: #0066cc;
 	border: none;
 	outline: none;
-	padding: 8px 5px;
 	cursor: pointer;
 	width: 100px;
 	height: 40px;
@@ -404,6 +403,16 @@ button.vmenu-toggle:hover {
 .cast.selected:hover, .episode.selected:hover {
 	color: #FFF;
 	background: #0099cc;
+}
+
+.episodes-empty {
+	text-align: center;
+	margin-top: 50px;
+}
+
+.episodes-empty button {
+	width: auto;
+	padding: 0 10px;
 }
 
 .cast input, .label input {

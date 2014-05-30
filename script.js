@@ -1823,12 +1823,11 @@ var DragDrop = (function() {
 			username: username,
 			password: $("#input-password").val(),
 			clientname: "Castcloud",
-			clientdescription: "Best",
-			clientversion: "1.0",
+			clientdescription: userAgent(),
+			clientversion: "0.1",
 			uuid: _uuid
 		}, function(res) {
 			token = res.token;
-			console.log(token);
 			if (token !== undefined) {
 				localStorage.token = token;
 				localStorage.username = username;
@@ -2223,46 +2222,51 @@ var DragDrop = (function() {
 			}
 		}
 
-		e.sort(function(a, b) {
-			var d1 = new Date(a.feed.pubDate);
-			var d2 = new Date(b.feed.pubDate);
-			if (d1 > d2) {
-				return -1;
-			}
-			if (d1 < d2) {
-				return 1;
-			}
-			return 0;
-		});
+		if (e.length > 0) {
+			e.sort(function(a, b) {
+				var d1 = new Date(a.feed.pubDate);
+				var d2 = new Date(b.feed.pubDate);
+				if (d1 > d2) {
+					return -1;
+				}
+				if (d1 < d2) {
+					return 1;
+				}
+				return 0;
+			});
 
-		var template = _.template($("script.episodes").html());
-		$("#episodes").empty().append(template({ episodes: e }));
+			var template = _.template($("script.episodes").html());
+			$("#episodes").empty().append(template({ episodes: e }));
 
-		if (episodeScroll) {
-			setTimeout(function() { episodeScroll.refresh(); }, 0);
+			if (episodeScroll) {
+				setTimeout(function() { episodeScroll.refresh(); }, 0);
+			}
+			else {
+				episodeScroll = new IScroll('#foo2', {
+					mouseWheel: true,
+					scrollbars: 'custom',
+					keyBindings: true,
+					interactiveScrollbars: true,
+					click: true
+				});
+			}
+			
+			updateEpisodeIndicators();
+
+			if (sessionStorage.lastepisode) {
+				var lastepisode = JSON.parse(sessionStorage.lastepisode);
+				if (lastepisode.id in episodes) {
+					playEpisode(lastepisode.id);
+				}
+				$("#ep-" + lastepisode.id).addClass("selected");
+			}
+			else if (sessionStorage.selectedepisode) {
+				loadEpisodeInfo(sessionStorage.selectedepisode);
+				$("#ep-" + sessionStorage.selectedepisode).addClass("selected");
+			}
 		}
 		else {
-			episodeScroll = new IScroll('#foo2', {
-				mouseWheel: true,
-				scrollbars: 'custom',
-				keyBindings: true,
-				interactiveScrollbars: true,
-				click: true
-			});
-		}
-		
-		updateEpisodeIndicators();
-
-		if (sessionStorage.lastepisode) {
-			var lastepisode = JSON.parse(sessionStorage.lastepisode);
-			if (lastepisode.id in episodes) {
-				playEpisode(lastepisode.id);
-			}
-			$("#ep-" + lastepisode.id).addClass("selected");
-		}
-		else if (sessionStorage.selectedepisode) {
-			loadEpisodeInfo(sessionStorage.selectedepisode);
-			$("#ep-" + sessionStorage.selectedepisode).addClass("selected");
+			$("#episodes").empty().append('<div class="episodes-empty"><h2>There are no episodes left</h2><button id="show-all-episodes" class="button">Show me everything!</button></div>');
 		}
 	}
 
