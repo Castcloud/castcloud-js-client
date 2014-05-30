@@ -1425,6 +1425,24 @@ var DragDrop = (function() {
 				$(this).toggleClass("selected");
 				$(this).children(".bar").toggle();
 			}
+			else if (shiftDown) {
+				var start = $("#ep-" + selectedEpisodeId).index();
+				var end = $(this).index();
+				var episodes = $(".episode");
+
+				if (start > end) {
+					end--;
+				}
+				else {
+					end++;
+				}
+
+				episodes.removeClass("selected");
+
+				_.range(start, end, start > end ? -1 : 1).forEach(function(i) {
+					$(episodes.get(i)).addClass("selected");
+				});
+			}
 			else {
 				var id = $(this).prop("id").split("-")[1];
 				selectedEpisodeId = id;
@@ -1755,7 +1773,7 @@ var DragDrop = (function() {
 		$("#ep-" + id).remove();
 		pushEvent(Event.Delete, id);
 
-		var count = $("#cast-" + episodes[contextItemID].castid + " .n");
+		var count = $("#cast-" + episodes[id].castid + " .n");
 		count.html(count.html() - 1);
 
 		delete episodes[contextItemID];
