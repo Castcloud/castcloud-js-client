@@ -413,7 +413,7 @@ var DragDrop = (function() {
 
 	var buffer = {
 		events: [],
-		settings: {},
+		settings: [],
 		idb: {}
 	};
 
@@ -2387,7 +2387,8 @@ var DragDrop = (function() {
 							settings[category] = {};
 						}
 						settings[category][name] = {
-							value: setting.value
+							value: setting.value,
+							clientspecific: setting.clientspecific
 						};
 					});
 
@@ -2463,7 +2464,11 @@ var DragDrop = (function() {
 		category = category || 'General'
 		settings[category][key].value = value;
 		settingsHash = md5(JSON.stringify(settings));
-		buffer.settings[category + "/" + key] = value;
+		buffer.settings.push({
+			setting: category + "/" + key,
+			value: value,
+			clientspecific: settings[category][key].clientspecific
+		});
 		db.put("buffer_settings", buffer.settings);
 		flushSettings();
 		db.put("settings", settings);
@@ -2475,7 +2480,7 @@ var DragDrop = (function() {
 
 	function flushSettings() {
 		$.post(apiRoot + "account/settings", buffer.settings, function() {
-			buffer.settings = {};
+			buffer.settings = [];
 			db.remove("buffer_settings");
 		});
 	}
@@ -2484,7 +2489,11 @@ var DragDrop = (function() {
 		settings = DefaultSettings;
 		for (var c in settings) {
 			for (var s in settings[c]) {
-				buffer.settings[c + "/" + s] = settings[c][s];
+				buffer.settings.push({
+					setting: c + "/" + s,
+					value: settings[c][s].value,
+					clientspecific: settings[c][s].clientspecific
+				});
 			}
 		}
 		db.put("buffer_settings", buffer.settings);
