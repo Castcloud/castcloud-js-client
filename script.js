@@ -389,6 +389,12 @@ var DragDrop = (function() {
 				type: Setting.Keybind,
 				value: 'left'
 			}
+		},
+		Advanced: {
+			SyncInterval: {
+				type: Setting.Text,
+				value: 10
+			}
 		}
 	};
 
@@ -503,6 +509,7 @@ var DragDrop = (function() {
 				}
 				else {
 					$("#tab-settings").show();
+					updateStorageUsed();
 					$("#vid-container").addClass("thumb");
 				}
 			},
@@ -1555,6 +1562,14 @@ var DragDrop = (function() {
 			reader.readAsText(file);
 		});
 
+		$("#settings-panel").on("click", "#clear-local-data", function() {
+			db.clear(function() {
+				setTimeout(updateStorageUsed, 1000);
+			});
+			localStorage.clear();
+			sessionStorage.clear();
+		});
+
 		$("#settings-panel").on("click", "#reset-settings", resetSettings);
 
 		var settingTimerId;
@@ -1567,7 +1582,7 @@ var DragDrop = (function() {
 			}, 500);
 		});
 
-		$("#tab-settings").on("change", ".setting", function() {
+		$("#tab-settings").on("change", "checkbox.setting", function() {
 			var id = $(this).prop("id").split("_");
 			var val = $(this).prop("checked");
 			saveSetting(id[1], val, id[0]);
@@ -1956,6 +1971,8 @@ var DragDrop = (function() {
 					console.log("Settings loaded from IDB");
 					settings = $.extend(true, {}, DefaultSettings, data);
 
+					console.log(settings);
+
 					setKeybinds();
 					renderSettings();
 				}
@@ -2000,7 +2017,7 @@ var DragDrop = (function() {
 		}
 
 		if (!onDemand) {
-			setTimeout(sync, 10000);
+			setTimeout(sync, settings.Advanced.SyncInterval.value * 1000);
 		}		
 	}
 
@@ -2431,7 +2448,9 @@ var DragDrop = (function() {
 				if (c === "General") {
 					panel.append('<h3>OPML</h3><p><button class="button" id="import-opml">Import</button><input type="file" id="hax" style="display:none">' +
 						'<button class="button" id="opml">Export</button></p>' +
+						'<h3>Local data<span class="used"></span></h3><button class="button" id="clear-local-data">Clear</button>' +
 						'<h3>Default settings</h3><button class="button" id="reset-settings">Reset</button>');
+					updateStorageUsed();
 				}
 
 				for (var s in settings[c]) {
@@ -2464,6 +2483,7 @@ var DragDrop = (function() {
 	}
 
 	function saveSetting(key, value, category) {
+		console.log(key + ":" + value);
 		category = category || 'General';
 		settings[category][key].value = value;
 		settingsHash = md5(JSON.stringify(settings));
@@ -2505,6 +2525,16 @@ var DragDrop = (function() {
 
 		renderSettings(true);
 		setKeybinds();
+	}
+
+	function updateStorageUsed() {
+		if (navigator.webkitTemporaryStorage) {
+			navigator.webkitTemporaryStorage.queryUsageAndQuota(
+				function(used) {
+					$(".used").html((used / 1024 / 1024).toFixed(2) + " MB");
+				}
+			);
+		}
 	}
 
 	function setKeybinds() {

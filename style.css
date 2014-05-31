@@ -1021,10 +1021,27 @@ button.vmenu-toggle:hover {
 	display: none;
 }
 
+#settings-panel input {
+	color: #FFF;
+	width: 50px;
+	background: #333;
+}
+
+#settings-panel input[type="checkbox"] {
+	margin: 13px 0;
+	width: auto;
+}
+
 #settings-panel .keybind {
 	background: none;
 	color: #0099cc;
 	cursor: pointer;
+	width: 100px;
+}
+
+#settings-panel .used {
+	color: #666;
+	margin-left: 10px;
 }
 
 #clip {
