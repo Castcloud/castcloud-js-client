@@ -737,10 +737,6 @@ button.vmenu-toggle:hover {
 	color: #0099cc;
 }
 
-#playbar .button:active {
-	background: #0099cc;
-}
-
 #playbar-gear {
 	float: right;
 	line-height: 60px;

@@ -198,6 +198,20 @@ var Chromecast = (function() {
 			}
 		},
 
+		mute: function(muted) {
+			if (currentMedia) {
+				var req = new chrome.cast.media.VolumeRequest(new chrome.cast.Volume(null, muted));
+				currentMedia.setVolume(req, null, null);
+			}
+		},
+
+		volume: function(vol) {
+			if (currentMedia) {
+				var req = new chrome.cast.media.VolumeRequest(new chrome.cast.Volume(vol, null));
+				currentMedia.setVolume(req, null, null);
+			}
+		},
+
 		timeUpdate: function(callback) {
 			timeUpdateCallbacks.push(callback);
 		},
@@ -346,7 +360,8 @@ var DragDrop = (function() {
 		episodeFeedScroll,
 		poppedOut,
 		mediaType,
-		idbReady = false;
+		idbReady = false,
+		currentTime;
 
 	var Setting = {
 		Text: 0,
@@ -669,7 +684,6 @@ var DragDrop = (function() {
 			updateTime(video.currentTime);
 		});
 
-		var currentTime;
 		Chromecast.timeUpdate(function(time) {
 			updateTime(time);
 			currentTime = time;
@@ -2746,7 +2760,6 @@ var DragDrop = (function() {
 	}
 
 	function seek(time) {
-		console.log(time);
 		if (poppedOut) {
 			popoutMessage({
 				action: "seek",
@@ -2754,9 +2767,12 @@ var DragDrop = (function() {
 			});
 		}
 		else {
-			var video = el("vid");
-			video.currentTime = time;
-			Chromecast.seek(time);
+			if (Chromecast.running()) {
+				Chromecast.seek(time);
+			}
+			else {
+				el("vid").currentTime = time;
+			}			
 		}
 		var progress = 1 / currentEpisodeDuration * time;
 		$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
@@ -2770,6 +2786,10 @@ var DragDrop = (function() {
 			});
 		}
 		else {
+			if (Chromecast.running()) {
+				currentTime -= 15;
+				Chromecast.seek(currentTime);
+			}
 			var video = el("vid");
 			pushEvent(Event.Pause);
 			video.currentTime = video.currentTime - 15;
@@ -2787,6 +2807,10 @@ var DragDrop = (function() {
 			});
 		}
 		else {
+			if (Chromecast.running()) {
+				currentTime += 15;
+				Chromecast.seek(currentTime);
+			}
 			var video = el("vid");
 			pushEvent(Event.Pause);
 			video.currentTime = video.currentTime + 15;
@@ -2806,6 +2830,7 @@ var DragDrop = (function() {
 		else {
 			var video = el("vid");
 			video.muted = !video.muted;
+			Chromecast.mute(video.muted);
 			if (video.muted) {
 				$("#volume i").removeClass("fa-volume-up");
 				$("#volume i").addClass("fa-volume-off");
@@ -2830,6 +2855,7 @@ var DragDrop = (function() {
 
 		}
 		else {
+			Chromecast.volume(vol);
 			var video = el("vid");
 			video.volume = vol;
 			$("#volume .bar .inner").css("width", (60 * video.volume) + "px");
