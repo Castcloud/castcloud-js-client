@@ -410,6 +410,12 @@ var DragDrop = (function() {
 				type: Setting.Text,
 				value: 10
 			}
+		},
+		__client: {
+			ThumbWidth: {
+				value: 200,
+				clientspecific: true
+			}
 		}
 	};
 
@@ -993,9 +999,11 @@ var DragDrop = (function() {
 		});
 
 		$(document).mousemove(function(e) {
-			//$(".thumb").css("left", e.pageX+"px");
 			if (x) {
-				$(".thumb").css("width", (window.innerWidth - e.pageX - 15 + o)+"px");
+				var thumb = $(".thumb");
+				var width = window.innerWidth - e.pageX - o - (window.innerWidth - (thumb.offset().left + thumb.width()));
+				thumb.css("width", width + "px");
+				saveSetting("ThumbWidth", width, "__client");
 			}
 			if (seeking) {
 				seek(1 / $("#seekbar").width() * (e.pageX - $("#seekbar").position().left) * currentEpisodeDuration);
@@ -1675,11 +1683,10 @@ var DragDrop = (function() {
 		var x = false;
 		var o = 0;
 
-		/*$("#vid-thumb-bar").mousedown(function(e) {
+		$("#vid-thumb-bar .drag").mousedown(function(e) {
 			x = true;
-			o = window.innerWidth - e.pageX;
-			$(".thumb").css("width", (window.innerWidth - e.pageX - 15 + o)+"px");
-		});*/
+			o = e.pageX - $(".thumb").offset().left;
+		});
 
 		$("#settings-menu").on("click", "p", function() {
 			var id = $(this).id();
@@ -1999,7 +2006,7 @@ var DragDrop = (function() {
 					console.log("Settings loaded from IDB");
 					settings = $.extend(true, {}, DefaultSettings, data);
 
-					console.log(settings);
+					$(".thumb").width(settings.__client.ThumbWidth.value);
 
 					setKeybinds();
 					renderSettings();
@@ -2529,7 +2536,6 @@ var DragDrop = (function() {
 	}
 
 	function saveSetting(key, value, category) {
-		console.log(key + ":" + value);
 		category = category || 'General';
 		settings[category][key].value = value;
 		settingsHash = md5(JSON.stringify(settings));

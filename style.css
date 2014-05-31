@@ -507,6 +507,13 @@ button.vmenu-toggle:hover {
 	width: 200px;
 	min-width: 160px;
 	max-width: 50%;
+	max-height: 70%;
+}
+
+#vid-container video {
+	width: auto;
+	height: auto;
+	max-height: 80%;
 }
 
 #vid-container.thumb.minimized {
@@ -530,7 +537,6 @@ button.vmenu-toggle:hover {
 	display: block;
 	height: 30px;
 	background: #111;
-	cursor: nwse-resize;
 }
 
 #vid-thumb-bar a {
@@ -565,6 +571,16 @@ button.vmenu-toggle:hover {
 
 #vid-thumb-bar .button:active {
 	background: #0099cc;
+}
+
+#vid-thumb-bar .drag {
+	position: absolute;
+	top: -2px;
+	left: -2px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;	
+	cursor: nwse-resize;
 }
 
 #overlay-info {
