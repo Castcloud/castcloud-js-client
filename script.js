@@ -1511,8 +1511,11 @@ var DragDrop = (function() {
 
 		$("#episodes").on("click", ".reset", function(e) {
 			e.stopPropagation();
-			resetPlayback($(this).parent().prop("id").split("-")[1]);
+			var id = $(this).parent().prop("id").split("-")[1];
+			resetPlayback(id);
 			$(this).hide();
+			var count = $("#cast-" + episodes[id].castid + " .n");
+			count.html(parseInt(count.html()) + 1);
 		});
 
 		$("#episodes").on("mouseover", ".episode", function() {
@@ -1862,14 +1865,16 @@ var DragDrop = (function() {
 	}
 
 	function deleteEpisode(id) {
-		$("#ep-" + id).remove();
-		pushEvent(Event.Delete, id);
+		if (id in episodes) {
+			$("#ep-" + id).remove();
+			pushEvent(Event.Delete, id);
 
-		var count = $("#cast-" + episodes[id].castid + " .n");
-		count.html(count.html() - 1);
+			var count = $("#cast-" + episodes[id].castid + " .n");
+			count.html(count.html() - 1);
 
-		delete episodes[contextItemID];
-		db.put("episodes", episodes);
+			delete episodes[contextItemID];
+			db.put("episodes", episodes);
+		}
 	}
 
 	function login() {
@@ -2416,6 +2421,9 @@ var DragDrop = (function() {
 			}
 			pushEvent(Event.Pause, id, 0);
 			updateEpisodeIndicators();
+
+			var count = $("#cast-" + episodes[id].castid + " .n");
+			count.html(parseInt(count.html()) + 1);
 		}
 	}
 
