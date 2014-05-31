@@ -1192,7 +1192,7 @@ var DragDrop = (function() {
 		});
 
 		$("#podcasts").on("mouseover", ".cast", function() {
-			castHovered = $(this).prop("id").split("-")[1];
+			castHovered = $(this).id();
 		});
 
 		$("#podcasts").on("mouseout", ".cast", function() {
@@ -1200,7 +1200,7 @@ var DragDrop = (function() {
 		});
 
 		$("#episodes").on("mouseover", ".episode", function() {
-			episodeHovered = $(this).prop("id").split("-")[1];
+			episodeHovered = $(this).id();
 		});
 
 		$("#episodes").on("mouseout", ".episode", function() {
@@ -1270,7 +1270,7 @@ var DragDrop = (function() {
 
 		$("#cast-context-unsub").click(function() {
 			$(".cast.selected").each(function() {
-				var id = $(this).prop("id").split("-")[1];
+				var id = $(this).id();
 				$("#cast-" + id).remove();
 				$.ajax(apiRoot + "library/casts/" + id, { type: "DELETE" });
 			});
@@ -1328,7 +1328,7 @@ var DragDrop = (function() {
 				deleteEpisode(contextItemID);
 			}
 			$(".episode.selected").each(function() {
-				deleteEpisode($(this).prop("id").split("-")[1]);
+				deleteEpisode($(this).id());
 			});
 		});
 
@@ -1460,7 +1460,7 @@ var DragDrop = (function() {
 				}
 			}
 			else {
-				var id = $(this).prop("id").split("-")[1];
+				var id = $(this).id();
 				selectCast(id);
 			}
 		});
@@ -1493,25 +1493,25 @@ var DragDrop = (function() {
 				});
 			}
 			else {
-				selectEpisode($(this).prop("id").split("-")[1]);
+				selectEpisode($(this).id());
 			}
 		});
 
 		$("#episodes").on("dblclick", ".episode", function() {
-			var id = $(this).prop("id").split("-")[1];
+			var id = $(this).id();
 			autoplay = true;
 			playEpisode(id);
 		});
 
 		$("#episodes").on("click", ".delete", function(e) {
 			e.stopPropagation();
-			var id = $(this).parent().prop("id").split("-")[1];
+			var id = $(this).parent().id();
 			deleteEpisode(id);
 		});
 
 		$("#episodes").on("click", ".reset", function(e) {
 			e.stopPropagation();
-			var id = $(this).parent().prop("id").split("-")[1];
+			var id = $(this).parent().id();
 			resetPlayback(id);
 			$(this).hide();
 			var count = $("#cast-" + episodes[id].castid + " .n");
@@ -1521,7 +1521,7 @@ var DragDrop = (function() {
 		$("#episodes").on("mouseover", ".episode", function() {
 			$(this).children(".progress").css("color", "#FFF");
 			if ($(this).find(".fa-circle").length > 0) {
-				var id = $(this).prop("id").split("-")[1];
+				var id = $(this).id();
 				var episode = id in episodes ? episodes[id] : tempEpisodes[id];
 				$(this).children(".delete, .reset").show();
 				if (episode.lastevent.type == Event.Delete) {
@@ -1682,7 +1682,7 @@ var DragDrop = (function() {
 		});*/
 
 		$("#settings-menu").on("click", "p", function() {
-			var id = $(this).prop("id").split("-")[1];
+			var id = $(this).id();
 			$(".setting-panel").hide();
 			$(".setting-button").removeClass("selected");
 			$("#setting-"+ id).addClass("selected");
@@ -2228,7 +2228,7 @@ var DragDrop = (function() {
 
 			if (addingFeed) {
 				addingFeed = false;
-				selectCast($("#podcasts > .cast:last-child").prop("id").split("-")[1]);
+				selectCast($("#podcasts > .cast:last-child").id());
 				setTimeout(function() {
 					castScroll.scrollTo(0, castScroll.maxScrollY, 0); 
 				}, 0);
@@ -2660,7 +2660,7 @@ var DragDrop = (function() {
 				content.push($(el).prop("id").replace("-", "/"));
 			});
 
-			$.ajax(apiRoot + "library/labels/" + $(el).prop("id").split("-")[1], {
+			$.ajax(apiRoot + "library/labels/" + $(el).id(), {
 				type: "PUT",
 				data: {
 					content: content.join(),
@@ -2960,7 +2960,7 @@ var DragDrop = (function() {
 	function updateEpisodeIndicators() {
 		$(".episode i").remove();
 		$(".episode").each(function(index, el) {
-			var id = $(el).prop("id").split("-")[1];
+			var id = $(el).id();
 			var episode = id in episodes ? episodes[id] : tempEpisodes[id];
 			if (id === currentEpisodeId && !ended) {
 				if (videoLoading) {
@@ -2993,7 +2993,7 @@ var DragDrop = (function() {
 	}
 
 	function showContextMenu(id, target, e) {
-		contextItemID = $(target).prop("id").split("-")[1];
+		contextItemID = $(target).id();
 
 		$(id).css("left", e.pageX + "px");
 		$(id).css("top", e.pageY + "px");
@@ -3047,5 +3047,9 @@ var DragDrop = (function() {
 	        overflowing = true;
 	    }
 	    return overflowing;
+	}
+
+	$.fn.id = function() {
+		return this.prop("id").split("-")[1];
 	}
 }());
