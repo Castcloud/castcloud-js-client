@@ -1132,6 +1132,7 @@ button.vmenu-toggle:hover {
 }
 
 #cast-overlay .name {
+	padding: 0;
 	color: #0099cc;
 }
 

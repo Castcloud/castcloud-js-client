@@ -888,6 +888,7 @@ var DragDrop = (function() {
 				$("#vid-container").show();
 				$("#vid-container").addClass("audio");
 			}
+			padCastOverlay();
 
 			currentEpisodeDuration = video.duration;
 
