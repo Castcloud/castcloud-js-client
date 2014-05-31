@@ -451,7 +451,7 @@ button.vmenu-toggle:hover {
 	color: #666;
 }
 
-.episode .delete {
+.episode .delete, .episode .reset {
 	position: absolute;
 	right: 0;
 	top: 0;
@@ -575,6 +575,7 @@ button.vmenu-toggle:hover {
 	margin: 20px;
 	padding: 10px 15px;
 	background: rgba(0,0,0,0.75);
+	z-index: 1000;
 }
 
 #vid-container:not(.fs) #overlay-info {
@@ -715,6 +716,7 @@ button.vmenu-toggle:hover {
 	right: 0;
 	position: fixed;
 	color: #666;
+	z-index: 1000;
 }
 
 #playbar .button {
@@ -1110,7 +1112,7 @@ button.vmenu-toggle:hover {
 	width: 100%;
 	background: rgba(0,0,0,0.8);
 	text-align: center;
-	z-index: 1000;
+	z-index: 999;
 	line-height: 300px;
 	text-shadow: 0px 0px 5px rgba(0,0,0,1);
 }
