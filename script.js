@@ -454,7 +454,6 @@ var DragDrop = (function() {
 	Chromecast.receiver(function(n) {
 		if (n > 0) {
 			$(".cc").show();
-			//$("#seekbar").css("right", ($("#playbar").width() - $("#time").position().left) + "px");
 		}
 		else {
 			$(".cc").hide();
@@ -1299,6 +1298,20 @@ var DragDrop = (function() {
 			});
 		});
 
+		var prevScrollY;
+
+		$("#cast-context-label").click(function() {
+			$("#add-to-label").show();
+			prevScrollY = castScroll.y;
+			castScroll.scrollTo(0, 0);
+		});
+
+		$("#add-to-label").on("click", "p", function() {
+			$("#add-to-label").hide();
+			var id = $(this).id();
+			castScroll.scrollTo(0, prevScrollY);
+		});
+
 		$("#label-context-rename").click(function() {
 			var name = $("#label-" + contextItemID + " .name span").html();
 			$("#label-" + contextItemID + " .name span").html('<input type="text">');
@@ -1745,6 +1758,8 @@ var DragDrop = (function() {
 		$("#input-vmenu-label").toggle();
 		$("#button-vmenu-label").toggle();
 
+		//$("#add-to-label").append('<p>' + name + '</p>');
+
 		$.post(apiRoot + "library/labels", { name: name }, function() {
 			loadLabels();
 		});
@@ -1941,6 +1956,9 @@ var DragDrop = (function() {
 
 		var render = _.after(4, function() {
 			renderCasts();
+
+			var template = _.template($("script.labels").html());
+			$("#add-to-label").empty().append(template({ labels: labels }));
 			//renderEpisodeFeed();
 		});
 		var updateLastEvent =_.after(2, function() {
@@ -2611,7 +2629,7 @@ var DragDrop = (function() {
 		$.ajax(url, {
 			type: "GET",
 			headers: {
-				"If-None-Match": localStorage.etag_labels
+				//"If-None-Match": localStorage.etag_labels
 			},
 			success: function(res, status, xhr) {
 				if (xhr.status === 200) {
@@ -2640,6 +2658,41 @@ var DragDrop = (function() {
 							expanded: label.expanded
 						};
 					});
+
+					var template = _.template($("script.labels").html());
+					$("#add-to-label").empty().append(template({ labels: labels }));
+
+					/*labels = [];
+					res.forEach(function(label) {
+						if (label.name === "root") {
+							rootLabelId = label.id;
+							label.content.split(",").forEach(function(item) {
+								var split = item.split("/");
+								labels.push({
+									type: split[0],
+									id: parseInt(split[1])
+								});
+							});
+						}
+					});
+					res.forEach(function(label) {
+						if (label.name !== "root") {
+							labels.forEach(function(item) {
+								if (item.id == label.id && item.type == "label") {
+									item.name = label.name;
+									item.content = [];
+									item.expanded = label.expanded;
+									if (label.content) {
+										label.content.split(",").forEach(function(cast) {
+											item.content.push(cast.split("/")[1]);
+										});
+									}
+								}
+							});
+						}
+					});
+					console.log(labels);*/
+
 					if (idbReady) {
 						db.put("labels", labels);
 					}

@@ -14,6 +14,7 @@
 		<div id="cast-context-show-all">Show all episodes</div>
 		<div id="cast-context-rename">Rename</div>
 		<div id="cast-context-unsub">Unsubscribe</div>
+		<div id="cast-context-label">Add to label</div>
 	</div>
 	<div id="label-context-menu" class="context-menu">
 		<div id="label-context-rename">Rename</div>
@@ -67,12 +68,13 @@
 				<div id="vmenu-sync"><i class="fa fa-refresh"></i></div>
 			</div>
 			<div id="podcast-cols">
-				<div class="col" id="foo"><div>
+				<div class="col" id="foo"><div>					
 					<input class="vmenu-toggle" type="text" id="input-vmenu-add" placeholder="Feed URL / Search">
 					<button class="vmenu-toggle" id="button-vmenu-add">Add</button>
 					<div class="vmenu-toggle" id="vmenu-add-results"></div>
 					<input class="vmenu-toggle" type="text" id="input-vmenu-label" placeholder="Label">
 					<button class="vmenu-toggle" id="button-vmenu-label">Add</button>
+					<div id="add-to-label"></div>
 					<div id="podcasts"></div></div>
 				</div>
 				<div class="col" id="foo2"><div id="episodes"></div></div>
@@ -157,6 +159,15 @@
 						} %>
 					</div>
 				</div>
+	<%		}
+		}); %>
+	</script>
+
+	<script type="text/template" class="labels">
+	<h2>Labels</h2>
+	<% 	labels.root.forEach(function(label) {
+			if (label.type === "label") { %>
+				<p id="addtolabel-<%= label.id %>"><%= labels[label.id].name %></p>
 	<%		}
 		}); %>
 	</script>

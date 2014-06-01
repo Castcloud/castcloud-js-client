@@ -214,13 +214,13 @@ input.vmenu-toggle {
 	font: 16px "Lato";
 	height: 50px;
 	width: 100%;
-	padding: 0px 10px;
+	padding: 0px 15px;
 	border: none;
 	outline: none;
 	z-index: 1;
 	-webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-    box-sizing: border-box;  
+    box-sizing: border-box;
 }
 
 button.vmenu-toggle {
@@ -296,6 +296,7 @@ button.vmenu-toggle:hover {
 }
 
 .col {
+	position: relative;
 	width: 33.333333%;
 	height: 100%;
 	background: #222;
@@ -378,8 +379,8 @@ button.vmenu-toggle:hover {
     box-sizing: border-box;
 }
 
-.episode, .name {
-	padding: 10px 20px;
+.episode, .name, #add-to-label p {
+	padding: 10px 15px;
 }
 
 .cast .name {
@@ -392,7 +393,7 @@ button.vmenu-toggle:hover {
 	padding-right: 0;
 }
 
-.cast:hover, .episode:hover, .label > .name:hover {
+.cast:hover, .episode:hover, .label > .name:hover, #add-to-label p:hover {
 	background: #0066cc;
 }
 
@@ -432,6 +433,22 @@ button.vmenu-toggle:hover {
 	text-align: right;
 	color: #AAA;
 	width: 30px;
+}
+
+#add-to-label {
+	display: none;
+	position: absolute;
+	background: #222;
+	width: 100%;
+	height: 100%;
+}
+
+#add-to-label h2 {
+	padding: 10px 15px;
+}
+
+#add-to-label p {
+	cursor: pointer;
 }
 
 .episode {
@@ -1202,14 +1219,6 @@ button.vmenu-toggle:hover {
 	margin-right: 2px;
 	overflow: hidden;
 	right: 0;
-}
-
-#foo .iScrollVerticalScrollbar {
-	right: 66.666666%;
-}
-
-#foo2 .iScrollVerticalScrollbar {
-	right: 33.333333%
 }
 
 .iScrollVerticalScrollbar.iScrollBothScrollbars {
