@@ -2746,11 +2746,14 @@ var DragDrop = (function() {
 
 	function renderEvents(id) {
 		var e = [];
-		events.forEach(function(event) {
-			if (event.episodeid == id) {
-				e.push(event);
+		for (var i = 0; i < events.length; i++) {
+			if (events[i].episodeid == id) {
+				e.push(events[i]);
+				if (e.length === 10) {
+					break;
+				}
 			}
-		});
+		}
 		var template = _.template($("script.events").html());
 		$("#events").empty().append(template({ events: e }));
 	}

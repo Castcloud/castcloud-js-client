@@ -515,7 +515,7 @@ button.vmenu-toggle:hover {
 
 #vid-container.thumb.minimized {
 	height: 30px;
-	bottom: 55px;
+	width: 160px !important; 
 }
 
 .audio #vid {
