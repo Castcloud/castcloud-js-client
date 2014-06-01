@@ -478,9 +478,9 @@ button.vmenu-toggle:hover {
 
 #vid-container {
 	display: none;
-	position: fixed;
-	top: 60px;
-	bottom: 55px;
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
 	width: 100%;
 }
 
@@ -498,21 +498,15 @@ button.vmenu-toggle:hover {
 }
 
 #vid-container.thumb {
-	position: fixed;
+	position: absolute;
 	right: 15px;
-	bottom: 55px;
+	bottom: 0px;
 	top: auto;
 	background: #111;
 	padding: 0 5px;
 	width: 200px;
 	min-width: 160px;
 	max-width: 70%;
-	max-height: 70%; /* Should be 100% but the parrent seems to include the top and bottom bar */
-}
-
-#vid-container video {
-	width: auto;
-	height: auto;
 	max-height: 100%;
 }
 
