@@ -760,6 +760,14 @@ var DragDrop = (function() {
 					case "seek":
 						seek(message.time);
 						break;
+
+					case "muteToggle":
+						muteToggle();
+						break;
+
+					case "volume":
+						volume(message.volume);
+						break;
 				}
 			});
 		}
@@ -2865,20 +2873,18 @@ var DragDrop = (function() {
 				action: "muteToggle"
 			});
 		}
+		var video = el("vid");
+		video.muted = !video.muted;
+		Chromecast.mute(video.muted);
+		if (video.muted) {
+			$("#volume i").removeClass("fa-volume-up");
+			$("#volume i").addClass("fa-volume-off");
+			$("#volume .bar .inner").css("width", 0);
+		}
 		else {
-			var video = el("vid");
-			video.muted = !video.muted;
-			Chromecast.mute(video.muted);
-			if (video.muted) {
-				$("#volume i").removeClass("fa-volume-up");
-				$("#volume i").addClass("fa-volume-off");
-				$("#volume .bar .inner").css("width", 0);
-			}
-			else {
-				$("#volume i").removeClass("fa-volume-off");
-				$("#volume i").addClass("fa-volume-up");
-				$("#volume .bar .inner").css("width", (60 * video.volume) + "px");
-			}
+			$("#volume i").removeClass("fa-volume-off");
+			$("#volume i").addClass("fa-volume-up");
+			$("#volume .bar .inner").css("width", (60 * video.volume) + "px");
 		}
 	}
 
@@ -2890,23 +2896,24 @@ var DragDrop = (function() {
 			vol = 1;
 		}
 		if (poppedOut) {
+			popoutMessage({
+				action: "volume",
+				volume: vol
+			});
+		}
+		Chromecast.volume(vol);
+		var video = el("vid");
+		video.volume = vol;
+		$("#volume .bar .inner").css("width", (60 * video.volume) + "px");
 
+		if (vol === 0) {
+			$("#volume i").removeClass("fa-volume-up");
+			$("#volume i").addClass("fa-volume-off");
 		}
 		else {
-			Chromecast.volume(vol);
-			var video = el("vid");
-			video.volume = vol;
-			$("#volume .bar .inner").css("width", (60 * video.volume) + "px");
-
-			if (vol === 0) {
-				$("#volume i").removeClass("fa-volume-up");
-				$("#volume i").addClass("fa-volume-off");
-			}
-			else {
-				video.muted = false;
-				$("#volume i").removeClass("fa-volume-off");
-				$("#volume i").addClass("fa-volume-up");
-			}
+			video.muted = false;
+			$("#volume i").removeClass("fa-volume-off");
+			$("#volume i").addClass("fa-volume-up");
 		}
 	}
 
