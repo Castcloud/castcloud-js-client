@@ -1199,7 +1199,6 @@ button.vmenu-toggle:hover {
 
 .iScrollVerticalScrollbar {
 	position: absolute;
-	z-index: 99999;
 	width: 8px;
 	bottom: 2px;
 	top: 2px;
