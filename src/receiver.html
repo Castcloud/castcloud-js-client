@@ -1,4 +1,39 @@
-<!DOCTYPE html><html><head><link href="//fonts.googleapis.com/css?family=Lato:400,700" rel=stylesheet type=text/css><link href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css rel=stylesheet><style type=text/css>@import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700);
+<!-- 
+Copyright 2014 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!--
+This shows a very simple receiver to help you get code up and running. You can
+think of this as your first step. It is not compatible with our UX guidelines.
+It is useful for learning the basic concepts of the system.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+	<!--
+	While this receiver doesn't have any text, it's important to know that
+	Chromecast defaults to a black background with black text.  Changing that will
+	help your efforts.
+
+	We find that having everything fit in the HTML boxes tends to look nicer on TV
+	so, we also set overflow: hidden, which clips all flowing outside of boxes or
+	adding of scrollbars, which aren't useful on TV.
+	-->
+	<link href='//fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+	<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+	<style type="text/css">
+	@import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700);
 	body {
 		font-family: "Lato", serif;
 		color: #FFF;
@@ -139,7 +174,46 @@
 	 
 	* html .clearfix {
 	    height: 1%;
-	}</style><script type=text/javascript src=//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js></script><title>Castcloud</title></head><body><h1 class="page logo">Castcloud</h1><div class="page loading"><h1 class=title></h1><figure><img class=cover width=50%></figure><h1><i class="fa fa-spinner fa-spin"></i> Loading...</h1></div><div class=page id=pausebox><div id=art><h1 class=title></h1><figure><img class=cover></figure><p class=description></p></div><div id=playbar><div id=seekbar><div></div></div><h3 id=time>00:00/00:00</h3></div></div><div class="page splash"><div class=clearfix><div><img style="width: 200px; margin-right: 30px; margin-top: -2px; float: left" src="http://www.castcloud.org/logo.php?schema=dark"><h1 style=float:left>Castcloud</h1></div><div style=clear:both><h2 style="position: relative; top: -10px; left: 120px">Your podcasting library in the cloud</h2></div></div><div><img src=img/splash.png></div></div><video id=vid class=page><script src=//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js></script><script type=text/javascript>$(document).ready(function() {
+	}
+	</style>
+	<!--
+	Include the Receiver Library - Very important use our URL, don't attempt to
+	host this yourself.
+	-->
+	<script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+	<title>Castcloud</title>
+</head>
+<body>
+	<h1 class="page logo">Castcloud</h1>
+	<div class="page loading">
+		<h1 class="title"></h1>
+		<figure><img class="cover" width="50%"></figure>
+		<h1><i class="fa fa-spinner fa-spin"></i> Loading...</h1>
+	</div>	
+	<div class="page" id="pausebox">
+		<div id="art">
+			<h1 class="title"></h1>
+			<figure><img class="cover"></figure>
+			<p class="description"></p>
+		</div>
+		<div id="playbar">
+			<div id="seekbar"><div></div></div>
+			<h3 id="time">00:00/00:00</h3>
+		</div>
+	</div>
+	<div class="page splash">
+		<div class="clearfix">
+			<div><img style="width: 200px; margin-right: 30px; margin-top: -2px; float: left" src="http://www.castcloud.org/logo.php?schema=dark"><h1 style="float:left">Castcloud</h1></div>
+			<div style="clear:both">
+				<h2 style="position: relative; top: -10px; left: 120px">Your podcasting library in the cloud</h2>
+			</div>
+		</div>
+		<div><img src="img/splash.png"></div>
+	</div>
+	<video id='vid' class="page" />
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
 		$(".loading").css("margin-top", window.innerHeight / 2 - $(".loading").height() / 2);
 		$(".logo").css("margin-top", window.innerHeight / 2 - $(".logo").height() / 2);
 		// Turn on debugging so that you can see what is going on.  Please turn this off
@@ -266,4 +340,7 @@
 		// speed the recognition of disconnection of a sender.  As the TCP/IP standard
 		// mechanisms can be quite slow.
 		castReceiverManager.start({maxInactivity: 600});
-	});</script></video></body></html>
+	});
+	</script>
+</body>
+</html>

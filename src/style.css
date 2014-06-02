@@ -1,0 +1,1256 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+*:not(input) {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none; 
+}
+
+html, body {
+	height: 100%;
+}
+
+body {
+	background: #222;
+	color: #FFF;
+	font-family: "Lato";
+	overflow: hidden;
+}
+
+a {
+	text-decoration: none;
+}
+
+#topbar {
+	background: #111;
+	position: fixed;
+	z-index: 100;
+	left: 0;
+	top: 0;
+	right: 0;
+	height: 60px;
+}
+
+#topbar h1 {
+	padding: 10px 20px;
+	color: #FFF;
+}
+
+#topbar nav {
+	position: absolute;
+	top: 0;
+	line-height: 60px;
+	left: 200px;
+}
+
+#topbar nav ul li {
+	display: inline-block;
+}
+
+#topbar nav {
+	display: none;
+}
+
+#topbar nav a {
+	padding: 0px 10px;
+	height: 60px;
+	display: inline-block;
+	color: #FFF;
+	text-decoration: none;
+}
+
+#topbar nav a:hover {
+	color: #0099cc;
+}
+
+#main-container {
+	background: #222;
+	bottom: 0;
+	top: 60px;
+	left: 0;
+	right: 0;
+	position: absolute;
+	overflow: hidden;
+}
+
+.tab {
+	display: none;
+	height: 100%;
+}
+
+#login-container {
+	width: 200px;
+	margin: 0 auto;
+}
+
+#login-container p {
+	margin-bottom: 5px;
+}
+
+#login-container input, #tab-settings input, #input-target-container input {
+	width: 190px;
+	font: 16px "Lato";
+	padding: 10px 5px;
+	border: none;
+	outline: none;
+}
+
+#login-container button {
+	font: bold 18px "Lato";
+	color: #FFF;
+	background: #0066cc;
+	border: none;
+	outline: none;
+	padding: 8px 5px;
+	width: 200px;
+	cursor: pointer;
+}
+
+#userinfo {
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: none;
+}
+
+#userinfo div {
+	float: left;
+	line-height: 60px;
+}
+
+#userinfo span {
+	margin-right: 20px;
+}
+
+#userinfo .button {
+	float: right;
+}
+
+.button {
+	font: bold 18px "Lato";
+	color: #FFF;
+	background: #0066cc;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	width: 100px;
+	height: 40px;
+	margin: 10px;
+}
+
+.button:hover {
+	background: #0099cc;
+}
+
+.button:active {
+	background: #0066cc;
+}
+
+#login-container button:hover {
+	background: #0099cc;
+}
+
+#login-container button:active {
+	background: #0066cc;
+}
+
+#input-target-container {
+	margin-left: 12px;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	color: #AAA;
+}
+
+#input-target {
+	background: #111;
+	color: #AAA;
+	margin: 5px;
+}
+
+.vmenu-toggle {
+	display: none;
+}
+
+#podcast-vmenu {
+	position: fixed;
+	width: 50px;
+	height: 100%;
+	background: #222;
+}
+
+#podcast-vmenu div {
+	position: relative;
+	width: 50px;
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+	cursor: pointer;
+	font-size: 32px;
+}
+
+#podcast-vmenu div:hover {
+	background: #0066cc;
+}
+
+#podcast-vmenu div:active {
+	background: #0099cc;
+}
+
+#podcast-vmenu i {
+	position: absolute;
+	left: 16px;
+	top: 16px;
+	font-size: 20px;
+}
+
+input.vmenu-toggle {
+	display: none;
+	font: 16px "Lato";
+	height: 50px;
+	width: 100%;
+	padding: 0px 15px;
+	border: none;
+	outline: none;
+	z-index: 1;
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+button.vmenu-toggle {
+	display: none;
+	width: 100px;
+	float: right;
+	margin-top: -50px;
+	height: 50px;
+	background: #0066cc;
+	color: #FFF;
+	font: bold 18px "Lato";
+	border: none;
+	cursor: pointer;
+	position: relative;
+	z-index: 2;
+}
+
+button.vmenu-toggle:hover {
+	background: #0099cc;
+}
+
+#vmenu-add-results {
+	background: #FFF;
+	color: #AAA;
+	position: relative;
+	width: 100%;
+}
+
+#vmenu-add-results p {
+	padding: 10px 15px;
+	cursor: pointer;
+}
+
+#vmenu-add-results p:hover {
+	color: #0099cc;
+}
+
+#vmenu-add-results p.selected {
+	background: #0099cc;
+	color: #FFF;
+}
+
+#tags {
+	display: none;
+}
+
+#tags .button {
+	width: auto;
+	background: #333;
+	padding: 0px 10px;
+	margin: 5px;
+	margin-right: 0px;
+}
+
+#tags .button.selected {
+	background: #0099cc;
+}
+
+#tags .button:hover {
+	background: #0066cc;
+}
+
+#tags .button:active {
+	background: #0099cc;
+}
+
+#podcast-cols {
+	left: 50px;
+	right: 0;
+	height:100%;
+	position: absolute;
+	background: #000;
+}
+
+.col {
+	position: relative;
+	width: 33.333333%;
+	height: 100%;
+	background: #222;
+	float: left;
+}
+
+@media all and (max-height: 250px) {
+	#input-target-container {
+		position: relative;
+	}
+}
+
+@media all and (max-width: 600px) {
+	#menu-container {
+		display: none;
+	}
+
+	#topbar nav {
+		position: relative;
+		left: 0;
+		width: 100%;
+		background: #111;
+		z-index: 1000;
+	}
+
+	#topbar nav li, #topbar nav a {
+		width: 100%;
+		text-align: center;
+		margin: 0px;
+		padding: 0px;
+	}
+
+	#userinfo {
+		position: relative;
+		float: right;
+		z-index: 1111;
+		background: #111;
+		width: 100%;
+		text-align: center;
+	}
+
+	.col {
+		width: 100%;
+	}
+
+	#navicon {
+		position: absolute;
+		right: 0;
+		top: 0;
+		margin: 0px 20px;
+		line-height: 60px;
+		font-size: 40px;
+		cursor: pointer;
+	}
+
+	#navicon:hover {
+		color: #0066cc;
+	}
+
+	#navicon:active {
+		color: #0099cc;
+	}
+}
+
+@media all and (min-width: 600px) and (max-width: 720px) {
+	#userinfo div {
+		display: none;
+	}
+}
+
+.cast, .episode, .label .name {
+	padding-right: 20px;
+	cursor: pointer;
+
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.episode, .name, #add-to-label p {
+	padding: 10px 15px;
+}
+
+.cast .name {
+	display: table-cell;
+
+	overflow: hidden;
+    white-space: nowrap;
+	text-overflow: ellipsis;
+
+	padding-right: 0;
+}
+
+.cast:hover, .episode:hover, .label > .name:hover, #add-to-label p:hover {
+	background: #0066cc;
+}
+
+.cast.selected, .episode.selected {
+	color: #0099cc;
+}
+
+.cast.selected:hover, .episode.selected:hover {
+	color: #FFF;
+	background: #0099cc;
+}
+
+.episodes-empty {
+	text-align: center;
+	margin-top: 50px;
+}
+
+.episodes-empty button {
+	width: auto;
+	padding: 0 10px;
+}
+
+.cast input, .label input {
+	font: 16px Lato, sans-serif;
+	border: none;
+	outline: none;
+	background: rgba(0,0,0,0);
+	color: #FFF;
+}
+
+.label .content .cast {
+	padding-left: 20px;
+}
+
+.cast .n {
+	display: table-cell;
+	text-align: right;
+	color: #AAA;
+	width: 30px;
+}
+
+#add-to-label {
+	display: none;
+	position: absolute;
+	background: #222;
+	width: 100%;
+	height: 100%;
+}
+
+#add-to-label h2 {
+	padding: 10px 15px;
+}
+
+#add-to-label p {
+	cursor: pointer;
+}
+
+.episode {
+	position: relative;
+}
+
+.episode i {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 12px;
+	margin-right: 5px;
+}
+
+.episode .progress {
+	font-size: 14px;
+	color: #666;
+}
+
+.episode .delete, .episode .reset {
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 1;
+	background: #0099cc;
+	padding: 10px;
+	color: #FFF;
+	display: none;
+}
+
+.episode .delete:hover {
+	background: #F00;
+	color: #FFF;
+}
+
+.episode .delete:active {
+	background: #FFF;
+	color: #F00;
+}
+
+#vid {
+	width: 100% !important;
+}
+
+#vid-container {
+	display: none;
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	width: 100%;
+}
+
+#vid-container:not(.thumb) {
+	width: 100% !important;
+}
+
+.thumb video {
+	max-height: 90%;
+}
+
+#vid-container.fs {
+	position: fixed;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 100% !important;
+	background: #000;
+}
+
+#vid-container.thumb {
+	right: 15px;
+	bottom: 0px;
+	top: auto;
+	background: #111;
+	padding: 0 5px;
+	width: 200px;
+	min-width: 160px;
+	max-width: 70%;
+	max-height: 100%;
+}
+
+#vid-container.thumb.minimized {
+	height: 30px;
+	width: 160px !important; 
+}
+
+.audio #vid {
+	display: none;
+}
+
+.audio #vid-art {
+	display:auto;
+}
+
+#vid-thumb-bar {
+	display: none;
+}
+
+.thumb #vid-thumb-bar {
+	display: block;
+	height: 30px;
+	background: #111;
+}
+
+#vid-thumb-bar a {
+	color: #666;
+}
+
+#vid-thumb-bar a:hover {
+	color: #0099cc;
+}
+
+#vid-thumb-bar h4 {
+	float: left;
+	line-height: 30px;
+	color: #666;
+	font-weight: 400;
+}
+
+#vid-thumb-bar .button {
+	height: 30px;
+	margin: 0;
+	padding: 0;
+	width: 30px;
+	background: #111;
+	float: right;
+	color: #666;
+}
+
+#vid-thumb-bar .button:hover {
+	background: #0066cc;
+	color: #FFF;
+}
+
+#vid-thumb-bar .button:active {
+	background: #0099cc;
+}
+
+#vid-thumb-bar .drag {
+	position: absolute;
+	top: -2px;
+	left: -2px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;	
+	cursor: nwse-resize;
+}
+
+#overlay-info {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	margin: 20px;
+	padding: 10px 15px;
+	background: rgba(0,0,0,0.75);
+	z-index: 1000;
+}
+
+#vid-container:not(.fs) #overlay-info {
+	margin: 10px;
+	top: 60px;
+}
+
+#overlay-info h5 {
+	color: #AAA;
+}
+
+#overlay-loading {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0,0,0,0.75);
+}
+
+#episode-bar {
+	margin: 0;
+	padding: 0;
+	display: none;
+}
+
+#episode-bar .button {
+	background: none;
+	color: #AAA;
+	font-weight: 400;
+	width: auto;
+	margin: 0;
+	padding: 0 10px;
+}
+
+#episode-bar .button:hover {
+	color: #0099cc;
+}
+
+#episodeinfo p, #events p {
+	margin: 5px 0;
+	line-height: 1.5;
+}
+
+#episodeinfo-text {
+	margin: 10px;
+	padding-bottom: 10px;
+}
+
+#episode-title {
+	margin: 5px 0px;
+}
+
+#episode-date {
+	color: #666;
+}
+
+#episode-desc {
+	color: #AAA;
+}
+
+#episode-desc figure, #episode-desc img, #episode-desc iframe {
+	display: none;
+}
+
+#episode-desc a {
+	color: #FFF;
+}
+
+#episode-desc a:hover {
+	color: #0099cc;
+}
+
+#episode-desc a:active {
+	color: #0066cc;
+}
+
+#events {
+	position: absolute;
+	left: 100%;
+	top: 0;
+	bottom: 0;
+	width: 33.333333%;
+	background: #1A1A1A;
+	z-index: 1;
+	-webkit-transition: left .2s;
+}
+
+#events-close {
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+
+#events h1 {
+	margin: 10px 15px;
+}
+
+#events div {
+	color: #AAA;
+	padding: 5px 15px;
+	cursor: pointer;
+}
+
+#events div:hover {
+	background: #333;
+}
+
+#events div:active {
+	background: #444;
+}
+
+#events .what {
+	color: #0099cc;
+}
+
+#events .who {
+	font-size: 11px;
+}
+
+#events .when {
+	float: right;
+	font-size: 11px;
+}
+
+#events .secondline {
+	line-height: 1;
+	clear: both;
+}
+
+#playbar {
+	display: none;
+	background: #111;
+	height: 55px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	position: fixed;
+	color: #666;
+	z-index: 1000;
+}
+
+#playbar .button {
+	float: left;
+	background: none;
+	width: 40px;
+	height: 50px;
+	margin: 0;
+	margin-top: 5px;
+	padding: 0;
+	color: #666;
+}
+
+#playbar .button:first-child {
+	padding-left: 10px;
+	width: 50px;
+}
+
+#playbar .button:hover {
+	color: #0099cc;
+}
+
+#playbar-gear {
+	float: right;
+	line-height: 60px;
+	margin-right: 20px;
+	cursor: pointer;
+}
+
+#playbar-gear:hover {
+	color: #0099cc;
+}
+
+#playbar-fullscreen {
+	float:right;
+	line-height: 60px;
+	margin-right: 20px;
+	cursor: pointer;
+}
+
+#playbar-fullscreen:hover {
+	color: #0099cc;
+}
+
+#playbar-gear-menu {
+	display: none;
+	position: fixed;
+	bottom: 55px;
+	right: 0;
+	width: 180px;
+	height: 150px;
+	background: #111;
+	color: #666;
+}
+
+#playbar-gear-menu * {
+	margin-bottom: 5px;
+}
+
+#playbar-gear-menu p {
+	margin: 10px;
+}
+
+#playbar-gear-menu .button {
+	width: 60px !important;
+	margin-top: -10px;
+	border-radius: 0px;
+	background: none;
+	color: #FFF;
+}
+
+#playbar-gear-menu .button.selected {
+	color: #0099cc;
+}
+
+#playbar-gear-menu .button:hover {
+	color: #0099cc;
+}
+
+#playbar-gear-menu .button:active {
+	background: none;
+}
+
+#volume {
+	float: left;
+	height: 40px;
+	margin: 10px 15px;
+	font-size: 24px;
+	line-height: 40px;
+	color: #666;
+}
+
+#volume i {
+	width: 20px;
+}
+
+#volume i:hover {
+	color: #0099cc;
+}
+
+#volume i, #volume .bar {
+	cursor: pointer;
+}
+
+#volume .bar {
+	display: none;
+	float: right;
+	background: #FFF;
+	width: 60px;
+	height: 6px;
+	margin-top: 17px;
+	margin-left: 10px;
+	border-radius: 3px;
+}
+
+#volume .bar .inner {
+	background: #0099cc;
+	width: 60px;
+	height: 6px;
+	border-radius: 3px;
+}
+
+#playbar-info {
+	display: none;
+	float: left;
+	line-height: 75px;
+	margin: 0px 20px;
+}
+
+#time {
+	margin: 0 20px;
+	line-height: 60px;
+	float: right;
+	font-weight: 400;
+}
+
+#seekbar {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	height: 5px;
+	background: #333;
+	-webkit-transition: height 0.1s;
+}
+
+#seekbar:hover {
+	cursor: pointer;
+}
+
+#seekbar div {
+	background: #0099cc;
+	height: 100%;
+	width: 0px;
+}
+
+#badeball {
+	position: absolute;
+	background: #FFF;
+	top: 2.5px;
+	z-index: 1;
+	width: 0px;
+	height: 0px;
+	left: -20px;
+	border-radius: 50%;
+	cursor: pointer;
+	margin-left: 10px;
+	-webkit-transition: width 0.1s, height 0.1s, top 0.1s, margin 0.1s;
+}
+
+#badeball div {
+	width: 50%;
+	height: 50%;
+	margin: 25%;
+	background: #0099cc;
+	border-radius: 50%;
+}
+
+#seektime {
+	position: fixed;
+	display: none;
+	color: #FFF;
+	font-size: 12px;
+	bottom: 40px;
+}
+
+.context-menu {
+	display: none;
+	position: fixed;
+	width: 200px;
+	background: #111;
+	color: #FFF;
+	top: 10px;
+	left: 10px;
+	z-index: 999999;
+	padding: 5px 0px;
+	border: 1px solid #222;
+}
+
+.context-menu div {
+	padding: 5px 10px;
+	cursor: pointer;
+}
+
+.context-menu div:hover {
+	background: #0066cc;
+	color: #FFF;
+}
+
+#tab-episodes .list {
+	text-align: center;
+}
+
+#tab-episodes .list div {
+	position: relative;
+	min-height: 280px;
+	width: 300px;
+	display: inline-block;
+	vertical-align: top;
+	padding: 10px;
+	background: #111;
+	margin: 10px;
+	cursor: pointer;
+	text-align: center;
+}
+
+#tab-episodes .list div:hover {
+	background: #1a1a1a;
+}
+
+#tab-episodes img {
+	max-height: 160px;
+	max-width: 280px;
+}
+
+#tab-episodes h1 {
+	color: #0099cc;
+	font-size: 16px;
+	margin: 10px 0;
+	font-weight: 400;
+}
+
+#tab-episodes h2 {
+	color: #666;
+	font-size: 14px;
+	margin: 10px 0;
+	font-weight: 400;
+}
+
+#tab-settings .button {
+	margin: 0;
+	margin-right: 5px;
+}
+
+#tab-settings label {
+	display: inline-block;
+	width: 100px;
+}
+
+#settings-menu {
+	float: left;
+	background: #1A1A1A;
+	height: 100%;
+}
+
+#settings-menu p {
+	padding: 10px;
+	padding-right: 50px;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+#settings-menu p:hover {
+	background: #0066cc;
+	color: #FFF !important;
+}
+
+#settings-menu p.selected {
+	color: #0099cc;
+}
+
+#settings-panel {
+	float: left;
+	margin: 10px;
+}
+
+#settings-panel h2 {
+	margin-bottom: 10px;
+}
+
+#settings-panel h3 {
+	margin-top: 20px;
+	margin-bottom: 10px;
+	color: #EEE;
+	font-weight: 400;
+	font-size: 16px;
+}
+
+#settings-panel div {
+	display: none;
+}
+
+#settings-panel input {
+	color: #FFF;
+	width: 50px;
+	background: #333;
+}
+
+#settings-panel input[type="checkbox"] {
+	margin: 13px 0;
+	width: auto;
+}
+
+#settings-panel .keybind {
+	background: none;
+	color: #0099cc;
+	cursor: pointer;
+	width: 100px;
+}
+
+#settings-panel .used {
+	color: #666;
+	margin-left: 10px;
+}
+
+#clip {
+	position: fixed;
+	width: 1px;
+	height: 1px;
+	left: -10px;
+}
+
+#episodeinfo figure {
+	text-align: center;
+	background: #1A1A1A;
+	position: relative;
+}
+
+#pretty {
+	display: none;
+	color: rgba(0,0,0,0.3);
+}
+
+#pretty:hover {
+	color: rgba(0,153,204,1);
+	cursor: pointer;
+}
+
+#pretty img {
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+	min-height: 100px;
+	width: auto;
+	height: auto;
+}
+
+.pretty-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	text-align: center;
+	width: 100%;
+	height: 100%;
+}
+
+.pretty-button {
+	font-size: 96px;
+}
+
+.dragging {
+	position: fixed;
+}
+
+.dragging-placeholder {
+	height: 40px;
+}
+
+.cc {
+	display: none;
+	cursor: pointer;
+	float:right;
+	margin-top: 17px;
+	margin-right: 20px;
+}
+
+#cast-overlay {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	background: rgba(0,0,0,0.8);
+	text-align: center;
+	z-index: 999;
+	line-height: 300px;
+	text-shadow: 0px 0px 5px rgba(0,0,0,1);
+}
+
+.thumb #cast-overlay {
+	top: 30px;
+}
+
+.thumb #cast-overlay h1 {
+	font-size: 18px;
+}
+
+.thumb img {
+	display: none;
+}
+
+.audio.thumb {
+	display: none !important;
+}
+
+#cast-overlay .name {
+	padding: 0;
+	color: #0099cc;
+}
+
+.ball {
+	position: fixed;
+	top: 250px;
+	left: 15px;
+	z-index: 1000000;
+	height: 20px;
+}
+
+.c {
+	border-radius: 10px;
+	background: #111;
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 20px;
+	height: 20px;
+}
+
+.c2 {
+	border-top-left-radius: 10px;
+	border-bottom-left-radius: 10px;
+	background: #0099cc;
+	position: relative;
+	top: -18px;
+	left: 2px;
+	width: 8px;
+	height: 16px;
+}
+
+.iScrollHorizontalScrollbar {
+	position: relative;
+	z-index: 9999;
+	height: 16px;
+	left: 2px;
+	right: 2px;
+	bottom: 2px;
+	overflow: hidden;
+}
+
+.iScrollHorizontalScrollbar.iScrollBothScrollbars {
+	right: 0px;
+}
+
+.iScrollVerticalScrollbar {
+	position: absolute;
+	width: 8px;
+	bottom: 2px;
+	top: 2px;
+	margin-right: 2px;
+	overflow: hidden;
+	right: 0;
+}
+
+.iScrollVerticalScrollbar.iScrollBothScrollbars {
+	bottom: 0px;
+}
+
+.iScrollIndicator {
+	position: relative;
+	background: rgba(0,0,0,0.35);
+}
+
+.iScrollIndicator:hover {
+	background: rgba(0,0,0,0.5);
+}
+
+.iScrollIndicator:active {
+	background: #0099cc;
+}
+
+.iScrollHorizontalScrollbar .iScrollIndicator {
+	height: 100%;
+	background: -moz-linear-gradient(left,  #cc3f6e 0%, #93004e 100%);
+	background: -webkit-linear-gradient(left,  #cc3f6e 0%,#93004e 100%);
+	background: -o-linear-gradient(left,  #cc3f6e 0%,#93004e 100%);
+	background: -ms-linear-gradient(left,  #cc3f6e 0%,#93004e 100%);
+	background: linear-gradient(to right,  #cc3f6e 0%,#93004e 100%);
+}
+
+.iScrollVerticalScrollbar .iScrollIndicator {
+	width: 100%;
+}
+
+#episodeinfo {
+	position: relative;
+}
