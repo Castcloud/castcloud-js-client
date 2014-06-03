@@ -25,7 +25,7 @@ gulp.task('js', ['browserify'], function() {
 
 gulp.task('browserify', function() {
     return browserify('./src/script.js')
-        .bundle({ debug: true})
+        .bundle({ debug: true })
         .pipe(source('script.js'))
         .pipe(gulp.dest('./'));
 });

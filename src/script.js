@@ -981,7 +981,7 @@
 			setTimeout(function() {
 				castScroll.refresh();
 			}, 0);
-			$.ajax(apiRoot + "labels/" + contextItemID, {
+			$.ajax(apiRoot + "library/labels/" + contextItemID, {
 				type: "DELETE"
 			});
 		});
