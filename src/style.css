@@ -68,6 +68,10 @@ a {
 	color: #0099cc;
 }
 
+#navicon {
+	display: none;
+}
+
 #main-container {
 	background: #222;
 	bottom: 0;
@@ -309,7 +313,7 @@ button.vmenu-toggle:hover {
 	}
 }
 
-@media all and (max-width: 600px) {
+@media all and (max-width: 665px) {
 	#menu-container {
 		display: none;
 	}
@@ -343,6 +347,7 @@ button.vmenu-toggle:hover {
 	}
 
 	#navicon {
+		display: block;
 		position: absolute;
 		right: 0;
 		top: 0;
@@ -361,7 +366,7 @@ button.vmenu-toggle:hover {
 	}
 }
 
-@media all and (min-width: 600px) and (max-width: 720px) {
+@media all and (min-width: 665px) and (max-width: 810px) {
 	#userinfo div {
 		display: none;
 	}
@@ -379,11 +384,11 @@ button.vmenu-toggle:hover {
     box-sizing: border-box;
 }
 
-.episode, .name, #add-to-label p {
+.name, #add-to-label p {
 	padding: 10px 15px;
 }
 
-.cast .name {
+.cast .name, .episode .name {
 	display: table-cell;
 
 	overflow: hidden;
@@ -456,11 +461,9 @@ button.vmenu-toggle:hover {
 }
 
 .episode i {
-	position: absolute;
-	top: 0;
-	right: 0;
-	padding: 12px;
-	margin-right: 5px;
+	width: 8px;
+	padding-left: 8px;
+	display: table-cell;
 }
 
 .episode .progress {

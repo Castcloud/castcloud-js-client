@@ -45,7 +45,7 @@
 				<div>Logged in as <span style="color: #0099cc"></span></div><button class="button" id="button-logout">Log out</button>
 			</div>
 		</div>
-		<!--<i class="fa fa-bars" id="navicon"></i>-->
+		<i class="fa fa-bars" id="navicon"></i>
 	</div>
 	<div id="main-container">
 		<div class="tab" id="tab-login">
@@ -169,7 +169,7 @@
 
 	<script type="text/template" class="episodes">
 	<% episodes.forEach(function(episode) { %>
-		<div id="ep-<%= episode.id %>" class="episode"><%= episode.feed.title %><div class="delete">Delete</div></div>
+		<div id="ep-<%= episode.id %>" class="episode"><span class="name"><%= episode.feed.title %></span><div class="delete">Delete</div></div>
 	<% }); %>
 	</script>
 
@@ -183,6 +183,8 @@
 		</div>
 	<% }); %>
 	</script>
+
+	<!--<script src="http://jsconsole.com/remote.js?238EB830-2F48-486D-8FBF-E72F794E5FB5"></script>-->
 
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
