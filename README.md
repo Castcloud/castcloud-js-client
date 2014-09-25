@@ -1,9 +1,16 @@
-# JavaScript Web Client for Castcloud
+# Castcloud JavaScript Web Client
 ## Requirements
 
  * Castcloud server e.g. [php-server](https://github.com/Castcloud/php-server), [node-castcloud](https://github.com/Castcloud/node-castcloud)
- * Modern webbrowser e.g. resent verion of Chrome, Safari, Firefox, IE11 and maybe Opera
+ * Modern web browser e.g. recent verion of Chrome, Safari, Firefox, IE11 and maybe Opera
 
-## Limmitations
+## Build Instructions
 
- * Offline storage of mediafiles are currently not possible as per blowser limmitations
+```sh
+npm install
+gulp
+```
+
+## Limitations
+
+ * Offline storage of media files is currently not possible as per browser limitations
