@@ -977,11 +977,16 @@
 				play();
 			}
 			else {
+				var desc = "";
+	            if (_.isString(episodes[currentEpisodeId].feed.description)) {
+	                desc = episodes[currentEpisodeId].feed.description.replace(/(<([^>]+)>)/ig,"");
+	            }
+
 				$(".cc img").prop("src", "img/cast_on.png");
 				Chromecast.start();
 				Chromecast.load(episodes[currentEpisodeId].feed.enclosure.url, {
 					title: episodes[currentEpisodeId].feed.title,
-					description: episodes[currentEpisodeId].feed.description,
+					description: desc,
 					image: getEpisodeImage(currentEpisodeId)
 				});				
 			}
