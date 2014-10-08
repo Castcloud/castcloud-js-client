@@ -4,6 +4,7 @@
 	var Chromecast = require('./chromecast.js');
 	var DragDrop = require('./dragdrop.js');
 	require('./jquery-plugins.js');
+	require('./md5.js');
 
 	var token;
 	var username;
