@@ -420,11 +420,12 @@
 		});
 
 		$("#vid").on("loadstart", function() {
-			if ($("#ep-" + currentEpisodeId + " i").length > 0) {
+			/*if ($("#ep-" + currentEpisodeId + " i").length > 0) {
 				$("#ep-" + currentEpisodeId + " i").remove();
-			}
+			}*/
 			$("#vid-container").hide();
 			updateEpisodeIndicators();
+			updatePrettyOverlay();
 		});
 
 		$("#vid").on("canplay", function() {
@@ -470,6 +471,7 @@
 			videoLoading = false;
 
 			updateEpisodeIndicators();
+			updatePrettyOverlay();
 		});
 
 		$("#vid").on("ended", function() {
@@ -937,7 +939,7 @@
 		});
 
 		$("#episode-bar-events").click(function() {
-			$("#events").css("left", "66.666666%");
+			$("#events").css("left", "0%");
 		});
 
 		$("#episode-bar-play").click(function() {
@@ -1403,6 +1405,7 @@
 		selectedEpisodeId = id;
 		loadEpisodeInfo(id);
 		sessionStorage.selectedepisode = id;
+		updatePrettyOverlay();
 
 		if (currentEpisodeId === id) {
 			if (paused) {
@@ -1461,6 +1464,7 @@
 				video.load();
 				videoLoading = true;
 				ended = false;
+				paused = true;
 
 				video.playbackRate = settings.Playback.PlaybackRate.value;
 
@@ -2447,7 +2451,7 @@
 		$(".button-play i").removeClass("fa-play");
 		updateEpisodeIndicators();
 		$("#episode-bar-play").html("Pause");
-		$(".pretty-overlay").hide();
+		updatePrettyOverlay();
 	}
 
 	function pause() {
@@ -2463,7 +2467,7 @@
 		$(".button-play i").removeClass("fa-pause");
 		updateEpisodeIndicators();
 		$("#episode-bar-play").html("Play");
-		$(".pretty-overlay").show();
+		updatePrettyOverlay();
 	}
 
 	function seek(time) {
@@ -2687,6 +2691,30 @@
 				}
 			}
 		});
+	}
+
+	function updatePrettyOverlay() {
+		if (selectedEpisodeId === currentEpisodeId) {
+			if (paused) {
+				$(".pretty-overlay").show();
+				if (videoLoading) {
+					$(".pretty-button").removeClass("fa-play-circle-o");
+					$(".pretty-button").addClass("fa-spinner fa-spin");
+				}
+				else {
+					$(".pretty-button").removeClass("fa-spinner fa-spin");
+					$(".pretty-button").addClass("fa-play-circle-o");
+				}
+			}
+			else {
+				$(".pretty-overlay").hide();
+			}
+		}
+		else {
+			$(".pretty-overlay").show();
+			$(".pretty-button").removeClass("fa-spinner fa-spin");
+			$(".pretty-button").addClass("fa-play-circle-o");
+		}
 	}
 
 	function popoutMessage(obj) {
