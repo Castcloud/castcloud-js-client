@@ -1087,8 +1087,6 @@
 			var id = $(this).parent().id();
 			resetPlayback(id);
 			$(this).hide();
-			var count = $("#cast-" + episodes[id].castid + " .n");
-			count.html(parseInt(count.html()) + 1);
 		});
 
 		$("#episodes").on("mouseover", ".episode", function() {
@@ -1842,26 +1840,7 @@
 				renderEpisodes(lastepisode.castid);
 			}
 
-			var n = {};
-			for (var i in episodes) {
-				var episode = episodes[i];
-				if (episode.castid in n) {
-					n[episode.castid]++;
-				}
-				else {
-					n[episode.castid] = 1;
-				}
-			}
-
-			for (var index in n) {
-				$("#cast-" + index + " .n").html(n[index]);
-			}
-
-			$(".cast .n").each(function(index, el) {
-				if ($(el).html().length < 1) {
-					$(el).width(0);
-				}
-			});
+			updateEpisodeCount();
 
 			if (addingFeed) {
 				addingFeed = false;
@@ -1911,9 +1890,13 @@
 						$("#episodes").prepend('<div id="ep-' + episode.id + '" class="episode">' + episode.feed.title + '<div class="delete">Delete</div></div>');
 					}
 				});
+
+				updateEpisodeCount();
+
 				if (selectedCastId == res.episodes[0].castid) {
 					setTimeout(function() { episodeScroll.refresh(); }, 0);
 				}
+
 				if (addingFeed) {
 					loadLabels();
 				}
@@ -1976,6 +1959,29 @@
 				interactiveScrollbars: true,
 				click: true
 			});
+		}
+	}
+
+	function updateEpisodeCount() {
+		var n = {};
+		for (var i in episodes) {
+			var episode = episodes[i];
+			if (episode.castid in n) {
+				n[episode.castid]++;
+			}
+			else {
+				n[episode.castid] = 1;
+			}
+		}
+
+		for (var index in n) {
+			var episodeCounter = $("#cast-" + index + " .n");
+			if (n[index] > 0) {
+				episodeCounter.html(n[index]);
+			}
+			else {
+				episodeCounter.width(0);
+			}
 		}
 	}
 
@@ -2058,9 +2064,7 @@
 			}
 			pushEvent(Event.Pause, id, 0);
 			updateEpisodeIndicators();
-
-			var count = $("#cast-" + episodes[id].castid + " .n");
-			count.html(parseInt(count.html()) + 1);
+			updateEpisodeCount();
 		}
 	}
 
