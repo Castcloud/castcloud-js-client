@@ -939,7 +939,12 @@
 		});
 
 		$("#episode-bar-events").click(function() {
-			$("#events").css("left", "0%");
+			if (small) {
+				$("#events").css("left", "0%");
+			}
+			else {
+				$("#events").css("left", "66.666666%");
+			}
 		});
 
 		$("#episode-bar-play").click(function() {
