@@ -1896,7 +1896,10 @@
 				res.episodes.forEach(function(episode) {
 					episodes[episode.id] = episode;
 					if (selectedCastId == episode.castid) {
-						$("#episodes").prepend('<div id="ep-' + episode.id + '" class="episode">' + episode.feed.title + '<div class="delete">Delete</div></div>');
+						if ($(".episode").length < 1) {
+							$("#episodes").empty();
+						}
+						$("#episodes").prepend('<div id="ep-' + episode.id + '" class="episode"><span class="name">' + episode.feed.title + '</span><div class="delete">Delete</div></div>');
 					}
 				});
 
