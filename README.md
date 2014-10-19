@@ -11,6 +11,10 @@ npm install
 gulp
 ```
 
+## Webservers
+.htaccess provided for apache
+nginx should use "try_files $uri /index.html;"
+
 ## Limitations
 
  * Offline storage of media files is currently not possible as per browser limitations
