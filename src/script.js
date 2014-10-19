@@ -169,6 +169,9 @@
 		var router = new Router();
 
 		router.bind("all", function(route, router) {
+			if (small) {
+				$("#menu-container").hide();
+			}
 			positionThumb();
 			padCastOverlay();
 			$("#overlay-info").hide();
@@ -207,11 +210,13 @@
 					$("#podcast-vmenu").show();
 					$("#podcast-cols").css("left", "50px");
 				}
+				$("#menu-container").hide();
 			}
 			else if (prevSmall && !small) {
 				$(".col").show();
 				$("#podcast-vmenu").show();
 				$("#podcast-cols").css("left", "50px");
+				$("#menu-container").show();
 			}
 			$(".pretty-button").css("line-height", $("#pretty img").height() + "px");
 			$("#pretty img").css("max-height", $("#main-container").height() * 0.4 + "px");
@@ -219,7 +224,7 @@
 		});
 
 		$("#navicon").click(function() {
-			$("#menu-container").toggle();
+			$("#menu-container").slideToggle("fast");
 		});
 
 		$("a").click(function(e) {
