@@ -5,6 +5,7 @@
   "devDependencies": {
     "browserify": "^4.1.7",
     "gulp": "^3.7.0",
+    "gulp-autoprefixer": "^1.0.1",
     "gulp-minify-css": "^0.3.4",
     "gulp-minify-html": "^0.1.3",
     "gulp-streamify": "0.0.5",

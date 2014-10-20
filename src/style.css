@@ -4,10 +4,6 @@
 }
 
 *:not(input) {
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
 	user-select: none; 
 }
 
@@ -222,8 +218,6 @@ input.vmenu-toggle {
 	border: none;
 	outline: none;
 	z-index: 1;
-	-webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 
@@ -314,8 +308,6 @@ button.vmenu-toggle:hover {
 	display: table;
 	table-layout: fixed;
 	width: 100%;
-	-webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 
@@ -630,7 +622,7 @@ button.vmenu-toggle:hover {
 	width: 33.333333%;
 	background: #1A1A1A;
 	z-index: 1;
-	-webkit-transition: left .2s;
+	transition: left .2s;
 }
 
 #events-close {
@@ -828,7 +820,7 @@ button.vmenu-toggle:hover {
 	top: 0px;
 	height: 5px;
 	background: #333;
-	-webkit-transition: height 0.1s;
+	transition: height 0.1s;
 }
 
 #seekbar:hover {
@@ -852,7 +844,7 @@ button.vmenu-toggle:hover {
 	border-radius: 50%;
 	cursor: pointer;
 	margin-left: 10px;
-	-webkit-transition: width 0.1s, height 0.1s, top 0.1s, margin 0.1s;
+	transition: width 0.1s, height 0.1s, top 0.1s, margin 0.1s;
 }
 
 #badeball div {
@@ -1182,11 +1174,6 @@ button.vmenu-toggle:hover {
 
 .iScrollHorizontalScrollbar .iScrollIndicator {
 	height: 100%;
-	background: -moz-linear-gradient(left,  #cc3f6e 0%, #93004e 100%);
-	background: -webkit-linear-gradient(left,  #cc3f6e 0%,#93004e 100%);
-	background: -o-linear-gradient(left,  #cc3f6e 0%,#93004e 100%);
-	background: -ms-linear-gradient(left,  #cc3f6e 0%,#93004e 100%);
-	background: linear-gradient(to right,  #cc3f6e 0%,#93004e 100%);
 }
 
 .iScrollVerticalScrollbar .iScrollIndicator {
