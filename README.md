@@ -11,7 +11,7 @@ npm install
 gulp
 ```
 
-## Webservers
+## Rewriting
 .htaccess provided for apache
 
 nginx should use "try_files $uri /index.html;"
