@@ -4,7 +4,6 @@
 	var Chromecast = require('./chromecast.js');
 	var DragDrop = require('./dragdrop.js');
 	require('./jquery-plugins.js');
-	require('./md5.js');
 
 	var token;
 	var username;
@@ -1843,7 +1842,7 @@
 	function renderCasts() {
 		var hash = "";
 		if (!firstCastsRender) {
-			hash = md5(JSON.stringify(labels) + JSON.stringify(casts));
+			hash = CryptoJS.MD5(JSON.stringify(labels) + JSON.stringify(casts));
 		}
 		if (hash !== castsHash) {
 			castsHash = hash;
@@ -1898,7 +1897,7 @@
 			if (firstCastsRender) {
 				firstCastsRender = false;
 				setTimeout(function() {
-					castsHash = md5(JSON.stringify(labels) + JSON.stringify(casts));
+					castsHash = CryptoJS.MD5(JSON.stringify(labels) + JSON.stringify(casts));
 				}, 0);
 			}
 		}
@@ -2169,7 +2168,7 @@
 	function renderSettings(forceRender) {
 		var hash = "";
 		if (forceRender === undefined && !firstSettingsRender) {
-			hash = md5(JSON.stringify(settings));
+			hash = CryptoJS.MD5(JSON.stringify(settings));
 		}
 		if (forceRender || hash !== settingsHash) {
 			settingsHash = hash;
@@ -2211,7 +2210,7 @@
 			if (firstSettingsRender) {
 				firstSettingsRender = false;
 				setTimeout(function() {
-					settingsHash = md5(JSON.stringify(settings));
+					settingsHash = CryptoJS.MD5(JSON.stringify(settings));
 				}, 0);
 			}
 		}
@@ -2220,7 +2219,7 @@
 	function saveSetting(key, value, category) {
 		category = category || 'General';
 		settings[category][key].value = value;
-		settingsHash = md5(JSON.stringify(settings));
+		settingsHash = CryptoJS.MD5(JSON.stringify(settings));
 		buffer.settings.push({
 			setting: category + "/" + key,
 			value: value,
