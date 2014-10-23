@@ -6,6 +6,7 @@ var uglify = require('gulp-uglify');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var streamify = require('gulp-streamify');
+var strictify = require('strictify');
 
 gulp.task('html', function() {
     gulp.src('./src/*.html')
@@ -22,6 +23,7 @@ gulp.task('css', function() {
 
 gulp.task('js', function() {
     return browserify('./src/script.js')
+        .transform(strictify)
         .bundle()
         .pipe(source('script.js'))
         .pipe(streamify(uglify()))

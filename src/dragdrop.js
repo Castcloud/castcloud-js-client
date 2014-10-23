@@ -1,5 +1,3 @@
-"use strict";
-
 var container;
 var child;
 var dragging;

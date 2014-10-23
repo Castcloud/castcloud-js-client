@@ -1,5 +1,3 @@
-"use strict";
-
 $.fn.keybindInput = function(child) {
     this.on("keydown", child, function(e) {
         e.preventDefault();
