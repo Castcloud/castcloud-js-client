@@ -737,7 +737,6 @@
 		
 		positionThumb();
 		$(window).resize(function() {
-			$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 			positionThumb();
 		});
 
@@ -1284,7 +1283,6 @@
 				$(".tab").hide();
 				if (!loggedIn) {
 					$("#tab-login").show();
-					$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 				}
 				else {
 					$("#tab-podcasts").show();
@@ -1308,7 +1306,6 @@
 				$(".tab").hide();
 				if (!loggedIn) {
 					$("#tab-login").show();
-					$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 				}
 				else {
 					$("#tab-episodes").show();
@@ -1323,7 +1320,6 @@
 				$(".tab").hide();
 				if (!loggedIn) {
 					$("#tab-login").show();
-					$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 				}
 				else {
 					$("#tab-settings").show();
@@ -1336,7 +1332,6 @@
 				$(".tab").hide();
 				if (!loggedIn) {
 					$("#tab-login").show();
-					$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 				}
 				else {
 					$("#tab-podcasts").show();
@@ -1368,7 +1363,6 @@
 				$(".tab").hide();
 				if (!loggedIn) {
 					$("#tab-login").show();
-					$("#login-container").css("padding-top", ((window.innerHeight - 60) / 2 - $("#login-container").height() / 2) + "px");
 				}
 				else {
 					$("#vid-container").removeClass("thumb");

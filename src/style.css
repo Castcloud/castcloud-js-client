@@ -84,8 +84,13 @@ a {
 }
 
 #login-container {
-	width: 200px;
-	margin: 0 auto;
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+#login-container div {
+	margin: auto;
 }
 
 #login-container p {
