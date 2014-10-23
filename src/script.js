@@ -247,7 +247,6 @@
 				$("#podcast-cols").css("left", "50px");
 				$("#menu-container").show();
 			}
-			$(".pretty-button").css("line-height", $("#pretty img").height() + "px");
 			$("#pretty img").css("max-height", $("#main-container").height() * 0.4 + "px");
 			prevSmall = small;
 		});
@@ -625,6 +624,7 @@
 			$("#topbar nav").hide();
 			$("#userinfo").hide();
 			$(".tab").hide();
+			$("#main-container").css("bottom", "0px");
 			$("#tab-login").show();
 		});
 
@@ -968,7 +968,6 @@
 
 		$("#pretty img").load(function() {			
 			$("#pretty img").css("max-height", $("#main-container").height() * 0.4 + "px");
-			$(".pretty-button").css("line-height", $(this).height() + "px");
 		});
 
 		$("#episode-bar-events").click(function() {
@@ -1253,6 +1252,13 @@
 			interactiveScrollbars: true,
 			click: true
 		});
+
+		$(document).on("focus", "input", function() {
+			$(this).attr("autocomplete", "off")
+				.attr("autocorrect", "off")
+				.attr("autocapitalize", "off")
+				.attr("spellcheck", "false");
+		});
 		
 		if (localStorage.token) {
 			token = localStorage.token;
@@ -1412,7 +1418,6 @@
 		if (image) {
 			$("#pretty img").prop("src", image);
 			$("#pretty").show();
-			$(".pretty-button").css("line-height", $("#pretty img").height() + "px");
 			$("#pretty img").css("max-height", $("#main-container").height() * 0.4 + "px");
 		}
 		else {

@@ -1039,10 +1039,12 @@ button.vmenu-toggle:hover {
 }
 
 .pretty-overlay {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	position: absolute;
 	top: 0;
 	left: 0;
-	text-align: center;
 	width: 100%;
 	height: 100%;
 }
