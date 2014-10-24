@@ -1564,17 +1564,17 @@ function login() {
 	}, function(res) {
 		token = res.token;
 		if (token !== undefined) {
-			localStorage.token = token;
-			localStorage.username = username;
-			localStorage.uuid = _uuid;
-			localStorage[uniqueName("apiTarget")] = apiRoot;
-			
 			finishLogin();
 
 			$("#tab-podcasts").fadeIn("fast");
 			$("#playbar").slideDown("fast");
 			$("#topbar nav").fadeIn("fast");
 			$("#userinfo").fadeIn("fast");
+
+			localStorage.token = token;
+			localStorage.username = username;
+			localStorage.uuid = _uuid;
+			localStorage[uniqueName("apiTarget")] = apiRoot;
 		}
 	});
 
@@ -1619,7 +1619,8 @@ function initDB() {
 	});
 
 	localforage.config({
-		name: uniqueName("db")
+		name: "Castcloud",
+		storeName: uniqueName("db")
 	});
 
 	localforage.getItem("labels", function(err, data) {
@@ -1792,27 +1793,30 @@ function flushEvents() {
 
 function loadCasts(tag) {
 	var url = apiRoot + (tag === undefined ? "library/casts" : "library/casts/" + tag);
-	$.ajax(url, {
-		headers: {
-			"If-None-Match": localStorage.etag_casts
-		},
-		type: "GET",
-		success: function(res, status, xhr) {
-			if (xhr.status === 200) {
-				var etag = xhr.getResponseHeader("etag");
-				if (etag) {
-					localStorage.etag_casts = etag;
+	
+	localforage.getItem("etag_casts", function(err, etag) {
+		$.ajax(url, {
+			headers: {
+				"If-None-Match": etag
+			},
+			type: "GET",
+			success: function(res, status, xhr) {
+				if (xhr.status === 200) {
+					var etag = xhr.getResponseHeader("etag");
+					if (etag) {
+						localforage.setItem("etag_casts", etag);
+					}
+
+					res.forEach(function(cast) {
+						casts[cast.id] = cast;
+					});
+
+					localforage.setItem("casts", casts);
+
+					renderCasts();
 				}
-
-				res.forEach(function(cast) {
-					casts[cast.id] = cast;
-				});
-
-				localforage.setItem("casts", casts);
-
-				renderCasts();
 			}
-		}
+		});
 	});
 }
 
@@ -1892,42 +1896,44 @@ function selectCast(id) {
 }
 
 function loadEpisodes() {
-	if (!localStorage[uniqueName("since")]) {
-		localStorage[uniqueName("since")] = 0;
-	}
-	console.log("fetching episodes since " + localStorage[uniqueName("since")]);
-	$.get(apiRoot + "library/newepisodes", { since: localStorage[uniqueName("since")] }, function(res) {
-		localStorage[uniqueName("since")] = res.timestamp;
-		console.log(res.episodes.length + " episodes fetched");
-		if (res.episodes.length > 0) {
-			localforage.getItem("episodes", function(err, localEpisodes) {
-				localEpisodes = localEpisodes || {};
-				res.episodes.forEach(function(episode) {
-					localEpisodes[episode.id] = episode;
+	localforage.getItem("since_episodes", function(err, since) {
+		since = since || 0;
+		console.log("fetching episodes since " + since);
+
+		$.get(apiRoot + "library/newepisodes", { since: since }, function(res) {
+			localforage.setItem("since_episodes", res.timestamp);
+
+			console.log(res.episodes.length + " episodes fetched");
+			if (res.episodes.length > 0) {
+				localforage.getItem("episodes", function(err, localEpisodes) {
+					localEpisodes = localEpisodes || {};
+					res.episodes.forEach(function(episode) {
+						localEpisodes[episode.id] = episode;
+					});
+					localforage.setItem("episodes", localEpisodes);
 				});
-				localforage.setItem("episodes", localEpisodes);
-			});
 
-			res.episodes.forEach(function(episode) {
-				episodes[episode.id] = episode;
-				if (selectedCastId == episode.castid) {
-					if ($(".episode").length < 1) {
-						$("#episodes").empty();
+				res.episodes.forEach(function(episode) {
+					episodes[episode.id] = episode;
+					if (selectedCastId == episode.castid) {
+						if ($(".episode").length < 1) {
+							$("#episodes").empty();
+						}
+						$("#episodes").prepend('<div id="ep-' + episode.id + '" class="episode"><span class="name">' + episode.feed.title + '</span><div class="delete">Delete</div></div>');
 					}
-					$("#episodes").prepend('<div id="ep-' + episode.id + '" class="episode"><span class="name">' + episode.feed.title + '</span><div class="delete">Delete</div></div>');
+				});
+
+				updateEpisodeCount();
+
+				if (selectedCastId == res.episodes[0].castid) {
+					setTimeout(function() { episodeScroll.refresh(); }, 0);
 				}
-			});
 
-			updateEpisodeCount();
-
-			if (selectedCastId == res.episodes[0].castid) {
-				setTimeout(function() { episodeScroll.refresh(); }, 0);
-			}
-
-			if (addingFeed) {
-				loadLabels();
-			}
-		}			
+				if (addingFeed) {
+					loadLabels();
+				}
+			}			
+		});
 	});
 }
 
@@ -2097,43 +2103,46 @@ function resetPlayback(id) {
 
 function loadSettings() {
 	var url = apiRoot + "account/settings";
-	$.ajax(url, {
-		headers: {
-			"If-None-Match": localStorage.etag_settings
-		},
-		type: "GET",
-		success: function(res, status, xhr) {
-			if (xhr.status === 200) {
-				var etag = xhr.getResponseHeader("etag");
-				if (etag) {
-					localStorage.etag_settings = etag;
+
+	localforage.getItem("etag_settings", function(err, etag) {
+		$.ajax(url, {
+			headers: {
+				"If-None-Match": etag
+			},
+			type: "GET",
+			success: function(res, status, xhr) {
+				if (xhr.status === 200) {
+					var etag = xhr.getResponseHeader("etag");
+					if (etag) {
+						localforage.setItem("etag_settings", etag);
+					}
+
+					settings = {};
+					res.forEach(function(setting) {
+						var category = setting.setting.split("/")[0];
+						var name = setting.setting.split("/")[1];
+						if (name === undefined) {
+							name = category;
+							category = "General";
+						}
+						if (settings[category] === undefined) {
+							settings[category] = {};
+						}
+						settings[category][name] = {
+							value: setting.value,
+							clientspecific: setting.clientspecific
+						};
+					});
+
+					settings = $.extend(true, {}, DefaultSettings, settings);
+
+					setKeybinds();
+					renderSettings();
+
+					localforage.setItem("settings", settings);
 				}
-
-				settings = {};
-				res.forEach(function(setting) {
-					var category = setting.setting.split("/")[0];
-					var name = setting.setting.split("/")[1];
-					if (name === undefined) {
-						name = category;
-						category = "General";
-					}
-					if (settings[category] === undefined) {
-						settings[category] = {};
-					}
-					settings[category][name] = {
-						value: setting.value,
-						clientspecific: setting.clientspecific
-					};
-				});
-
-				settings = $.extend(true, {}, DefaultSettings, settings);
-
-				setKeybinds();
-				renderSettings();
-
-				localforage.setItem("settings", settings);
 			}
-		}
+		});
 	});
 }
 
@@ -2265,7 +2274,7 @@ function loadLabels() {
 			if (xhr.status === 200) {
 				var etag = xhr.getResponseHeader("etag");
 				if (etag) {
-					localStorage.etag_labels = etag;
+					localforage.setItem("etag_labels", etag);
 				}
 
 				labels = {};
@@ -2363,57 +2372,59 @@ function saveLabels() {
 }
 
 function loadEvents() {
-	if (!localStorage[uniqueName("since-events")]) {
-		localStorage[uniqueName("since-events")] = 0;
-	}
-	console.log("fetching events since " + localStorage[uniqueName("since-events")]);
-	$.get(apiRoot + "library/events", { since: localStorage[uniqueName("since-events")], exclude_self: true }, function(res) {
-		localStorage[uniqueName("since-events")] = res.timestamp;
-		res.events.forEach(function(event) {
-			var position = new Date(event.positionts * 1000);
-			position.setHours(position.getHours() - 1);
-			event.position = "";
-			if (position.getHours() > 0) {
-				event.position += position.getHours() + "h ";
-			}
-			event.position += position.getMinutes() + "m " + position.getSeconds() + "s";
-			var date = new Date(event.clientts * 1000);
-			date.setHours(date.getHours() - 1);
-			event.date = date.toLocaleString();
-			event.name = Event[event.type];
+	localforage.getItem("since_events", function(err, since) {
+		since = since || 0;
+		console.log("fetching events since " + since);
 
-			if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
-				episodes[event.episodeid].lastevent = event;
-			}
+		$.get(apiRoot + "library/events", { since: since, exclude_self: true }, function(res) {
+			localforage.setItem("since_events", res.timestamp);
 
-			events.unshift(event);
-		});
-
-		if (res.events.length > 0) {
-			events.sort(function(a, b) {
-				if (a.clientts > b.clientts) {
-					return -1;
+			res.events.forEach(function(event) {
+				var position = new Date(event.positionts * 1000);
+				position.setHours(position.getHours() - 1);
+				event.position = "";
+				if (position.getHours() > 0) {
+					event.position += position.getHours() + "h ";
 				}
-				if (a.clientts < b.clientts) {
-					return 1;
+				event.position += position.getMinutes() + "m " + position.getSeconds() + "s";
+				var date = new Date(event.clientts * 1000);
+				date.setHours(date.getHours() - 1);
+				event.date = date.toLocaleString();
+				event.name = Event[event.type];
+
+				if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
+					episodes[event.episodeid].lastevent = event;
 				}
 
-				if (a.concurrentorder > b.concurrentorder) {
-					return -1;
-				}
-				if (a.concurrentorder < b.concurrentorder) {
-					return 1;
-				}
-				return 0;
+				events.unshift(event);
 			});
 
-			localforage.setItem("events", events);
+			if (res.events.length > 0) {
+				events.sort(function(a, b) {
+					if (a.clientts > b.clientts) {
+						return -1;
+					}
+					if (a.clientts < b.clientts) {
+						return 1;
+					}
 
-			if (selectedEpisodeId !== null) {
-				renderEvents(selectedEpisodeId);
+					if (a.concurrentorder > b.concurrentorder) {
+						return -1;
+					}
+					if (a.concurrentorder < b.concurrentorder) {
+						return 1;
+					}
+					return 0;
+				});
+
+				localforage.setItem("events", events);
+
+				if (selectedEpisodeId !== null) {
+					renderEvents(selectedEpisodeId);
+				}
 			}
-		}
-		console.log(res.events.length + " events fetched");
+			console.log(res.events.length + " events fetched");
+		});
 	});
 }
 
