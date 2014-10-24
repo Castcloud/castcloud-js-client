@@ -8,8 +8,6 @@ var loggedIn = false;
 var root;
 var apiRoot;
 
-var db;
-var idbReady = false;
 var episodes = {};
 var tempEpisodes = {};
 var casts = {};
@@ -124,8 +122,7 @@ var Event = {
 
 var buffer = {
 	events: [],
-	settings: [],
-	idb: {}
+	settings: []
 };
 
 Chromecast.init("3EC703A8");	
@@ -1197,7 +1194,7 @@ $(document).ready(function() {
 	});
 
 	$("#settings-panel").on("click", "#clear-local-data", function() {
-		db.clear(function() {
+		localforage.clear(function() {
 			setTimeout(updateStorageUsed, 1000);
 		});
 		localStorage.clear();
@@ -1470,7 +1467,7 @@ function playEpisode(id) {
 		if (!(id in episodes) && id in tempEpisodes) {
 			episodes[id] = tempEpisodes[id];
 			delete tempEpisodes[id];
-			db.put("episodes", episodes);
+			localforage.setItem("episodes", episodes);
 		}
 
 		if (id in episodes) {
@@ -1544,7 +1541,7 @@ function deleteEpisode(id) {
 		count.html(count.html() - 1);
 
 		delete episodes[contextItemID];
-		db.put("episodes", episodes);
+		localforage.setItem("episodes", episodes);
 	}
 }
 
@@ -1587,6 +1584,14 @@ function login() {
 function finishLogin() {
 	loggedIn = true;
 
+	initDB();
+
+	$.ajaxSetup({
+		headers: { Authorization: token }
+	});
+
+	sync();
+
 	$("#userinfo span").html(username);
 	$(".tab").hide();
 	$("#main-container").css("bottom", "55px");
@@ -1594,13 +1599,6 @@ function finishLogin() {
 	if (Backbone.history.fragment !== "now-playing") {
 		$("#vid-container").addClass("thumb");
 	}
-
-	$.ajaxSetup({
-		headers: { Authorization: token }
-	});
-
-	initDB();
-	sync();
 }
 
 function initDB() {
@@ -1620,91 +1618,82 @@ function initDB() {
 		});
 	});
 
-	db = new IDBStore({
-		storeName: uniqueName("db"),
-		keyPath: null
-	}, function() {
-		idbReady = true;
-		console.log("IDB ready");
+	localforage.config({
+		name: uniqueName("db")
+	});
 
-		db.get("labels", function(data) {
-			if (data) {
-				console.log("Labels loaded from IDB");
-				labels = data;
-				render();
-			}
-		});
+	localforage.getItem("labels", function(err, data) {
+		if (data) {
+			console.log("Labels loaded");
+			labels = data;
+			render();
+		}
+	});
 
-		db.get("casts", function(data) {
-			if (data) {
-				console.log("Casts loaded from IDB");
-				casts = data;
-				render();
-			}
-		})
+	localforage.getItem("casts", function(err, data) {
+		if (data) {
+			console.log("Casts loaded");
+			casts = data;
+			render();
+		}
+	});
 
-		db.get("episodes", function(data) {
-			if (data) {
-				console.log("Episodes loaded from IDB");
-				episodes = data;
+	localforage.getItem("episodes", function(err, data) {
+		if (data) {
+			console.log("Episodes loaded");
+			episodes = data;
 
-				updateLastEvent();
-				render();
-			}
-		});
+			updateLastEvent();
+			render();
+		}
+	});
 
-		db.get("events", function(data) {
-			if (data) {
-				console.log("Events loaded from IDB");
-				events = data;
-				
-				if (window.name !== "popout") {
-					if (localStorage.beforeunloadevent) {
-						var ev = JSON.parse(localStorage.beforeunloadevent);
-						console.log("pushing beforeunloadevent");
-						pushEvent(ev.type, ev.id, ev.time);
-						localStorage.removeItem("beforeunloadevent");
-					}
-					if (localStorage.unloadevent) {
-						var ev = JSON.parse(localStorage.unloadevent);
-						console.log("pushing unloadevent");
-						pushEvent(ev.type, ev.id, ev.time);
-						localStorage.removeItem("unloadevent");
-					}
+	localforage.getItem("events", function(err, data) {
+		if (data) {
+			console.log("Events loaded");
+			events = data;
+			
+			if (window.name !== "popout") {
+				if (localStorage.beforeunloadevent) {
+					var ev = JSON.parse(localStorage.beforeunloadevent);
+					console.log("pushing beforeunloadevent");
+					pushEvent(ev.type, ev.id, ev.time);
+					localStorage.removeItem("beforeunloadevent");
 				}
-
-				updateLastEvent();
-				render();
+				if (localStorage.unloadevent) {
+					var ev = JSON.parse(localStorage.unloadevent);
+					console.log("pushing unloadevent");
+					pushEvent(ev.type, ev.id, ev.time);
+					localStorage.removeItem("unloadevent");
+				}
 			}
-		});
 
-		db.get("settings", function(data) {
-			if (data) {
-				console.log("Settings loaded from IDB");
-				settings = $.extend(true, {}, DefaultSettings, data);
+			updateLastEvent();
+			render();
+		}
+	});
 
-				$(".thumb").width(settings.__client.ThumbWidth.value);
+	localforage.getItem("settings", function(err, data) {
+		if (data) {
+			console.log("Settings loaded");
+			settings = $.extend(true, {}, DefaultSettings, data);
 
-				setKeybinds();
-				renderSettings();
-			}
-		});
+			$(".thumb").width(settings.__client.ThumbWidth.value);
 
-		db.get("buffer_events", function(data) {
-			if (data) {
-				buffer.events = data;
-			}
-		});
+			setKeybinds();
+			renderSettings();
+		}
+	});
 
-		db.get("buffer_settings", function(data) {
-			if (data) {
-				buffer.settings = data;
-			}
-		});
+	localforage.getItem("buffer_events", function(err, data) {
+		if (data) {
+			buffer.events = data;
+		}
+	});
 
-		for (var key in buffer.idb) {
-			db.put(key, buffer.idb[key]);
-			console.log("Flushed " + key + " from IDB buffer");
+	localforage.getItem("buffer_settings", function(err, data) {
+		if (data) {
+			buffer.settings = data;
 		}
 	});
 }
@@ -1750,7 +1739,7 @@ function pushEvent(type, id, time) {
 		concurrentorder: currentOrder,
 		clientts: eventTS				
 	});
-	db.put("buffer_events", buffer.events);
+	localforage.setItem("buffer_events", buffer.events);
 
 	flushEvents();
 
@@ -1787,7 +1776,7 @@ function pushEvent(type, id, time) {
 
 	events.unshift(event);
 
-	db.put("events", events);
+	localforage.setItem("events", events);
 
 	if (id == selectedEpisodeId) {
 		renderEvents(id);
@@ -1797,7 +1786,7 @@ function pushEvent(type, id, time) {
 function flushEvents() {
 	$.post(apiRoot + "library/events", { json: JSON.stringify(buffer.events) }, function() {
 		buffer.events = [];
-		db.remove("buffer_events");
+		localforage.removeItem("buffer_events");
 	});	
 }
 
@@ -1819,12 +1808,7 @@ function loadCasts(tag) {
 					casts[cast.id] = cast;
 				});
 
-				if (idbReady) {
-					db.put("casts", casts);				
-				}
-				else {
-					buffer.idb.casts = casts;
-				}
+				localforage.setItem("casts", casts);
 
 				renderCasts();
 			}
@@ -1916,12 +1900,12 @@ function loadEpisodes() {
 		localStorage[uniqueName("since")] = res.timestamp;
 		console.log(res.episodes.length + " episodes fetched");
 		if (res.episodes.length > 0) {
-			db.get("episodes", function(localEpisodes) {
+			localforage.getItem("episodes", function(err, localEpisodes) {
 				localEpisodes = localEpisodes || {};
 				res.episodes.forEach(function(episode) {
 					localEpisodes[episode.id] = episode;
 				});
-				db.put("episodes", localEpisodes);
+				localforage.setItem("episodes", localEpisodes);
 			});
 
 			res.episodes.forEach(function(episode) {
@@ -2103,7 +2087,7 @@ function resetPlayback(id) {
 		if (!(id in episodes) && id in tempEpisodes) {
 			episodes[id] = tempEpisodes[id]
 			delete tempEpisodes[id];
-			db.put("episodes", episodes);
+			localforage.setItem("episodes", episodes);
 		}
 		pushEvent(Event.Pause, id, 0);
 		updateEpisodeIndicators();
@@ -2147,12 +2131,7 @@ function loadSettings() {
 				setKeybinds();
 				renderSettings();
 
-				if (idbReady) {
-					db.put("settings", settings);
-				}
-				else {
-					buffer.idb.settings = settings;
-				}
+				localforage.setItem("settings", settings);
 			}
 		}
 	});
@@ -2221,9 +2200,9 @@ function saveSetting(key, value, category) {
 		value: value,
 		clientspecific: settings[category][key].clientspecific
 	});
-	db.put("buffer_settings", buffer.settings);
+	localforage.setItem("buffer_settings", buffer.settings);
 	flushSettings();
-	db.put("settings", settings);
+	localforage.setItem("settings", settings);
 
 	if (category === "Keybinds") {
 		setKeybinds();		
@@ -2233,7 +2212,7 @@ function saveSetting(key, value, category) {
 function flushSettings() {
 	$.post(apiRoot + "account/settings", { json: JSON.stringify(buffer.settings) }, function() {
 		buffer.settings = [];
-		db.remove("buffer_settings");
+		localforage.removeItem("buffer_settings");
 	});
 }
 
@@ -2248,9 +2227,9 @@ function resetSettings() {
 			});
 		}
 	}
-	db.put("buffer_settings", buffer.settings);
+	localforage.setItem("buffer_settings", buffer.settings);
 	flushSettings();
-	db.put("settings", settings);
+	localforage.setItem("settings", settings);
 
 	renderSettings(true);
 	setKeybinds();
@@ -2344,12 +2323,7 @@ function loadLabels() {
 				});
 				console.log(labels);*/
 
-				if (idbReady) {
-					db.put("labels", labels);
-				}
-				else {
-					buffer.idb.labels = labels;
-				}
+				localforage.setItem("labels", labels);
 				loadCasts();
 			}
 		},
@@ -2433,12 +2407,7 @@ function loadEvents() {
 				return 0;
 			});
 
-			if (idbReady) {
-				db.put("events", events);
-			}
-			else {
-				buffer.idb.events = events;
-			}
+			localforage.setItem("events", events);
 
 			if (selectedEpisodeId !== null) {
 				renderEvents(selectedEpisodeId);
