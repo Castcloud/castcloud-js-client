@@ -1,8 +1,8 @@
 var Chromecast = require('./chromecast.js');
 var DragDrop = require('./dragdrop.js');
+var API = require('./api.js');
 require('./jquery-plugins.js');
 
-var token;
 var username;
 var loggedIn = false;
 var root;
@@ -12,7 +12,7 @@ var episodes = {};
 var tempEpisodes = {};
 var casts = {};
 var labels;
-var events = [];	
+var events = [];
 var rootLabelId;
 
 var poppedOut;
@@ -49,7 +49,7 @@ var Setting = {
 	Text: 0,
 	Bool: 1,
 	Keybind: 2
-}
+};
 
 var DefaultSettings = {
 	General: {
@@ -75,7 +75,7 @@ var DefaultSettings = {
 			value: 'pageup'
 		},
 		Previous: {
-			type: Setting.Keybind, 
+			type: Setting.Keybind,
 			value: 'pagedown'
 		},
 		SkipForward: {
@@ -125,7 +125,7 @@ var buffer = {
 	settings: []
 };
 
-Chromecast.init("3EC703A8");	
+Chromecast.init("3EC703A8");
 Chromecast.session(function() {
 	$(".cc img").prop("src", "img/cast_on.png");
 	el("vid").pause();
@@ -205,9 +205,10 @@ $(document).ready(function() {
 	var path = window.location.pathname;
 	root = path.substr(0, path.indexOf("client/") + 7);
 	apiRoot = localStorage[uniqueName("apiTarget")] || window.location.protocol + "//" + window.location.host + root.replace("client", "api");
+	API.setRoot(apiRoot);
 	$("#input-target").val(apiRoot);
 	
-	if(localStorage.username){
+	if(localStorage.username) {
 		username = localStorage.username;
 		$("#input-username").val(username);
 	}
@@ -343,43 +344,46 @@ $(document).ready(function() {
 		$("#vid-container").toggleClass("fs");
 		if ($("#vid-container").hasClass("fs")) {
 			$("#vid-container").removeClass("thumb");
-			$("#playbar").detach().appendTo("#vid-container");
-			$("#playbar").show();
+			$("#playbar").detach().appendTo("#vid-container").show();
 		}
 		else {
 			if (Backbone.history.fragment !== "now-playing") {
 				$("#vid-container").addClass("thumb");
 			}
-			$("#playbar").detach().appendTo("body");
-			$("#playbar").show();
+			$("#playbar").detach().appendTo("body").show();
 			if (timer !== null) {
 				clearTimeout(timer);
 			}
-			$("#overlay-info").stop().hide();
+			$("#overlay-info").velocity("stop").hide();
 		}
 	});
 
 	var timer = null;
 	$("#vid-container").mousemove(function() {
 		if (!bar) {
+			var overlay = $("#overlay-info");
 			if ($(this).hasClass("fs")) {
 				$("#playbar").show();
-				$("#overlay-info").velocity("fadeIn");
+				if (overlay.css("display") === "none") {
+					overlay.velocity("fadeIn");
+				}
 				if (timer !== null) {
 					clearTimeout(timer);
 				}
 				timer = setTimeout(function() { 
 					$("#playbar").hide();
-					$("#overlay-info").stop().velocity("fadeOut");
+					overlay.velocity("fadeOut");
 				}, 1000);
 			}
 			else if ($(this).css("right") == "0px") {
-				$("#overlay-info").velocity("fadeIn");
+				if (overlay.css("display") === "none") {
+					overlay.velocity("fadeIn");
+				}
 				if (timer !== null) {
 					clearTimeout(timer);
 				}
 				timer = setTimeout(function() {
-					$("#overlay-info").stop().velocity("fadeOut");
+					overlay.velocity("fadeOut");
 				}, 1000);
 			}
 		}
@@ -615,13 +619,17 @@ $(document).ready(function() {
 
 	$("#button-logout").click(function() {
 		localStorage.removeItem("token");
-		$("#vid-container").hide();
+		/*$("#vid-container").hide();
 		$("#playbar").hide();
 		$("#topbar nav").hide();
 		$("#userinfo").hide();
 		$(".tab").hide();
-		$("#main-container").css("bottom", "0px");
-		$("#tab-login").show();
+		$("#main-container").css("bottom", "0px");*/
+
+		sessionStorage.clear();
+		window.location.reload();
+
+		//$("#tab-login").show();
 	});
 
 	$("#vmenu-add").click(function() {
@@ -843,28 +851,20 @@ $(document).ready(function() {
 			if (e.which === 13) {
 				var name = $(this).val();
 				$(this).parent().html(name);
-				$.ajax(apiRoot + "library/casts/" + contextItemID, {
-					type: "PUT",
-					data: {
-						name: name
-					}
-				});
+				API.renameCast(contextItemID, name);
 			}
-		})
+		});
 	});
 
 	$("#cast-context-unsub").click(function() {
 		$(".cast.selected").each(function() {
 			var id = $(this).id();
 			$("#cast-" + id).remove();
-			$.ajax(apiRoot + "library/casts/" + id, { type: "DELETE" });
+			API.removeCast(id);
 		});
 		$("#cast-" + contextItemID).remove();
-		$.ajax(apiRoot + "library/casts/" + contextItemID, { 
-			type: "DELETE",
-			success: function(res) {
-				loadLabels();
-			}
+		API.removeCast(contextItemID, function() {
+			loadLabels();
 		});
 	});
 
@@ -891,12 +891,7 @@ $(document).ready(function() {
 			if (e.which === 13) {
 				var name = $(this).val();
 				$(this).parent().html(name);
-				$.ajax(apiRoot + "library/labels/" + contextItemID, {
-					type: "PUT",
-					data: {
-						name: name
-					}
-				});
+				API.renameLabel(contextItemID, name);
 			}
 		});
 	});
@@ -907,9 +902,7 @@ $(document).ready(function() {
 		setTimeout(function() {
 			castScroll.refresh();
 		}, 0);
-		$.ajax(apiRoot + "library/labels/" + contextItemID, {
-			type: "DELETE"
-		});
+		API.removeLabel(contextItemID);
 	});
 
 	$("#episode-context-play").click(function() {
@@ -1163,21 +1156,21 @@ $(document).ready(function() {
 		var reader = new FileReader();
 
 		reader.onload = function() {
-			$.post(apiRoot + "library/casts.opml", { opml: reader.result });
+			API.importOPML(reader.result);
 		};
 
 		reader.readAsText(file);
 	});
 
 	$("#settings-panel").on("click", "#opml", function() {
-		$.get(apiRoot + "library/casts.opml", function(res) {
+		API.exportOPML(function(opml) {
 			var a = window.document.createElement('a');
-			a.href = window.URL.createObjectURL(new Blob([res], {type: 'text/plain'}));
+			a.href = window.URL.createObjectURL(new Blob([opml], {type: 'text/plain'}));
 			a.download = 'casts.opml';
 			document.body.appendChild(a);
 			a.click();
 			document.body.removeChild(a);
-		});			
+		});	
 	});
 
 	$("#settings-panel").on("click", "#import-opml", function() {
@@ -1189,7 +1182,7 @@ $(document).ready(function() {
 		var reader = new FileReader();
 
 		reader.onload = function() {
-			$.post(apiRoot + "library/casts.opml", { opml: reader.result });
+			API.importOPML(reader.result);
 		};
 
 		reader.readAsText(file);
@@ -1257,7 +1250,10 @@ $(document).ready(function() {
 	});
 	
 	if (localStorage.token) {
-		token = localStorage.token;
+		API.setToken(localStorage.token);
+		$.ajaxSetup({
+			headers: { Authorization: localStorage.token }
+		});
 		finishLogin();
 
 		$("#playbar").show();
@@ -1384,7 +1380,7 @@ function createRouter() {
 var addingFeed = false;
 
 function addFeed(feedurl) {
-	$.post(apiRoot + "library/casts", { feedurl: feedurl }, function() {
+	API.addCast(feedurl, function() {
 		addingFeed = true;
 		loadEpisodes();
 	});
@@ -1402,9 +1398,7 @@ function addLabel(name) {
 
 	//$("#add-to-label").append('<p>' + name + '</p>');
 
-	$.post(apiRoot + "library/labels", { name: name }, function() {
-		loadLabels();
-	});
+	API.addLabel(name);
 }
 
 function loadEpisodeInfo(id) {
@@ -1547,51 +1541,34 @@ function deleteEpisode(id) {
 	}
 }
 
-function login() {
-	username = $("#input-username").val();
+function login() {	
 	apiRoot = $("#input-target").val();
 	if (apiRoot.indexOf("/", apiRoot.length - 1) === -1) {
 		apiRoot += "/";
 	}
-	
-	var _uuid = localStorage.uuid || uuid();
+	API.setRoot(apiRoot);
 
-	$.post(apiRoot + "account/login", {
-		username: username,
-		password: $("#input-password").val(),
-		clientname: "Castcloud",
-		clientdescription: userAgent(),
-		clientversion: "0.1",
-		uuid: _uuid
-	}, function(res) {
-		token = res.token;
-		if (token !== undefined) {
+	username = $("#input-username").val();
+	var password = $("#input-password");
+
+	API.login(username, password.val(), function(loggedIn) {
+		if (loggedIn) {
 			finishLogin();
 
 			$("#tab-podcasts").velocity("fadeIn");
 			$("#playbar").velocity("slideDown");
 			$("#topbar nav").velocity("fadeIn");
 			$("#userinfo").velocity("fadeIn");
-
-			localStorage.token = token;
-			localStorage.username = username;
-			localStorage.uuid = _uuid;
-			localStorage[uniqueName("apiTarget")] = apiRoot;
 		}
 	});
 
-	$("#input-password").val("");
+	password.val("");
 }
 
 function finishLogin() {
 	loggedIn = true;
 
 	initDB();
-
-	$.ajaxSetup({
-		headers: { Authorization: token }
-	});
-
 	sync();
 
 	$("#userinfo span").html(username);
@@ -1659,13 +1636,11 @@ function initDB() {
 			if (window.name !== "popout") {
 				if (localStorage.beforeunloadevent) {
 					var ev = JSON.parse(localStorage.beforeunloadevent);
-					console.log("pushing beforeunloadevent");
 					pushEvent(ev.type, ev.id, ev.time);
 					localStorage.removeItem("beforeunloadevent");
 				}
 				if (localStorage.unloadevent) {
 					var ev = JSON.parse(localStorage.unloadevent);
-					console.log("pushing unloadevent");
 					pushEvent(ev.type, ev.id, ev.time);
 					localStorage.removeItem("unloadevent");
 				}
@@ -1787,38 +1762,19 @@ function pushEvent(type, id, time) {
 }
 
 function flushEvents() {
-	$.post(apiRoot + "library/events", { json: JSON.stringify(buffer.events) }, function() {
+	API.sendEvents(buffer.events, function() {
 		buffer.events = [];
 		localforage.removeItem("buffer_events");
-	});	
+	});
 }
 
-function loadCasts(tag) {
-	var url = apiRoot + (tag === undefined ? "library/casts" : "library/casts/" + tag);
-	
-	localforage.getItem("etag_casts", function(err, etag) {
-		$.ajax(url, {
-			headers: {
-				"If-None-Match": etag
-			},
-			type: "GET",
-			success: function(res, status, xhr) {
-				if (xhr.status === 200) {
-					var etag = xhr.getResponseHeader("etag");
-					if (etag) {
-						localforage.setItem("etag_casts", etag);
-					}
+function loadCasts() {
+	API.getCasts(function(res) {
+		casts = res;
 
-					res.forEach(function(cast) {
-						casts[cast.id] = cast;
-					});
+		localforage.setItem("casts", casts);
 
-					localforage.setItem("casts", casts);
-
-					renderCasts();
-				}
-			}
-		});
+		renderCasts();
 	});
 }
 
@@ -1898,44 +1854,36 @@ function selectCast(id) {
 }
 
 function loadEpisodes() {
-	localforage.getItem("since_episodes", function(err, since) {
-		since = since || 0;
-		console.log("fetching episodes since " + since);
-
-		$.get(apiRoot + "library/newepisodes", { since: since }, function(res) {
-			localforage.setItem("since_episodes", res.timestamp);
-
-			console.log(res.episodes.length + " episodes fetched");
-			if (res.episodes.length > 0) {
-				localforage.getItem("episodes", function(err, localEpisodes) {
-					localEpisodes = localEpisodes || {};
-					res.episodes.forEach(function(episode) {
-						localEpisodes[episode.id] = episode;
-					});
-					localforage.setItem("episodes", localEpisodes);
+	API.getNewEpisodes(function(newEpisodes) {
+		if (newEpisodes.length > 0) {
+			localforage.getItem("episodes", function(err, localEpisodes) {
+				localEpisodes = localEpisodes || {};
+				newEpisodes.forEach(function(episode) {
+					localEpisodes[episode.id] = episode;
 				});
+				localforage.setItem("episodes", localEpisodes);
+			});
 
-				res.episodes.forEach(function(episode) {
-					episodes[episode.id] = episode;
-					if (selectedCastId == episode.castid) {
-						if ($(".episode").length < 1) {
-							$("#episodes").empty();
-						}
-						$("#episodes").prepend('<div id="ep-' + episode.id + '" class="episode"><span class="name">' + episode.feed.title + '</span><div class="delete">Delete</div></div>');
+			newEpisodes.forEach(function(episode) {
+				episodes[episode.id] = episode;
+				if (selectedCastId == episode.castid) {
+					if ($(".episode").length < 1) {
+						$("#episodes").empty();
 					}
-				});
-
-				updateEpisodeCount();
-
-				if (selectedCastId == res.episodes[0].castid) {
-					setTimeout(function() { episodeScroll.refresh(); }, 0);
+					$("#episodes").prepend('<div id="ep-' + episode.id + '" class="episode"><span class="name">' + episode.feed.title + '</span><div class="delete">Delete</div></div>');
 				}
+			});
 
-				if (addingFeed) {
-					loadLabels();
-				}
-			}			
-		});
+			updateEpisodeCount();
+
+			if (selectedCastId == newEpisodes[0].castid) {
+				setTimeout(function() { episodeScroll.refresh(); }, 0);
+			}
+
+			if (addingFeed) {
+				loadLabels();
+			}
+		}
 	});
 }
 
@@ -2060,15 +2008,15 @@ function renderEpisodeFeed() {
 	}
 }
 
-function showAllEpisodes(id) {
-	$.get(apiRoot + "library/episodes/" + id, function(res) {
+function showAllEpisodes(castid) {
+	API.getEpisodes(castid, function(episodes) {
 		tempEpisodes = {};
-		res.forEach(function(episode) {
+		episodes.forEach(function(episode) {
 			tempEpisodes[episode.id] = episode;
 		});
 
 		var template = _.template($("script.episodes").html());
-		$("#episodes").empty().append(template({ episodes: res }));
+		$("#episodes").empty().append(template({ episodes: episodes }));
 
 		if (episodeScroll) {
 			setTimeout(function() { episodeScroll.refresh(); }, 0);
@@ -2104,47 +2052,13 @@ function resetPlayback(id) {
 }
 
 function loadSettings() {
-	var url = apiRoot + "account/settings";
+	API.getSettings(function(res) {
+		settings = $.extend(true, {}, DefaultSettings, res);
 
-	localforage.getItem("etag_settings", function(err, etag) {
-		$.ajax(url, {
-			headers: {
-				"If-None-Match": etag
-			},
-			type: "GET",
-			success: function(res, status, xhr) {
-				if (xhr.status === 200) {
-					var etag = xhr.getResponseHeader("etag");
-					if (etag) {
-						localforage.setItem("etag_settings", etag);
-					}
+		setKeybinds();
+		renderSettings();
 
-					settings = {};
-					res.forEach(function(setting) {
-						var category = setting.setting.split("/")[0];
-						var name = setting.setting.split("/")[1];
-						if (name === undefined) {
-							name = category;
-							category = "General";
-						}
-						if (settings[category] === undefined) {
-							settings[category] = {};
-						}
-						settings[category][name] = {
-							value: setting.value,
-							clientspecific: setting.clientspecific
-						};
-					});
-
-					settings = $.extend(true, {}, DefaultSettings, settings);
-
-					setKeybinds();
-					renderSettings();
-
-					localforage.setItem("settings", settings);
-				}
-			}
-		});
+		localforage.setItem("settings", settings);
 	});
 }
 
@@ -2209,7 +2123,7 @@ function saveSetting(key, value, category) {
 	buffer.settings.push({
 		setting: category + "/" + key,
 		value: value,
-		clientspecific: settings[category][key].clientspecific
+		clientspecific: settings[category][key].clientspecific || false
 	});
 	localforage.setItem("buffer_settings", buffer.settings);
 	flushSettings();
@@ -2221,7 +2135,7 @@ function saveSetting(key, value, category) {
 }
 
 function flushSettings() {
-	$.post(apiRoot + "account/settings", { json: JSON.stringify(buffer.settings) }, function() {
+	API.saveSettings(buffer.settings, function() {
 		buffer.settings = [];
 		localforage.removeItem("buffer_settings");
 	});
@@ -2266,81 +2180,14 @@ function setKeybinds() {
 }
 
 function loadLabels() {
-	var url = apiRoot + "library/labels";
-	$.ajax(url, {
-		type: "GET",
-		headers: {
-			//"If-None-Match": localStorage.etag_labels
-		},
-		success: function(res, status, xhr) {
-			if (xhr.status === 200) {
-				var etag = xhr.getResponseHeader("etag");
-				if (etag) {
-					localforage.setItem("etag_labels", etag);
-				}
+	API.getLabels(function(res) {
+		labels = res;
 
-				labels = {};
-				res.forEach(function(label) {
-					if (label.name === "root") {
-						rootLabelId = label.id;
-					}
-					labels[label.name] = [];
-					if (label.content) {
-						label.content.split(",").forEach(function(item) {
-							var split = item.split("/");
-							labels[label.name].push({
-								type: split[0],
-								id: parseInt(split[1])
-							});
-						});
-					}
-					labels[label.id] = {
-						name: label.name,
-						expanded: label.expanded
-					};
-				});
-
-				var template = _.template($("script.labels").html());
-				$("#add-to-label").empty().append(template({ labels: labels }));
-
-				/*labels = [];
-				res.forEach(function(label) {
-					if (label.name === "root") {
-						rootLabelId = label.id;
-						label.content.split(",").forEach(function(item) {
-							var split = item.split("/");
-							labels.push({
-								type: split[0],
-								id: parseInt(split[1])
-							});
-						});
-					}
-				});
-				res.forEach(function(label) {
-					if (label.name !== "root") {
-						labels.forEach(function(item) {
-							if (item.id == label.id && item.type == "label") {
-								item.name = label.name;
-								item.content = [];
-								item.expanded = label.expanded;
-								if (label.content) {
-									label.content.split(",").forEach(function(cast) {
-										item.content.push(cast.split("/")[1]);
-									});
-								}
-							}
-						});
-					}
-				});
-				console.log(labels);*/
-
-				localforage.setItem("labels", labels);
-				loadCasts();
-			}
-		},
-		error: function() {
-			loadCasts();
-		}
+		var template = _.template($("script.labels").html());
+		$("#add-to-label").empty().append(template({ labels: labels }));
+	
+		localforage.setItem("labels", labels);
+		loadCasts();
 	});
 }
 
@@ -2350,11 +2197,8 @@ function saveLabels() {
 		content.push($(el).prop("id").replace("-", "/"));
 	});
 
-	$.ajax(apiRoot + "library/labels/" + rootLabelId, {
-		type: "PUT",
-		data: {
-			content: content.join()
-		}
+	API.updateLabel(rootLabelId, {
+		content: content.join()
 	});
 
 	$("#podcasts .label").each(function(index, el) {
@@ -2363,70 +2207,49 @@ function saveLabels() {
 			content.push($(el).prop("id").replace("-", "/"));
 		});
 
-		$.ajax(apiRoot + "library/labels/" + $(el).id(), {
-			type: "PUT",
-			data: {
-				content: content.join(),
-				expanded: $(el).find(".content").is(":visible")
-			}
+		API.updateLabel($(el).id(), {
+			content: content.join(),
+			expanded: $(el).find(".content").is(":visible")
 		});
 	});
 }
 
 function loadEvents() {
-	localforage.getItem("since_events", function(err, since) {
-		since = since || 0;
-		console.log("fetching events since " + since);
+	API.getEvents(function(res) {
+		res.forEach(function(event) {
+			event.name = Event[event.type];
 
-		$.get(apiRoot + "library/events", { since: since, exclude_self: true }, function(res) {
-			localforage.setItem("since_events", res.timestamp);
+			if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
+				episodes[event.episodeid].lastevent = event;
+			}
 
-			res.events.forEach(function(event) {
-				var position = new Date(event.positionts * 1000);
-				position.setHours(position.getHours() - 1);
-				event.position = "";
-				if (position.getHours() > 0) {
-					event.position += position.getHours() + "h ";
+			events.unshift(event);
+		});
+
+		if (res.length > 0) {
+			events.sort(function(a, b) {
+				if (a.clientts > b.clientts) {
+					return -1;
 				}
-				event.position += position.getMinutes() + "m " + position.getSeconds() + "s";
-				var date = new Date(event.clientts * 1000);
-				date.setHours(date.getHours() - 1);
-				event.date = date.toLocaleString();
-				event.name = Event[event.type];
-
-				if (event.episodeid in episodes && (!episodes[event.episodeid].lastevent || event.clientts > episodes[event.episodeid].lastevent.clientts)) {
-					episodes[event.episodeid].lastevent = event;
+				if (a.clientts < b.clientts) {
+					return 1;
 				}
 
-				events.unshift(event);
+				if (a.concurrentorder > b.concurrentorder) {
+					return -1;
+				}
+				if (a.concurrentorder < b.concurrentorder) {
+					return 1;
+				}
+				return 0;
 			});
 
-			if (res.events.length > 0) {
-				events.sort(function(a, b) {
-					if (a.clientts > b.clientts) {
-						return -1;
-					}
-					if (a.clientts < b.clientts) {
-						return 1;
-					}
+			localforage.setItem("events", events);
 
-					if (a.concurrentorder > b.concurrentorder) {
-						return -1;
-					}
-					if (a.concurrentorder < b.concurrentorder) {
-						return 1;
-					}
-					return 0;
-				});
-
-				localforage.setItem("events", events);
-
-				if (selectedEpisodeId !== null) {
-					renderEvents(selectedEpisodeId);
-				}
+			if (selectedEpisodeId !== null) {
+				renderEvents(selectedEpisodeId);
 			}
-			console.log(res.events.length + " events fetched");
-		});
+		}
 	});
 }
 
@@ -2764,26 +2587,8 @@ function unix() {
 	return $.now() / 1000 | 0;
 }
 
-function uuid() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-	    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-	    return v.toString(16);
-	});
-}
-
 function uniqueName(name) {
 	return username + "-" + name;
-}
-
-function userAgent() {
-	var ua = new UAParser().getResult();
-	var s = ua.browser.name ? ua.browser.name + ", " : "";
-	s += ua.os.name ? ua.os.name + " " + ua.os.version + ", " : "";
-	s += ua.device.vendor ? ua.device.vendor + " " + ua.device.model : "";
-	if (s.indexOf(" ", s.length - 1) !== -1) {
-		s = s.substr(0, s.length - 2);
-	}
-	return s;
 }
 
 Number.prototype.pad = function() {
