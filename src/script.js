@@ -3,6 +3,22 @@ var DragDrop = require('./dragdrop.js');
 var API = require('./api.js');
 require('./jquery-plugins.js');
 
+var userActions = require('./actions/userActions.js');
+
+var Settings = require('./components/Settings.jsx');
+var settingsActions = require('./actions/settingsActions.js');
+var settingsStore = require('./stores/settingsStore.js');
+
+var DefaultSettings = require('./constants.js').DefaultSettings;
+
+var settings = DefaultSettings;
+settingsStore.listen(function(newSettings) {
+	settings = newSettings;
+	setKeybinds();
+});
+
+React.render(<Settings />, document.getElementById("tab-settings"));
+
 var username;
 var loggedIn = false;
 var root;
@@ -45,64 +61,6 @@ var page = 0;
 var small;
 var prevSmall = false;
 
-var Setting = {
-	Text: 0,
-	Bool: 1,
-	Keybind: 2
-};
-
-var DefaultSettings = {
-	General: {
-
-	},
-	Playback: {
-		KeepPlaying: {
-			type: Setting.Bool,
-			value: true
-		},
-		PlaybackRate: {
-			type: Setting.Text,
-			value: 1.0
-		}
-	},
-	Keybinds: {
-		PlayPause: {
-			type: Setting.Keybind,
-			value: 'space'
-		},
-		Next: {
-			type: Setting.Keybind,
-			value: 'pageup'
-		},
-		Previous: {
-			type: Setting.Keybind,
-			value: 'pagedown'
-		},
-		SkipForward: {
-			type: Setting.Keybind,
-			value: 'right'
-		},
-		SkipBack: {
-			type: Setting.Keybind,
-			value: 'left'
-		}
-	},
-	Advanced: {
-		SyncInterval: {
-			type: Setting.Text,
-			value: 10
-		}
-	},
-	__client: {
-		ThumbWidth: {
-			value: 200,
-			clientspecific: true
-		}
-	}
-};
-
-var settings = DefaultSettings;
-
 var Event = {
 	Start: 10,
 	Pause: 20,
@@ -121,8 +79,7 @@ var Event = {
 };
 
 var buffer = {
-	events: [],
-	settings: []
+	events: []
 };
 
 Chromecast.init("3EC703A8");
@@ -584,7 +541,7 @@ $(document).ready(function() {
 			var thumb = $(".thumb");
 			var width = window.innerWidth - e.pageX - o - (window.innerWidth - (thumb.offset().left + thumb.width()));
 			thumb.css("width", width + "px");
-			saveSetting("ThumbWidth", width, "__client");
+			settingsActions.set("ThumbWidth", width, "__client");
 		}
 		if (seeking) {
 			seek(1 / $("#seekbar").width() * (e.pageX - $("#seekbar").position().left) * currentEpisodeDuration);
@@ -606,7 +563,7 @@ $(document).ready(function() {
 		$(".playback-rate").removeClass("selected");
 		$(this).addClass("selected");
 		el("vid").playbackRate = rate;
-		saveSetting("PlaybackRate", rate, "Playback");
+		settingsActions.set("PlaybackRate", rate, "Playback");
 	});
 
 	$("#button-login").click(login);
@@ -1162,7 +1119,7 @@ $(document).ready(function() {
 		reader.readAsText(file);
 	});
 
-	$("#settings-panel").on("click", "#opml", function() {
+	/*$("#settings-panel").on("click", "#opml", function() {
 		API.exportOPML(function(opml) {
 			var a = window.document.createElement('a');
 			a.href = window.URL.createObjectURL(new Blob([opml], {type: 'text/plain'}));
@@ -1186,35 +1143,7 @@ $(document).ready(function() {
 		};
 
 		reader.readAsText(file);
-	});
-
-	$("#settings-panel").on("click", "#clear-local-data", function() {
-		localforage.clear(function() {
-			setTimeout(updateStorageUsed, 1000);
-		});
-		localStorage.clear();
-		sessionStorage.clear();
-	});
-
-	$("#settings-panel").on("click", "#reset-settings", resetSettings);
-
-	var settingTimerId;
-	$("#tab-settings").on("keyup", ".setting", function() {
-		clearTimeout(settingTimerId);
-		var id = $(this).prop("id").split("_");
-		var val = $(this).val();
-		settingTimerId = setTimeout(function() {
-			saveSetting(id[1], val, id[0]);
-		}, 500);
-	});
-
-	$("#tab-settings").on("change", "checkbox.setting", function() {
-		var id = $(this).prop("id").split("_");
-		var val = $(this).prop("checked");
-		saveSetting(id[1], val, id[0]);
-	});
-
-	$("#tab-settings").keybindInput(".keybind");
+	});*/
 
 	var x = false;
 	var o = 0;
@@ -1223,16 +1152,6 @@ $(document).ready(function() {
 		x = true;
 		o = e.pageX - $(".thumb").offset().left;
 	});
-
-	$("#settings-menu").on("click", "p", function() {
-		var id = $(this).id();
-		$(".setting-panel").hide();
-		$(".setting-button").removeClass("selected");
-		$("#setting-"+ id).addClass("selected");
-		$("#setting-panel-" + id).show();
-	});
-
-	setKeybinds();
 
 	episodeinfoScroll = new IScroll('#episodeinfo', {
 		mouseWheel: true,
@@ -1254,6 +1173,7 @@ $(document).ready(function() {
 		$.ajaxSetup({
 			headers: { Authorization: localStorage.token }
 		});
+		userActions.loginDone(true);
 		finishLogin();
 
 		$("#playbar").show();
@@ -1321,7 +1241,7 @@ function createRouter() {
 			}
 			else {
 				$("#tab-settings").show();
-				updateStorageUsed();
+				//updateStorageUsed();
 				$("#vid-container").addClass("thumb");
 			}
 		},
@@ -1551,7 +1471,8 @@ function login() {
 	username = $("#input-username").val();
 	var password = $("#input-password");
 
-	API.login(username, password.val(), function(loggedIn) {
+	userActions.login(username, password.val());
+	userActions.loginDone.listen(function(loggedIn) {
 		if (loggedIn) {
 			finishLogin();
 
@@ -1595,11 +1516,6 @@ function initDB() {
 				episodes[event.episodeid].lastevent = event;
 			}
 		});
-	});
-
-	localforage.config({
-		name: "Castcloud",
-		storeName: uniqueName("db")
 	});
 
 	localforage.getItem("labels", function(err, data) {
@@ -1651,18 +1567,6 @@ function initDB() {
 		}
 	});
 
-	localforage.getItem("settings", function(err, data) {
-		if (data) {
-			console.log("Settings loaded");
-			settings = $.extend(true, {}, DefaultSettings, data);
-
-			$(".thumb").width(settings.__client.ThumbWidth.value);
-
-			setKeybinds();
-			renderSettings();
-		}
-	});
-
 	localforage.getItem("buffer_events", function(err, data) {
 		if (data) {
 			buffer.events = data;
@@ -1680,7 +1584,7 @@ function sync(onDemand) {
 	loadLabels();
 	loadEpisodes();
 	loadEvents();
-	loadSettings();
+	settingsActions.fetch();
 
 	if (buffer.events.length > 0) {
 		flushEvents();
@@ -2049,115 +1953,6 @@ function resetPlayback(id) {
 		updateEpisodeIndicators();
 		updateEpisodeCount();
 	}
-}
-
-function loadSettings() {
-	API.getSettings(function(res) {
-		settings = $.extend(true, {}, DefaultSettings, res);
-
-		setKeybinds();
-		renderSettings();
-
-		localforage.setItem("settings", settings);
-	});
-}
-
-var settingsHash;
-var firstSettingsRender = true;
-
-function renderSettings(forceRender) {
-	var hash = "";
-	if (forceRender === undefined && !firstSettingsRender) {
-		hash = CryptoJS.MD5(JSON.stringify(settings));
-	}
-	if (forceRender || hash !== settingsHash) {
-		settingsHash = hash;
-
-		$("#settings-menu").empty();
-		$("#settings-panel").empty();
-		for (var c in settings) {
-			$("#settings-menu").append('<p class="setting-button" id="setting-' + c + '">' + c + '</p>');
-			var panel = $('<div class="setting-panel" id="setting-panel-' + c + '"><h2>' + c + "</h2></div>");
-
-			if (c === "General") {
-				panel.append('<h3>OPML</h3><p><button class="button" id="import-opml">Import</button><input type="file" id="hax" style="display:none">' +
-					'<button class="button" id="opml">Export</button></p>' +
-					'<h3>Local data<span class="used"></span></h3><button class="button" id="clear-local-data">Clear</button>' +
-					'<h3>Default settings</h3><button class="button" id="reset-settings">Reset</button>');
-				updateStorageUsed();
-			}
-
-			for (var s in settings[c]) {
-				var id = c + "_" + s;
-				var setting = settings[c][s];
-				if (setting.type === Setting.Keybind) {
-					panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting keybind" value="' + setting.value + '"></p>');
-				}
-				else if (setting.type === Setting.Bool) {
-					panel.append("<p><label>" + s + '</label><input type="checkbox" id="' + id + '" class="setting"></p>');
-					panel.find("#" + id).prop("checked", String(setting.value) == "true");
-				}
-				else {
-					panel.append("<p><label>" + s + '</label><input type="text" id="' + id + '" class="setting" value="' + setting.value + '"></p>');
-				}
-			}
-
-			$("#settings-panel").append(panel);
-		}
-		$("#setting-General").addClass("selected");
-		$("#setting-panel-General").show();
-
-		if (firstSettingsRender) {
-			firstSettingsRender = false;
-			setTimeout(function() {
-				settingsHash = CryptoJS.MD5(JSON.stringify(settings));
-			}, 0);
-		}
-	}
-}
-
-function saveSetting(key, value, category) {
-	category = category || 'General';
-	settings[category][key].value = value;
-	settingsHash = CryptoJS.MD5(JSON.stringify(settings));
-	buffer.settings.push({
-		setting: category + "/" + key,
-		value: value,
-		clientspecific: settings[category][key].clientspecific || false
-	});
-	localforage.setItem("buffer_settings", buffer.settings);
-	flushSettings();
-	localforage.setItem("settings", settings);
-
-	if (category === "Keybinds") {
-		setKeybinds();		
-	}
-}
-
-function flushSettings() {
-	API.saveSettings(buffer.settings, function() {
-		buffer.settings = [];
-		localforage.removeItem("buffer_settings");
-	});
-}
-
-function resetSettings() {
-	settings = DefaultSettings;
-	for (var c in settings) {
-		for (var s in settings[c]) {
-			buffer.settings.push({
-				setting: c + "/" + s,
-				value: settings[c][s].value,
-				clientspecific: settings[c][s].clientspecific
-			});
-		}
-	}
-	localforage.setItem("buffer_settings", buffer.settings);
-	flushSettings();
-	localforage.setItem("settings", settings);
-
-	renderSettings(true);
-	setKeybinds();
 }
 
 function updateStorageUsed() {

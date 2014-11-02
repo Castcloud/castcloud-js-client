@@ -1,5 +1,7 @@
 var request = require("superagent");
 
+var DefaultSettings = require('./constants.js').DefaultSettings;
+
 var root;
 var token;
 
@@ -24,6 +26,11 @@ function userAgent() {
 	}
 	return s;
 }
+
+var buffer = {
+	settings: []
+};
+
 
 var API = {
 	login: function(username, password, cb) {
@@ -291,13 +298,27 @@ var API = {
 			});
 	},
 
-	saveSettings: function(settings, cb) {
+	saveSetting: function(name, value, category, cb) {
+		category = category || "General";
+
+		buffer.settings.push({
+			setting: category + "/" + name,
+			value: value,
+			clientspecific: DefaultSettings[category][name].clientspecific || false
+		});
+
+		localforage.setItem("buffer_settings", buffer.settings);
+
 		request
 			.post(url("account/settings"))
 			.type("form")
 			.set("Authorization", token)
-			.send({ json: JSON.stringify(settings) })
+			.send({ json: JSON.stringify(buffer.settings) })
 			.end(function(res) {
+				if (res.ok) {
+					buffer.settings = [];
+					localforage.removeItem("buffer_settings");
+				}
 				cb();
 			});
 	},

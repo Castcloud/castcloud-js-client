@@ -940,38 +940,42 @@ button.vmenu-toggle:hover {
 	width: 100px;
 }
 
-#settings-menu {
+.settings-container {
+	height: 100%;
+}
+
+.settings-menu {
 	float: left;
 	background: #1A1A1A;
 	height: 100%;
 }
 
-#settings-menu p {
+.settings-menu p {
 	padding: 10px;
 	padding-right: 50px;
 	font-size: 16px;
 	cursor: pointer;
 }
 
-#settings-menu p:hover {
+.settings-menu p:hover {
 	background: #0066cc;
 	color: #FFF !important;
 }
 
-#settings-menu p.selected {
+.settings-menu p.selected {
 	color: #0099cc;
 }
 
-#settings-panel {
+.settings-panel {
 	float: left;
 	margin: 10px;
 }
 
-#settings-panel h2 {
+.settings-panel h2 {
 	margin-bottom: 10px;
 }
 
-#settings-panel h3 {
+.settings-panel h3 {
 	margin-top: 20px;
 	margin-bottom: 10px;
 	color: #EEE;
@@ -979,29 +983,26 @@ button.vmenu-toggle:hover {
 	font-size: 16px;
 }
 
-#settings-panel div {
-	display: none;
-}
-
-#settings-panel input {
+.settings-panel input {
 	color: #FFF;
-	width: 50px;
+	width: 50px !important;
 	background: #333;
 }
 
-#settings-panel input[type="checkbox"] {
+.settings-panel input[type="checkbox"] {
+	background: #000;
+	padding: 0 !important;
 	margin: 13px 0;
-	width: auto;
 }
 
-#settings-panel .keybind {
+.settings-panel .keybind {
 	background: none;
 	color: #0099cc;
 	cursor: pointer;
-	width: 100px;
+	width: 100px !important;
 }
 
-#settings-panel .used {
+.settings-panel .used {
 	color: #666;
 	margin-left: 10px;
 }
