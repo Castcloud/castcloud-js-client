@@ -53,7 +53,7 @@ var API = {
 					$.ajaxSetup({
 						headers: { Authorization: token }
 					});
-					cb(true);
+					cb(true, username);
 
 					localStorage.token = token;
 					localStorage.username = username;

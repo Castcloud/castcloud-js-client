@@ -6,18 +6,15 @@ var userActions = Reflux.createActions([
 	"loginDone"
 ]);
 
-var attemptedUsername;
-
 userActions.login.preEmit = function(username, password) {
-	attemptedUsername = username;
 	API.login(username, password, userActions.loginDone);
 };
 
-userActions.loginDone.preEmit = function(loggedIn) {
+userActions.loginDone.preEmit = function(loggedIn, username) {
 	if (loggedIn) {
 		localforage.config({
 			name: "Castcloud",
-			storeName: attemptedUsername + "-db"
+			storeName: username + "-db"
 		});
 	}
 };

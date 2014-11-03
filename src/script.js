@@ -3,6 +3,14 @@ var DragDrop = require('./dragdrop.js');
 var API = require('./api.js');
 require('./jquery-plugins.js');
 
+var appActions = require('./actions/appActions.js');
+var appStore = require('./stores/appStore.js');
+
+var app = appStore.getDefaultData();
+appStore.listen(function(newApp) {
+	app = newApp;
+});
+
 var userActions = require('./actions/userActions.js');
 
 var Settings = require('./components/Settings.jsx');
@@ -1173,7 +1181,7 @@ $(document).ready(function() {
 		$.ajaxSetup({
 			headers: { Authorization: localStorage.token }
 		});
-		userActions.loginDone(true);
+		userActions.loginDone(true, username);
 		finishLogin();
 
 		$("#playbar").show();
@@ -1572,30 +1580,24 @@ function initDB() {
 			buffer.events = data;
 		}
 	});
-
-	localforage.getItem("buffer_settings", function(err, data) {
-		if (data) {
-			buffer.settings = data;
-		}
-	});
 }
 
 function sync(onDemand) {
-	loadLabels();
-	loadEpisodes();
-	loadEvents();
-	settingsActions.fetch();
+	if (onDemand || app.autoSync) {
+		console.log("sync");
+		loadLabels();
+		loadEpisodes();
+		loadEvents();
+		appActions.sync(onDemand);
 
-	if (buffer.events.length > 0) {
-		flushEvents();
-	}
-	if (_.size(buffer.settings) > 0) {
-		flushSettings();
+		if (buffer.events.length > 0) {
+			flushEvents();
+		}
 	}
 
 	if (!onDemand) {
 		setTimeout(sync, settings.Advanced.SyncInterval.value * 1000);
-	}		
+	}
 }
 
 function pushEvent(type, id, time) {

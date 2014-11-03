@@ -1,5 +1,6 @@
 var Setting = require('./Setting.jsx');
 var settingsActions = require('../actions/settingsActions.js');
+var appActions = require('../actions/appActions.js');
 
 var SettingsPanel = React.createClass({
 	render: function() {
@@ -7,12 +8,12 @@ var SettingsPanel = React.createClass({
 			<div>
 				<h3>OPML</h3>
 				<p>
-					<button className="button">Import</button>
+					<button className="button" onClick={appActions.importOPML}>Import</button>
 					<input type="file" style={{display: "none"}} />
-					<button className="button">Export</button>
+					<button className="button" onClick={appActions.exportOPML}>Export</button>
 				</p>
 				<h3>Local data</h3>
-				<button className="button">Clear</button>
+				<button className="button" onClick={appActions.clearLocalData}>Clear</button>
 				<h3>Default settings</h3>
 				<button className="button" onClick={settingsActions.reset}>Reset</button>
 			</div>
