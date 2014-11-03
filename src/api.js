@@ -117,7 +117,7 @@ var API = {
 			.get(url("library/casts.opml"))
 			.set("Authorization", token)
 			.end(function(res) {
-				cb(res.body);
+				cb(res.text);
 			});
 	},
 

@@ -14,7 +14,7 @@ userActions.loginDone.preEmit = function(loggedIn, username) {
 	if (loggedIn) {
 		localforage.config({
 			name: "Castcloud",
-			storeName: username + "-db"
+			storeName: username
 		});
 	}
 };

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "GPL",
   "devDependencies": {
-    "browserify": "^4.1.7",
+    "browserify": "^6.2.0",
     "gulp": "^3.7.0",
     "gulp-autoprefixer": "^1.0.1",
     "gulp-minify-css": "^0.3.4",
@@ -12,7 +12,8 @@
     "gulp-uglify": "^0.3.0",
     "reactify": "^0.15.2",
     "strictify": "^0.1.1",
-    "vinyl-source-stream": "^0.1.1"
+    "vinyl-source-stream": "^0.1.1",
+    "watchify": "^2.1.1"
   },
   "dependencies": {
     "reflux": "^0.1.13",

@@ -1181,6 +1181,10 @@ $(document).ready(function() {
 		$.ajaxSetup({
 			headers: { Authorization: localStorage.token }
 		});
+		localforage.config({
+			name: "Castcloud",
+			storeName: username
+		});
 		userActions.loginDone(true, username);
 		finishLogin();
 
@@ -2394,4 +2398,22 @@ Number.prototype.pad = function() {
 		str = "0" + str;
 	}
 	return str;
+}
+
+if (window.location.host === "castcloud.khlieng.com") {
+	$("#demo").show().click(demo);
+}
+
+function demo() {
+	userActions.login("demo", "pass");
+	userActions.loginDone.listen(function(loggedIn) {
+		if (loggedIn) {
+			finishLogin();
+
+			$("#tab-podcasts").velocity("fadeIn");
+			$("#playbar").velocity("slideDown");
+			$("#topbar nav").velocity("fadeIn");
+			$("#userinfo").velocity("fadeIn");
+		}
+	});
 }

@@ -9,7 +9,6 @@ var SettingsPanel = React.createClass({
 				<h3>OPML</h3>
 				<p>
 					<button className="button" onClick={appActions.importOPML}>Import</button>
-					<input type="file" style={{display: "none"}} />
 					<button className="button" onClick={appActions.exportOPML}>Export</button>
 				</p>
 				<h3>Local data</h3>

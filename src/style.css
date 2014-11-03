@@ -1265,3 +1265,14 @@ button.vmenu-toggle:hover {
 		display: none;
 	}
 }
+
+#demo {
+	text-align: center;
+	color: #666;
+	cursor: pointer;
+	padding: 8px;
+}
+
+#demo:hover {
+	color: #0099cc;
+}
