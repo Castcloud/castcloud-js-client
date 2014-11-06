@@ -1,6 +1,6 @@
 var request = require("superagent");
 
-var DefaultSettings = require('./constants.js').DefaultSettings;
+var DefaultSettings = require('./settings.js').DefaultSettings;
 
 var root;
 var token;
@@ -30,7 +30,6 @@ function userAgent() {
 var buffer = {
 	settings: []
 };
-
 
 var API = {
 	login: function(username, password, cb) {

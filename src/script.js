@@ -13,11 +13,14 @@ appStore.listen(function(newApp) {
 
 var userActions = require('./actions/userActions.js');
 
+var mediaActions = require('./actions/mediaActions.js');
+var mediaStore = require('./stores/mediaStore.js');
+
 var Settings = require('./components/Settings.jsx');
 var settingsActions = require('./actions/settingsActions.js');
 var settingsStore = require('./stores/settingsStore.js');
 
-var DefaultSettings = require('./constants.js').DefaultSettings;
+var DefaultSettings = require('./settings.js').DefaultSettings;
 
 var settings = DefaultSettings;
 settingsStore.listen(function(newSettings) {
@@ -306,16 +309,16 @@ $(document).ready(function() {
 	}
 
 	$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {
-		$("#vid-container").toggleClass("fs");
-		if ($("#vid-container").hasClass("fs")) {
+		$("#vid-wrap").toggleClass("fs");
+		if ($("#vid-wrap").hasClass("fs")) {
 			$("#vid-container").removeClass("thumb");
-			$("#playbar").detach().appendTo("#vid-container").show();
+			//$("#playbar").detach().appendTo("#vid-container").show();
 		}
 		else {
 			if (Backbone.history.fragment !== "now-playing") {
 				$("#vid-container").addClass("thumb");
 			}
-			$("#playbar").detach().appendTo("body").show();
+			//$("#playbar").detach().appendTo("body").show();
 			if (timer !== null) {
 				clearTimeout(timer);
 			}
@@ -324,7 +327,7 @@ $(document).ready(function() {
 	});
 
 	var timer = null;
-	$("#vid-container").mousemove(function() {
+	$("#vid-wrap").mousemove(function() {
 		if (!bar) {
 			var overlay = $("#overlay-info");
 			if ($(this).hasClass("fs")) {
@@ -340,7 +343,7 @@ $(document).ready(function() {
 					overlay.velocity("fadeOut");
 				}, 1000);
 			}
-			else if ($(this).css("right") == "0px") {
+			else if ($("#vid-container").css("right") == "0px") {
 				if (overlay.css("display") === "none") {
 					overlay.velocity("fadeIn");
 				}
@@ -1127,32 +1130,6 @@ $(document).ready(function() {
 		reader.readAsText(file);
 	});
 
-	/*$("#settings-panel").on("click", "#opml", function() {
-		API.exportOPML(function(opml) {
-			var a = window.document.createElement('a');
-			a.href = window.URL.createObjectURL(new Blob([opml], {type: 'text/plain'}));
-			a.download = 'casts.opml';
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-		});	
-	});
-
-	$("#settings-panel").on("click", "#import-opml", function() {
-		$("#hax").click();
-	});
-
-	$("#settings-panel").on("change", "#hax", function(e) {
-		var file = e.target.files[0];
-		var reader = new FileReader();
-
-		reader.onload = function() {
-			API.importOPML(reader.result);
-		};
-
-		reader.readAsText(file);
-	});*/
-
 	var x = false;
 	var o = 0;
 
@@ -1304,6 +1281,7 @@ function createRouter() {
 		fullscreen: function() {
 			$("#topbar").hide();
 			$("#vid-container").removeClass("thumb");
+			$("#vid-wrap").addClass("fs");
 			$("#vid-container").addClass("fs");
 		}
 	});
@@ -2242,8 +2220,8 @@ function previousEpisode() {
 }
 
 function toggleFullscreen() {
-	var video = el("vid-container");
-	if ($("#vid-container").hasClass("fs")) {
+	var video = el("vid-wrap");
+	if ($("#vid-wrap").hasClass("fs")) {
 		document.webkitExitFullscreen();
 		$("#playbar-fullscreen").removeClass("fa-compress").addClass("fa-expand");
 	}
@@ -2405,6 +2383,8 @@ if (window.location.host === "castcloud.khlieng.com") {
 }
 
 function demo() {
+	username = "demo";
+	
 	userActions.login("demo", "pass");
 	userActions.loginDone.listen(function(loggedIn) {
 		if (loggedIn) {

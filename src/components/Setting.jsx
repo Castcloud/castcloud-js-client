@@ -1,6 +1,6 @@
 var settingsActions = require('../actions/settingsActions.js');
 
-var Type = require('../constants.js').SettingType;
+var Type = require('../settings.js').SettingType;
 
 var Setting = React.createClass({
 	getInitialState: function() {

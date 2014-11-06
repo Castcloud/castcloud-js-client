@@ -45,9 +45,7 @@ function js(watch) {
 
     rebundle = function() {
         var stream = bundler.bundle();
-        stream.on('error', function(err) {
-            console.log(err);
-        });
+        stream.on('error', console.log);
         return stream
             .pipe(source('script.js'))
             .pipe(streamify(uglify()))
@@ -64,7 +62,7 @@ function js(watch) {
 gulp.task('img', function() {
     gulp.src('./src/img/*')
         .pipe(gulp.dest('./dist/img'));
-})
+});
 
 gulp.task('watch', ['default'], function() {
     gulp.watch('./src/*.html', ['html']);

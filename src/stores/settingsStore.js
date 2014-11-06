@@ -4,7 +4,7 @@ var userActions = require('../actions/userActions.js');
 
 var API = require('../api.js');
 
-var DefaultSettings = require('../constants.js').DefaultSettings;
+var DefaultSettings = require('../settings.js').DefaultSettings;
 
 var settings = DefaultSettings;
 
@@ -19,17 +19,15 @@ var settingsStore = Reflux.createStore({
 
 	loadLocalData: function(loggedIn) {
 		if (loggedIn) {
-			var self = this;
-
 			localforage.getItem("settings", function(err, data) {
 				if (data) {
 					console.log("Settings loaded");
 					settings = $.extend(true, {}, DefaultSettings, data);
-					self.trigger(settings);
+					this.trigger(settings);
 
 					$(".thumb").width(settings.__client.ThumbWidth.value);
 				}
-			});
+			}.bind(this));
 		}
 	},
 
