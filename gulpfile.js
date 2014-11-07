@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var replace = require('gulp-replace');
 var minifyHTML = require('gulp-minify-html');
 var minifyCSS = require('gulp-minify-css');
 var autoprefixer = require('gulp-autoprefixer');
@@ -12,6 +13,7 @@ var watchify = require('watchify');
 
 gulp.task('html', function() {
     gulp.src('./src/*.html')
+        .pipe(replace('{{root}}', '/client/'))
         .pipe(minifyHTML())
         .pipe(gulp.dest('./dist'));
 });

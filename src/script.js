@@ -170,8 +170,8 @@ $(document).ready(function() {
 		$("#overlay-info").hide();
 	});
 
-	var path = window.location.pathname;
-	root = path.substr(0, path.indexOf("client/") + 7);
+	root = CLIENT_ROOT;
+
 	apiRoot = localStorage[uniqueName("apiTarget")] || window.location.protocol + "//" + window.location.host + root.replace("client", "api");
 	API.setRoot(apiRoot);
 	$("#input-target").val(apiRoot);

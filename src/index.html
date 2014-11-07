@@ -6,7 +6,7 @@
 	<title>Castcloud</title>
 	<link href='//fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
 	<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="{{root}}style.css">
 </head>
 <body>
 	<textarea id="clip"></textarea>
@@ -104,10 +104,7 @@
 			</div>
 		</div>
 		<div class="tab" id="tab-episodes"><div class="list"></div></div>
-		<div class="tab" id="tab-settings">
-			<div id="settings-menu"></div>
-			<div id="settings-panel"></div>
-		</div>
+		<div class="tab" id="tab-settings"></div>
 		<div id="vid-wrap">
 			<div id="overlay-info"><h5></h5><h2></h2></div>
 			<div id="vid-container" class="thumb minimized">
@@ -202,6 +199,7 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"></script>
 	<script src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
-	<script src="script.js"></script>
+	<script>window.CLIENT_ROOT="{{root}}";</script>
+	<script src="{{root}}script.js"></script>
 </body>
 </html>
