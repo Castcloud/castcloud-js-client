@@ -1,4 +1,5 @@
 var request = require("superagent");
+var util = require('./util.js');
 
 var DefaultSettings = require('./settings.js').DefaultSettings;
 
@@ -9,31 +10,14 @@ function url(path) {
 	return root + path;
 }
 
-function UUID() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-	    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-	    return v.toString(16);
-	});
-}
-
-function userAgent() {
-	var ua = new UAParser().getResult();
-	var s = ua.browser.name ? ua.browser.name + ", " : "";
-	s += ua.os.name ? ua.os.name + " " + ua.os.version + ", " : "";
-	s += ua.device.vendor ? ua.device.vendor + " " + ua.device.model : "";
-	if (s.indexOf(" ", s.length - 1) !== -1) {
-		s = s.substr(0, s.length - 2);
-	}
-	return s;
-}
-
 var buffer = {
+	events: [],
 	settings: []
 };
 
 var API = {
 	login: function(username, password, cb) {
-		var uuid = localStorage.uuid || UUID();
+		var uuid = localStorage.uuid || util.UUID();
 
 		request
 			.post(url("account/login"))
@@ -42,7 +26,7 @@ var API = {
 				username: username,
 				password: password,
 				clientname: "Castcloud",
-				clientdescription: userAgent(),
+				clientdescription: util.userAgent(),
 				clientversion: "0.1",
 				uuid: uuid
 			})
@@ -76,7 +60,7 @@ var API = {
 						casts[cast.id] = cast;
 					});
 					cb(casts);
-				}					
+				}
 			});
 	},
 
@@ -202,7 +186,7 @@ var API = {
 	getNewEpisodes: function(cb) {
 		localforage.getItem("since_episodes", function(err, since) {
 			var since = since || 0;
-			
+
 			request
 				.get(url("library/newepisodes"))
 				.set("Authorization", token)
@@ -214,7 +198,7 @@ var API = {
 					}
 				});
 		});
-		
+
 	},
 
 	getEpisodes: function(castid, cb) {
@@ -229,7 +213,7 @@ var API = {
 	getEvents: function(cb) {
 		localforage.getItem("since_events", function(err, since) {
 			var since = since || 0;
-			
+
 			request
 				.get(url("library/events"))
 				.set("Authorization", token)
@@ -258,13 +242,21 @@ var API = {
 		});
 	},
 
-	sendEvents: function(events, cb) {
+	sendEvent: function(event, cb) {
+		buffer.events.push(event);
+
+		localforage.setItem("buffer_events", buffer.events);
+
 		request
 			.post(url("library/events"))
 			.type("form")
 			.set("Authorization", token)
-			.send({ json: JSON.stringify(events) })
+			.send({ json: JSON.stringify(buffer.events) })
 			.end(function(res) {
+				if (res.ok) {
+					buffer.events = [];
+					localforage.removeItem("buffer_events");
+				}
 				cb();
 			});
 	},

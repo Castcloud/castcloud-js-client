@@ -4,7 +4,7 @@
 }
 
 *:not(input) {
-	user-select: none; 
+	user-select: none;
 }
 
 html, body {
@@ -307,6 +307,11 @@ button.vmenu-toggle:hover {
 	float: left;
 }
 
+.scroller {
+	position: relative;
+	height: 100%;
+}
+
 .cast, .episode, .label .name {
 	padding-right: 15px;
 	cursor: pointer;
@@ -476,7 +481,7 @@ button.vmenu-toggle:hover {
 
 #vid-container.thumb.minimized {
 	height: 30px;
-	width: 160px !important; 
+	width: 160px !important;
 }
 
 .audio #vid {
@@ -537,7 +542,7 @@ button.vmenu-toggle:hover {
 	left: -2px;
 	width: 10px;
 	height: 10px;
-	border-radius: 50%;	
+	border-radius: 50%;
 	cursor: nwse-resize;
 }
 

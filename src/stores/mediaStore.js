@@ -1,11 +1,12 @@
 var Reflux = require('reflux');
 var actions = require('../actions/mediaActions.js');
-
+var episodeStore = require('./episodeStore.js');
 var settingsStore = require('./settingsStore.js');
 
 var media = {
 	paused: true,
 	ended: false,
+	loading: false,
 	currentTime: 0,
 	currentEpisode: null,
 	volume: 1.0,
@@ -17,6 +18,7 @@ var episodes = {};
 var mediaStore = Reflux.createStore({
 	init: function() {
 		this.listenToMany(actions);
+		this.listenTo(episodeStore, this.episodesChanged);
 		this.listenTo(settingsStore, this.settingsChanged);
 	},
 
@@ -48,6 +50,12 @@ var mediaStore = Reflux.createStore({
 
 	playEpisode: function(id) {
 		media.currentEpisode = episodes[id];
+		media.loading = true;
+		this.trigger(media);
+	},
+
+	loadDone: function() {
+		media.loading = false;
 		this.trigger(media);
 	},
 
@@ -75,9 +83,21 @@ var mediaStore = Reflux.createStore({
 		this.trigger(media);
 	},
 
+	episodesChanged: function(state) {
+		episodes = state.episodes;
+		if (media.currentEpisode && !(media.currentEpisode.id in episodes)) {
+			media.currentEpisode = null;
+			this.trigger(media);
+		}
+	},
+
 	settingsChanged: function(settings) {
 		media.playbackRate = settings.Playback.PlaybackRate.value;
 		this.trigger(media);
+	},
+
+	getDefaultData: function() {
+		return media;
 	}
 });
 

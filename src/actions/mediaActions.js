@@ -7,6 +7,7 @@ var mediaActions = Reflux.createActions([
 	"ended",
 	"updateTime",
 	"playEpisode",
+	"loadDone",
 	"setVolume",
 	"mute",
 	"setPlaybackRate"

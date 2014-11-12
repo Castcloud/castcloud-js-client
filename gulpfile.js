@@ -13,7 +13,7 @@ var watchify = require('watchify');
 
 gulp.task('html', function() {
     gulp.src('./src/*.html')
-        .pipe(replace('{{root}}', '/client/'))
+        .pipe(replace('{{root}}', '/castcloud/client/'))
         .pipe(minifyHTML())
         .pipe(gulp.dest('./dist'));
 });
@@ -32,6 +32,7 @@ gulp.task('js', function() {
 function js(watch) {
     var bundler, rebundle;
     bundler = browserify('./src/script.js', {
+        debug: true,
         cache: {},
         packageCache: {},
         fullPaths: watch
@@ -50,7 +51,7 @@ function js(watch) {
         stream.on('error', console.log);
         return stream
             .pipe(source('script.js'))
-            .pipe(streamify(uglify()))
+            //.pipe(streamify(uglify()))
             .pipe(gulp.dest('./dist'));
     };
 
