@@ -14,7 +14,9 @@
     "reactify": "^0.15.2",
     "strictify": "^0.1.1",
     "vinyl-source-stream": "^0.1.1",
-    "watchify": "^2.1.1"
+    "watchify": "^2.1.1",
+    "gulp-if": "~1.2.5",
+    "yargs": "~1.3.3"
   },
   "dependencies": {
     "reflux": "^0.1.13",

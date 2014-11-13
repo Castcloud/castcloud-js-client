@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var replace = require('gulp-replace');
+var gulpif = require('gulp-if');
 var minifyHTML = require('gulp-minify-html');
 var minifyCSS = require('gulp-minify-css');
 var autoprefixer = require('gulp-autoprefixer');
@@ -11,9 +12,23 @@ var reactify = require('reactify');
 var strictify = require('strictify');
 var watchify = require('watchify');
 
+var fs = require('fs');
+var argv = require('yargs')
+    .alias('p', 'production')
+    .argv;
+
+var cfg;
+if (fs.existsSync('config.js')) {
+    cfg = require('./config.js');
+}
+else {
+    cfg = require('./config.default.js');
+    fs.createReadStream('config.default.js').pipe(fs.createWriteStream('config.js'));
+}
+
 gulp.task('html', function() {
     gulp.src('./src/*.html')
-        .pipe(replace('{{root}}', '/castcloud/client/'))
+        .pipe(replace('{{root}}', cfg.client_root))
         .pipe(minifyHTML())
         .pipe(gulp.dest('./dist'));
 });
@@ -32,7 +47,7 @@ gulp.task('js', function() {
 function js(watch) {
     var bundler, rebundle;
     bundler = browserify('./src/script.js', {
-        debug: true,
+        debug: !argv.production,
         cache: {},
         packageCache: {},
         fullPaths: watch
@@ -51,7 +66,7 @@ function js(watch) {
         stream.on('error', console.log);
         return stream
             .pipe(source('script.js'))
-            //.pipe(streamify(uglify()))
+            .pipe(gulpif(argv.production, streamify(uglify())))
             .pipe(gulp.dest('./dist'));
     };
 

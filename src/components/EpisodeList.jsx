@@ -47,8 +47,9 @@ var EpisodeList = React.createClass({
 
     render: function() {
         var episodes = _.map(this.state.episodes, function(episode) {
+            var selected = episode.id === this.state.selectedEpisode;
             if (episode.castid === this.state.selectedCast) {
-                return <Episode key={episode.id} episode={episode} selected={episode.id === this.state.selectedEpisode} />
+                return <Episode key={episode.id} episode={episode} selected={selected} />
             }
         }.bind(this));
 

@@ -90,7 +90,6 @@ var playbackQueue = [];
 var currentQueuePosition = 0;
 
 var castScroll;
-var episodeScroll;
 var episodeinfoScroll;
 var episodeFeedScroll;
 
@@ -1218,7 +1217,6 @@ function createRouter() {
 				if (castScroll) {
 					setTimeout(function() {
 						castScroll.refresh();
-						episodeScroll.refresh();
 					}, 0);
 				}
 				if (small) {
@@ -1238,9 +1236,6 @@ function createRouter() {
 			}
 			else {
 				$("#tab-episodes").show();
-				if (episodeScroll) {
-					setTimeout(function() { episodeFeedScroll.refresh(); }, 0);
-				}
 				$("#vid-container").addClass("thumb");
 			}
 		},
@@ -1267,7 +1262,6 @@ function createRouter() {
 				if (castScroll) {
 					setTimeout(function() {
 						castScroll.refresh();
-						episodeScroll.refresh();
 					}, 0);
 				}
 				page = n;
@@ -1760,19 +1754,6 @@ function renderEpisodeFeed() {
 
 		var template = _.template($("script.episodes").html());
 		$("#episodes").empty().append(template({ episodes: episodes }));
-
-		if (episodeScroll) {
-			setTimeout(function() { episodeScroll.refresh(); }, 0);
-		}
-		else {
-			episodeScroll = new IScroll('#foo2', {
-				mouseWheel: true,
-				scrollbars: 'custom',
-				keyBindings: true,
-				interactiveScrollbars: true,
-				click: true
-			});
-		}
 	});
 }*/
 
