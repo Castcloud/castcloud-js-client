@@ -3,6 +3,8 @@ var API = require('../api.js');
 
 var eventActions = Reflux.createActions([
 	"send",
+	"show",
+	"hide",
 	"fetch",
 	"fetchDone"
 ]);

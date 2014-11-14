@@ -34,7 +34,6 @@ var eventStore = Reflux.createStore({
 					console.log("Events loaded");
 					events = data;
 					this.trigger(events);
-					console.log("triggered events");
 
 					/*if (window.name !== "popout") {
 						if (localStorage.beforeunloadevent) {

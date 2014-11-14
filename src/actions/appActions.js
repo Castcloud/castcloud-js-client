@@ -16,7 +16,7 @@ var appActions = Reflux.createActions([
 ]);
 
 appActions.sync.preEmit = function() {
-	//castActions.fetch();
+	castActions.fetch();
 	//labelActions.fetch();
 	episodeActions.fetch();
 	eventActions.fetch();
@@ -24,6 +24,7 @@ appActions.sync.preEmit = function() {
 };
 
 Reflux.all(
+	castActions.fetchDone,
 	episodeActions.fetchDone,
 	eventActions.fetchDone,
 	settingsActions.fetchDone

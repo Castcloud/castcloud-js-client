@@ -31,7 +31,7 @@ var Episode = React.createClass({
 	getInitialState: function() {
 		return {
 			indicator: null
-		}
+		};
 	},
 
 	componentWillReceiveProps: function(nextProps) {

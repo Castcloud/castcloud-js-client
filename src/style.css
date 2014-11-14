@@ -579,13 +579,12 @@ button.vmenu-toggle:hover {
 	background: rgba(0,0,0,0.75);
 }
 
-#episode-bar {
+.episode-bar {
 	margin: 0;
 	padding: 0;
-	display: none;
 }
 
-#episode-bar .button {
+.episode-bar .button {
 	background: none;
 	color: #AAA;
 	font-weight: 400;
@@ -594,8 +593,12 @@ button.vmenu-toggle:hover {
 	padding: 0 10px;
 }
 
-#episode-bar .button:hover {
+.episode-bar .button:hover {
 	color: #0099cc;
+}
+
+.episode-bar-events {
+	float: right;
 }
 
 #episodeinfo p, #events p {
@@ -603,36 +606,36 @@ button.vmenu-toggle:hover {
 	line-height: 1.5;
 }
 
-#episodeinfo-text {
+.episodeinfo-text {
 	margin: 10px;
 	padding-bottom: 10px;
 }
 
-#episode-title {
+.episode-title {
 	margin: 5px 0px;
 }
 
-#episode-date {
+.episode-date {
 	color: #666;
 }
 
-#episode-desc {
+.episode-desc {
 	color: #AAA;
 }
 
-#episode-desc figure, #episode-desc img, #episode-desc iframe {
+.episode-desc figure, .episode-desc img, .episode-desc iframe {
 	display: none;
 }
 
-#episode-desc a {
+.episode-desc a {
 	color: #FFF;
 }
 
-#episode-desc a:hover {
+.episode-desc a:hover {
 	color: #0099cc;
 }
 
-#episode-desc a:active {
+.episode-desc a:active {
 	color: #0066cc;
 }
 
@@ -1037,17 +1040,16 @@ button.vmenu-toggle:hover {
 	position: relative;
 }
 
-#pretty {
-	display: none;
+.pretty {
 	color: rgba(0,0,0,0.3);
 }
 
-#pretty:hover {
+.pretty:hover {
 	color: #FFF;
 	cursor: pointer;
 }
 
-#pretty img {
+.pretty img {
 	display: block;
 	margin: 0 auto;
 	max-width: 100%;

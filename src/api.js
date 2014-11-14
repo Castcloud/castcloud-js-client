@@ -33,9 +33,6 @@ var API = {
 			.end(function(res) {
 				if (res.ok) {
 					token = res.body.token;
-					$.ajaxSetup({
-						headers: { Authorization: token }
-					});
 					cb(true, username);
 
 					localStorage.token = token;

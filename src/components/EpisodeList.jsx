@@ -2,13 +2,14 @@ var Reflux = require('reflux');
 var episodeStore = require('../stores/episodeStore.js');
 var episodeActions = require('../actions/episodeActions.js');
 var castStore = require('../stores/castStore.js');
-
 var Episode = require('./Episode.jsx');
+var IScrollMixin = require('../mixins/IScrollMixin.js');
 
 var EpisodeList = React.createClass({
     mixins: [
         Reflux.listenTo(episodeStore, "onEpisodesChanged"),
-        Reflux.listenTo(castStore, "onCastsChanged", "onCastsChanged")
+        Reflux.listenTo(castStore, "onCastsChanged", "onCastsChanged"),
+        IScrollMixin
     ],
 
     getInitialState: function() {
@@ -16,23 +17,7 @@ var EpisodeList = React.createClass({
             episodes: {},
             selectedEpisode: null,
             selectedCast: null
-        }
-    },
-
-    componentDidMount: function() {
-        this.scroller = new IScroll(this.getDOMNode(), {
-            mouseWheel: true,
-            scrollbars: 'custom',
-            keyBindings: true,
-            interactiveScrollbars: true,
-            click: true
-        });
-    },
-
-    componentDidUpdate: function() {
-        if (this.scroller) {
-            this.scroller.refresh();
-        }
+        };
     },
 
     onEpisodesChanged: function(state) {

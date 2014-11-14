@@ -28,6 +28,7 @@ var settingsStore = require('./stores/settingsStore.js');
 var DefaultSettings = require('./settings.js').DefaultSettings;
 
 var EpisodeList = require('./components/EpisodeList.jsx');
+var EpisodeInfo = require('./components/EpisodeInfo.jsx');
 var episodeActions = require('./actions/episodeActions.js');
 var episodeStore = require('./stores/episodeStore.js');
 
@@ -44,6 +45,7 @@ episodeStore.listen(function(state) {
 	episodes = state.episodes;
 	if (state.selectedEpisode) {
 		selectEpisode(state.selectedEpisode);
+		renderEvents(state.selectedEpisode);
 	}
 	updateEpisodeCount();
 });
@@ -141,7 +143,17 @@ episodeActions.delete.listen(function(id) {
 	pushEvent(Event.Delete, id);
 });
 
+eventActions.show.listen(function() {
+	if (small) {
+		$("#events").velocity({ left: "0%" });
+	}
+	else {
+		$("#events").velocity({ left: "66.666666%" });
+	}
+});
+
 React.render(<EpisodeList />, document.getElementById("episode-list"));
+React.render(<EpisodeInfo />, document.getElementById("episodeinfo"));
 React.render(<Settings />, document.getElementById("tab-settings"));
 React.render(<ContextMenu />, document.getElementById("context-menu"));
 
@@ -278,15 +290,24 @@ $(document).ready(function() {
 		$("#overlay-info").hide();
 	});
 
-	root = CLIENT_ROOT;
-
-	apiRoot = localStorage[uniqueName("apiTarget")] || window.location.protocol + "//" + window.location.host + root.replace("client", "api");
-	API.setRoot(apiRoot);
-	$("#input-target").val(apiRoot);
-
-	if(localStorage.username) {
-		username = localStorage.username;
+	var storedUsername = localStorage.username;
+	if(storedUsername) {
+		username = storedUsername;
 		$("#input-username").val(username);
+	}
+
+	root = CLIENT_ROOT;
+	apiRoot = localStorage[uniqueName("apiTarget")] || window.location.protocol + "//" + window.location.host + root.replace("client", "api");
+	
+	var storedToken = localStorage.token;
+	if (storedToken) {
+		API.setRoot(apiRoot);
+		API.setToken(storedToken);
+		userActions.loginDone(true, username, true);
+	}
+	else {
+		Backbone.history.start({ pushState: true, root: root });
+		$("#input-target").val(apiRoot);
 	}
 
 	$("#podcasts").on("click", ".cast", function() {
@@ -320,7 +341,6 @@ $(document).ready(function() {
 			$("#podcast-cols").css("left", "50px");
 			$("#menu-container").show();
 		}
-		$("#pretty img").css("max-height", $("#main-container").height() * 0.4 + "px");
 		prevSmall = small;
 	});
 
@@ -529,7 +549,6 @@ $(document).ready(function() {
 
 	$("#vid").on("loadstart", function() {
 		$("#vid-container").hide();
-		updatePrettyOverlay();
 	});
 
 	$("#vid").on("canplay", function() {
@@ -575,8 +594,6 @@ $(document).ready(function() {
 			}
 		}
 		videoLoading = false;
-
-		updatePrettyOverlay();
 	});
 
 	$("#vid").on("ended", function() {
@@ -690,17 +707,8 @@ $(document).ready(function() {
 
 	$("#button-logout").click(function() {
 		localStorage.removeItem("token");
-		/*$("#vid-container").hide();
-		$("#playbar").hide();
-		$("#topbar nav").hide();
-		$("#userinfo").hide();
-		$(".tab").hide();
-		$("#main-container").css("bottom", "0px");*/
-
 		sessionStorage.clear();
 		window.location.reload();
-
-		//$("#tab-login").show();
 	});
 
 	$("#vmenu-add").click(function() {
@@ -926,39 +934,6 @@ $(document).ready(function() {
 		});
 	});
 
-	$("#pretty").click(function() {
-		if (selectedEpisodeId !== currentEpisodeId) {
-			autoplay = true;
-			mediaActions.playEpisode(selectedEpisodeId);
-		}
-		else {
-			playPauseToggle();
-		}
-	});
-
-	$("#pretty img").load(function() {
-		$("#pretty img").css("max-height", $("#main-container").height() * 0.4 + "px");
-	});
-
-	$("#episode-bar-events").click(function() {
-		if (small) {
-			$("#events").velocity({ left: "0%" });
-		}
-		else {
-			$("#events").velocity({ left: "66.666666%" });
-		}
-	});
-
-	$("#episode-bar-play").click(function() {
-		if (selectedEpisodeId !== currentEpisodeId) {
-			autoplay = true;
-			mediaActions.playEpisode(selectedEpisodeId);
-		}
-		else {
-			playPauseToggle();
-		}
-	});
-
 	$("#events").on("click", "#events-close", function() {
 		$("#events").velocity({ left: "100%" });
 	});
@@ -1145,39 +1120,12 @@ $(document).ready(function() {
 		o = e.pageX - $(".thumb").offset().left;
 	});
 
-	episodeinfoScroll = new IScroll('#episodeinfo', {
-		mouseWheel: true,
-		scrollbars: 'custom',
-		keyBindings: true,
-		interactiveScrollbars: true,
-		click: true
-	});
-
 	$(document).on("focus", "input", function() {
 		$(this).attr("autocomplete", "off")
 			.attr("autocorrect", "off")
 			.attr("autocapitalize", "off")
 			.attr("spellcheck", "false");
 	});
-
-	if (localStorage.token) {
-		API.setToken(localStorage.token);
-		$.ajaxSetup({
-			headers: { Authorization: localStorage.token }
-		});
-		localforage.config({
-			name: "Castcloud",
-			storeName: username
-		});
-		userActions.loginDone(true, username);
-		finishLogin();
-
-		$("#playbar").show();
-		$("#topbar nav").show();
-		$("#userinfo").show();
-	}
-
-	Backbone.history.start({ pushState: true, root: root });
 });
 
 function createRouter() {
@@ -1233,7 +1181,6 @@ function createRouter() {
 			}
 			else {
 				$("#tab-settings").show();
-				//updateStorageUsed();
 				$("#vid-container").addClass("thumb");
 			}
 		},
@@ -1314,53 +1261,17 @@ function addLabel(name) {
 }
 
 function loadEpisodeInfo(id) {
-	renderEvents(id);
-
-	var image = getEpisodeImage(id);
-	if (image) {
-		$("#pretty img").prop("src", image);
-		$("#pretty").show();
-		$("#pretty img").css("max-height", $("#main-container").height() * 0.4 + "px");
-	}
-	else {
-		$("#pretty").hide();
-	}
-
-	selectedEpisodeId = id;
-
 	var episode = id in episodes ? episodes[id] : tempEpisodes[id];
 	if (episode) {
-		$("#episode-title, #overlay-info h2").html(episode.feed.title);
-		$("#episode-date").html(new Date(episode.feed.pubDate).toLocaleString());
-		$("#episode-desc").html(episode.feed.description || " ");
-		$("#episode-desc *").removeAttr("style");
+		$("#overlay-info h2").html(episode.feed.title);
 		$("#overlay-info h5").html(casts[episode.castid].feed.title);
-		$("#episode-bar").show();
 	}
-
-	setTimeout(function() { episodeinfoScroll.refresh(); }, 0);
-
 	positionThumb();
 }
 
 function selectEpisode(id) {
 	selectedEpisodeId = id;
-	loadEpisodeInfo(id);
-	//sessionStorage.selectedepisode = id;
-	updatePrettyOverlay();
 	renderEvents(id);
-
-	if (currentEpisodeId === id) {
-		if (paused) {
-			$("#episode-bar-play").html("Play");
-		}
-		else {
-			$("#episode-bar-play").html("Pause");
-		}
-	}
-	else {
-		$("#episode-bar-play").html("Play");
-	}
 }
 
 function playEpisode(id) {
@@ -1379,8 +1290,6 @@ function playEpisode(id) {
 
 		if (id in episodes) {
 			sessionStorage.lastepisode = JSON.stringify({ id: id, castid: episodes[id].castid });
-
-			loadEpisodeInfo(id);
 
 			currentEpisodeId = id;
 
@@ -1449,21 +1358,27 @@ function login() {
 
 	username = $("#input-username").val();
 	var password = $("#input-password");
-
 	userActions.login(username, password.val());
-	userActions.loginDone.listen(function(loggedIn) {
-		if (loggedIn) {
-			finishLogin();
+	password.val("");
+}
 
+userActions.loginDone.listen(function(loggedIn, username, local) {
+	if (loggedIn) {
+		finishLogin();
+		if (local) {
+			Backbone.history.start({ pushState: true, root: root });
+			$("#playbar").show();
+			$("#topbar nav").show();
+			$("#userinfo").show();
+		}
+		else {
 			$("#tab-podcasts").velocity("fadeIn");
 			$("#playbar").velocity("slideDown");
 			$("#topbar nav").velocity("fadeIn");
 			$("#userinfo").velocity("fadeIn");
-		}
-	});
-
-	password.val("");
-}
+		}		
+	}
+});
 
 function finishLogin() {
 	loggedIn = true;
@@ -1480,13 +1395,14 @@ function finishLogin() {
 	}
 }
 
+var castsLoaded = false;
+
 function initDB() {
 	var render = _.after(2, function() {
 		renderCasts();
 
 		var template = _.template($("script.labels").html());
 		$("#add-to-label").empty().append(template({ labels: labels }));
-		//renderEpisodeFeed();
 	});
 
 	localforage.getItem("labels", function(err, data) {
@@ -1501,6 +1417,7 @@ function initDB() {
 		if (data) {
 			console.log("Casts loaded");
 			casts = data;
+			castsLoaded = true;
 			render();
 		}
 	});
@@ -1835,8 +1752,6 @@ function play() {
 	pushEvent(Event.Play);
 	$(".button-play i").addClass("fa-pause");
 	$(".button-play i").removeClass("fa-play");
-	$("#episode-bar-play").html("Pause");
-	updatePrettyOverlay();
 }
 
 function pause() {
@@ -1851,8 +1766,6 @@ function pause() {
 	pushEvent(Event.Pause);
 	$(".button-play i").addClass("fa-play");
 	$(".button-play i").removeClass("fa-pause");
-	$("#episode-bar-play").html("Play");
-	updatePrettyOverlay();
 }
 
 function seek(time) {
@@ -2053,30 +1966,6 @@ function positionThumb() {
 	}
 }
 
-function updatePrettyOverlay() {
-	if (selectedEpisodeId === currentEpisodeId) {
-		if (paused) {
-			$(".pretty-overlay").show();
-			if (videoLoading) {
-				$(".pretty-button").removeClass("fa-play-circle-o");
-				$(".pretty-button").addClass("fa-spinner fa-spin");
-			}
-			else {
-				$(".pretty-button").removeClass("fa-spinner fa-spin");
-				$(".pretty-button").addClass("fa-play-circle-o");
-			}
-		}
-		else {
-			$(".pretty-overlay").hide();
-		}
-	}
-	else {
-		$(".pretty-overlay").show();
-		$(".pretty-button").removeClass("fa-spinner fa-spin");
-		$(".pretty-button").addClass("fa-play-circle-o");
-	}
-}
-
 function popoutMessage(obj) {
 	poppedOut.postMessage(JSON.stringify(obj), "*");
 }
@@ -2111,16 +2000,5 @@ if (window.location.host === "castcloud.khlieng.com") {
 
 function demo() {
 	username = "demo";
-
 	userActions.login("demo", "pass");
-	userActions.loginDone.listen(function(loggedIn) {
-		if (loggedIn) {
-			finishLogin();
-
-			$("#tab-podcasts").velocity("fadeIn");
-			$("#playbar").velocity("slideDown");
-			$("#topbar nav").velocity("fadeIn");
-			$("#userinfo").velocity("fadeIn");
-		}
-	});
 }
