@@ -11,8 +11,7 @@ var state = {
 var episodeStore = Reflux.createStore({
     init: function() {
         this.listenTo(userActions.loginDone, this.loadLocalData);
-        this.listenTo(actions.select, this.select);
-        this.listenTo(actions.fetchDone, this.fetchDone);
+        this.listenToMany(actions);
         this.listenTo(eventStore, this.eventsChanged);
 
         state.selectedEpisode = sessionStorage.selectedepisode;
@@ -32,6 +31,11 @@ var episodeStore = Reflux.createStore({
 
     select: function(id) {
         state.selectedEpisode = id;
+        this.trigger(state);
+    },
+
+    delete: function(id) {
+        delete state.episodes[id];
         this.trigger(state);
     },
 

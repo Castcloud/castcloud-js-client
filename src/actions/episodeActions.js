@@ -3,6 +3,8 @@ var API = require('../api.js');
 
 var episodeActions = Reflux.createActions([
     "select",
+    "delete",
+    "resetPlayback",
     "fetch",
     "fetchDone"
 ]);
