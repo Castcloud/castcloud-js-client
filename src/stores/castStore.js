@@ -32,6 +32,11 @@ var castStore = Reflux.createStore({
         this.trigger(state);
     },
 
+    fetchDone: function(fetchedCasts) {
+        state.casts = fetchedCasts;
+        this.trigger(state);
+    },
+
     getDefaultData: function() {
         return state;
     }
