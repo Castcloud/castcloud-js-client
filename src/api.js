@@ -68,7 +68,7 @@ var API = {
 			.set("Authorization", token)
 			.send({ feedurl: feedurl })
 			.end(function(res) {
-				cb();
+				cb(res.body);
 			});
 	},
 

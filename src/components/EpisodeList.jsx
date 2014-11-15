@@ -38,6 +38,20 @@ var EpisodeList = React.createClass({
             }
         }.bind(this));
 
+        if (episodes.length > 0) {
+            episodes.sort(function(a, b) {
+                var d1 = new Date(a.props.episode.feed.pubDate);
+                var d2 = new Date(b.props.episode.feed.pubDate);
+                if (d1 > d2) {
+                    return -1;
+                }
+                if (d1 < d2) {
+                    return 1;
+                }
+                return 0;
+            });
+        }
+
         return (
             <div className="scroller">
                 <div className="episodes">

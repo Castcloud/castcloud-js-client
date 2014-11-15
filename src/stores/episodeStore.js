@@ -1,6 +1,7 @@
 var Reflux = require('reflux');
 var actions = require('../actions/episodeActions.js');
 var userActions = require('../actions/userActions.js');
+var castActions = require('../actions/castActions.js');
 var eventStore = require('./eventStore.js');
 
 var state = {
@@ -12,6 +13,7 @@ var episodeStore = Reflux.createStore({
     init: function() {
         this.listenTo(userActions.loginDone, this.loadLocalData);
         this.listenToMany(actions);
+        this.listenTo(castActions.remove, this.castRemoved);
         this.listenTo(eventStore, this.eventsChanged);
 
         state.selectedEpisode = sessionStorage.selectedepisode;
@@ -46,6 +48,15 @@ var episodeStore = Reflux.createStore({
             });
             this.trigger(state);
         }
+    },
+
+    castRemoved: function(castid) {
+        for (var id in state.episodes) {
+            if (state.episodes[id].castid === castid) {
+                delete state.episodes[id];
+            }
+        }
+        this.trigger(state);
     },
 
     eventsChanged: function(events) {

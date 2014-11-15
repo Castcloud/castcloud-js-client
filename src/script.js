@@ -94,14 +94,12 @@ contextMenus.cast = [{
 	content: "Unsubscribe",
 	action: function(id) {
 		$(".cast.selected").each(function() {
-			var _id = $(this).id();
-			$("#cast-" + _id).remove();
-			API.removeCast(_id);
+			var id = $(this).id();
+			$("#cast-" + id).remove();
+			castActions.remove(id);
 		});
 		$("#cast-" + id).remove();
-		API.removeCast(id, function() {
-			loadLabels();
-		});
+		castActions.remove(id);
 	}
 }, {
 	content: "Add to label",
@@ -141,6 +139,9 @@ contextMenus.label = [{
 episodeActions.resetPlayback.listen(resetPlayback);
 episodeActions.delete.listen(function(id) {
 	pushEvent(Event.Delete, id);
+});
+episodeActions.select.listen(function() {
+	router.navigate("p2", { trigger: true });
 });
 
 eventActions.show.listen(function() {
@@ -192,6 +193,7 @@ var videoLoading = false;
 var castHovered = null;
 var episodeHovered = null;
 
+var router;
 var page = 0;
 var small;
 var prevSmall = false;
@@ -279,7 +281,7 @@ $(document).ready(function() {
 	var menu = new Menu("#menu-container");
 
 	var Router = createRouter();
-	var router = new Router();
+	router = new Router();
 
 	router.bind("all", function(route, router) {
 		if (small) {
@@ -312,10 +314,6 @@ $(document).ready(function() {
 
 	$("#podcasts").on("click", ".cast", function() {
 		router.navigate("p1", { trigger: true });
-	});
-
-	$("#episodes").on("click", ".episode", function() {
-		router.navigate("p2", { trigger: true });
 	});
 
 	small = $(".col").css("width") === "100%";
@@ -1240,8 +1238,8 @@ var addingFeed = false;
 
 function addFeed(feedurl) {
 	API.addCast(feedurl, function() {
+		sync(true);
 		addingFeed = true;
-		loadEpisodes();
 	});
 
 	$("#input-vmenu-add").val("");

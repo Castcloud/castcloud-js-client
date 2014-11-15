@@ -27,6 +27,11 @@ var castStore = Reflux.createStore({
         }
     },
 
+    remove: function(id) {
+        delete state.casts[id];
+        this.trigger(state);
+    },
+
     select: function(id) {
         state.selectedCast = id;
         this.trigger(state);
