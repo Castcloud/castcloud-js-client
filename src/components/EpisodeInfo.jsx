@@ -5,13 +5,14 @@ var episodeStore = require('../stores/episodeStore.js');
 var castStore = require('../stores/castStore.js');
 var eventActions = require('../actions/eventActions.js');
 var IScrollMixin = require('../mixins/IScrollMixin.js');
+var util = require('../util.js');
 
 function buildState(data) {
 	var episode = data.episodes[data.selectedEpisode];
 	return {
 		title: episode ? episode.feed.title : null,
 		date: episode ? new Date(episode.feed.pubDate).toLocaleString() : null,
-		desc: episode ? episode.feed.description : null,
+		desc: episode ? util.strip(episode.feed.description) : null,
 		imgSrc: episode ? getImage(episode) : null,
 		imgHeight: window.innerHeight * 0.35,
 		selectedEpisode: episode
@@ -19,7 +20,7 @@ function buildState(data) {
 }
 
 function getImage(episode) {
-	var cast = castStore.getDefaultData().casts[episode.castid];
+	var cast = castStore.getState().casts[episode.castid];
 	return episode.feed["media:thumbnail"] ? episode.feed["media:thumbnail"].url : null ||
 		episode.feed["itunes:image"] ? episode.feed["itunes:image"].href : null ||
 		cast && cast.feed["itunes:image"] ? cast.feed["itunes:image"].href : null ||
@@ -29,14 +30,14 @@ function getImage(episode) {
 var EpisodeInfo = React.createClass({
 	mixins: [
 		Reflux.listenTo(episodeStore, "onEpisodesChanged"),
-		Reflux.listenTo(mediaStore, "onMediaChanged"),
 		Reflux.listenTo(castStore, "onCastsChanged"),
+		Reflux.connect(mediaStore, "media"),
 		IScrollMixin
 	],
 
 	getInitialState: function() {
-		var state = buildState(episodeStore.getDefaultData());
-		state.media = mediaStore.getDefaultData();
+		var state = buildState(episodeStore.getState());
+		state.media = mediaStore.getState();
 		return state;
 	},
 
@@ -52,14 +53,8 @@ var EpisodeInfo = React.createClass({
 		this.setState(buildState(data));
 	},
 
-	onMediaChanged: function(media) {
-		this.setState({
-			media: media
-		});
-	},
-
 	onCastsChanged: function() {
-		this.setState(buildState(episodeStore.getDefaultData()));
+		this.setState(buildState(episodeStore.getState()));
 	},
 
 	handleClick: function() {
@@ -111,7 +106,7 @@ var EpisodeInfo = React.createClass({
 					<div className="episodeinfo-text">
 						<h2 className="episode-title">{this.state.title}</h2>
 						<p className="episode-date">{this.state.date}</p>
-						<p className="episode-desc">{this.state.desc}</p>
+						<p className="episode-desc" dangerouslySetInnerHTML={{__html: this.state.desc}} />
 					</div>
 				</div>
 			</div>

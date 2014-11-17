@@ -224,6 +224,7 @@ input.vmenu-toggle {
 	border: none;
 	outline: none;
 	z-index: 1;
+	position: relative;
     box-sizing: border-box;
 }
 
@@ -299,6 +300,10 @@ button.vmenu-toggle:hover {
 	background: #000;
 }
 
+#podcasts {
+	height: 100%;
+}
+
 .col {
 	position: relative;
 	width: 33.333333%;
@@ -336,6 +341,11 @@ button.vmenu-toggle:hover {
 	padding-right: 0;
 }
 
+.label i {
+	float: right;
+	font-size: 20px;
+}
+
 .cast:hover, .episode:hover, .label > .name:hover, #add-to-label p:hover {
 	background: #0066cc;
 }
@@ -365,6 +375,7 @@ button.vmenu-toggle:hover {
 	outline: none;
 	background: rgba(0,0,0,0);
 	color: #FFF;
+	width: 100%;
 }
 
 .label .content .cast {

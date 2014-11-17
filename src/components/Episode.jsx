@@ -21,49 +21,47 @@ var Event = {
 	70: "Delete"
 };
 
-var media = {};
+function getIndicator(props) {
+	var media = mediaStore.getState();
+	var episode = props.episode;
+	var indicator;
+	if (media.currentEpisode && media.currentEpisode.id === episode.id && !media.ended) {
+		indicator = "fa-play";
+		if (media.loading) {
+			indicator = "fa-spinner fa-spin";
+		}
+		else if (media.paused) {
+			indicator = "fa-pause";
+		}
+	}
+	else if (episode.lastevent !== null) {
+		if (episode.lastevent.type >= Event.EndOfTrack) {
+			indicator = "fa-circle progress";
+		}
+		else if (episode.lastevent.positionts > 0) {
+			indicator = "fa-circle-o progress";
+		}
+	}
+	return indicator ? "fa " + indicator : null;
+}
 
 var Episode = React.createClass({
 	mixins: [
-		Reflux.listenTo(mediaStore, "onMediaChanged", "onMediaChanged")
+		Reflux.listenTo(mediaStore, "onMediaChanged")
 	],
 
 	getInitialState: function() {
 		return {
-			indicator: null
+			indicator: getIndicator(this.props)
 		};
 	},
 
 	componentWillReceiveProps: function(nextProps) {
-		this.updateIndicator(nextProps);
+		this.setState({ indicator: getIndicator(nextProps) });
 	},
 
-	onMediaChanged: function(_media) {
-		media = _media;
-		this.updateIndicator(this.props);
-	},
-
-	updateIndicator: function(props) {
-		var episode = props.episode;
-		var indicator;
-		if (media.currentEpisode && media.currentEpisode.id === episode.id && !media.ended) {
-			indicator = "fa-play";
-			if (media.loading) {
-				indicator = "fa-spinner fa-spin";
-			}
-			else if (media.paused) {
-				indicator = "fa-pause";
-			}
-		}
-		else if (episode.lastevent !== null) {
-			if (episode.lastevent.type >= Event.EndOfTrack) {
-				indicator = "fa-circle progress";
-			}
-			else if (episode.lastevent.positionts > 0) {
-				indicator = "fa-circle-o progress";
-			}
-		}
-		this.setState({ indicator: indicator ? "fa " + indicator : null });
+	onMediaChanged: function() {
+		this.setState({ indicator: getIndicator(this.props) });
 	},
 
 	handleClick: function() {

@@ -7,21 +7,18 @@ var IScrollMixin = require('../mixins/IScrollMixin.js');
 
 var EpisodeList = React.createClass({
     mixins: [
-        Reflux.listenTo(episodeStore, "onEpisodesChanged"),
-        Reflux.listenTo(castStore, "onCastsChanged", "onCastsChanged"),
+        Reflux.connect(episodeStore),
+        Reflux.listenTo(castStore, "onCastsChanged"),
         IScrollMixin
     ],
 
     getInitialState: function() {
+        var episodeState = episodeStore.getState();
         return {
-            episodes: {},
-            selectedEpisode: null,
-            selectedCast: null
+            episodes: episodeState.episodes,
+            selectedEpisode: episodeState.selectedEpisode,
+            selectedCast: castStore.getState().selectedCast
         };
-    },
-
-    onEpisodesChanged: function(state) {
-        this.setState(state);
     },
 
     onCastsChanged: function(state) {
@@ -34,7 +31,7 @@ var EpisodeList = React.createClass({
         var episodes = _.map(this.state.episodes, function(episode) {
             var selected = episode.id === this.state.selectedEpisode;
             if (episode.castid === this.state.selectedCast) {
-                return <Episode key={episode.id} episode={episode} selected={selected} />
+                return <Episode key={episode.id} episode={episode} selected={selected} />;
             }
         }.bind(this));
 

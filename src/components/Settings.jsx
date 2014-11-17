@@ -12,7 +12,7 @@ var Settings = React.createClass({
 
 	getInitialState: function() {
 		return {
-			settings: {},
+			settings: settingsStore.getState(),
 			selectedCategory: "General"
 		};
 	},

@@ -17,7 +17,7 @@ var userStore = Reflux.createStore({
 		this.trigger(user);
 	},
 
-	getDefaultData: function() {
+	getState: function() {
 		return user;
 	}
 });

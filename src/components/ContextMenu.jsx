@@ -8,7 +8,7 @@ var ContextMenu = React.createClass({
 	],
 
 	getInitialState: function() {
-		return contextMenuStore.getDefaultData();
+		return contextMenuStore.getState();
 	},
 
 	handleClick: function(action) {
@@ -18,7 +18,7 @@ var ContextMenu = React.createClass({
 
 	render: function() {
 		var menuItems = this.state.menu.map(function(item) {
-			return <div onClick={this.handleClick.bind(null, item.action)}>{item.content}</div>;
+			return <div onClick={this.handleClick.bind(null, item.action)}>{item.content}</div>
 		}.bind(this));
 
 		var style = {

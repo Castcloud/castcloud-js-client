@@ -85,7 +85,7 @@ var eventStore = Reflux.createStore({
 		}
 	},
 
-	getDefaultData: function() {
+	getState: function() {
 		return events;
 	}
 });

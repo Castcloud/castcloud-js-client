@@ -4,6 +4,7 @@ var API = require('../api.js');
 var labelActions = Reflux.createActions([
     "add",
     "update",
+    "beginRename",
     "rename",
     "remove",
     "fetch",

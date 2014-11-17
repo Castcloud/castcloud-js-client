@@ -14,6 +14,7 @@ var media = {
 };
 
 var episodes = {};
+var lastEpisodePlayed = false;
 
 var mediaStore = Reflux.createStore({
 	init: function() {
@@ -85,6 +86,13 @@ var mediaStore = Reflux.createStore({
 
 	episodesChanged: function(state) {
 		episodes = state.episodes;
+		if (!lastEpisodePlayed && sessionStorage.lastepisode) {
+			var lastEpisode = JSON.parse(sessionStorage.lastepisode);
+			if (lastEpisode.id in episodes) {
+				lastEpisodePlayed = true;
+				actions.playEpisode(lastEpisode.id);
+			}
+		}
 		if (media.currentEpisode && !(media.currentEpisode.id in episodes)) {
 			media.currentEpisode = null;
 			this.trigger(media);
@@ -96,7 +104,7 @@ var mediaStore = Reflux.createStore({
 		this.trigger(media);
 	},
 
-	getDefaultData: function() {
+	getState: function() {
 		return media;
 	}
 });

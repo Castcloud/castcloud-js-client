@@ -32,7 +32,7 @@ var appStore = Reflux.createStore({
 		this.trigger(app);
 	},
 
-	getDefaultData: function() {
+	getState: function() {
 		return app;
 	}
 });

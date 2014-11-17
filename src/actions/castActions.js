@@ -4,6 +4,7 @@ var API = require('../api.js');
 var castActions = Reflux.createActions([
     "add",
     "addDone",
+    "beginRename",
     "rename",
     "remove",
     "select",

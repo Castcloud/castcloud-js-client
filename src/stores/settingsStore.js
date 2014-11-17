@@ -53,7 +53,7 @@ var settingsStore = Reflux.createStore({
 		this.trigger(settings);
 	},
 
-	getDefaultData: function() {
+	getState: function() {
 		return settings;
 	}
 });

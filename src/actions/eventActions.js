@@ -11,13 +11,6 @@ var eventActions = Reflux.createActions([
 
 eventActions.send.preEmit = function(event) {
 	API.sendEvent(event);
-	/*API.sendEvent({
-		type: type,
-		episodeid: id,
-		positionts: time === undefined ? el("vid").currentTime | 0 : time,
-		concurrentorder: currentOrder,
-		clientts: eventTS
-	});*/
 };
 
 eventActions.fetch.preEmit = function() {

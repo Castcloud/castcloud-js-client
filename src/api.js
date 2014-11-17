@@ -118,26 +118,36 @@ var API = {
 			.set("Authorization", token)
 			.end(function(res) {
 				if (res.ok) {
-					var rootLabelId;
-					var labels = {};
-					res.body.forEach(function(label) {
-						if (label.name === "root") {
-							rootLabelId = label.id;
-						}
-						labels[label.name] = [];
-						if (label.content) {
-							label.content.split(",").forEach(function(item) {
-								var split = item.split("/");
-								labels[label.name].push({
-									type: split[0],
-									id: parseInt(split[1])
-								});
+					var labels = [];
+					var root = _.find(res.body, "root");
+
+					root.content.split(",").forEach(function(item) {
+						var split = item.split("/");
+						var type = split[0];
+						var id = split[1];
+						
+						if (type === "cast") {
+							labels.push({
+								id: id,
+								type: "cast"
 							});
 						}
-						labels[label.id] = {
-							name: label.name,
-							expanded: label.expanded
-						};
+						else {
+							var label = _.find(res.body, { id: id });
+							var casts = [];
+							if (label.content) {
+								casts = label.content.split(",").map(function(item) {
+									return item.split("/")[1];
+								});
+							}
+							labels.push({
+								id: id,
+								type: "label",
+								name: label.name,
+								expanded: label.expanded,
+								casts: casts
+							});
+						}
 					});
 
 					cb(labels);

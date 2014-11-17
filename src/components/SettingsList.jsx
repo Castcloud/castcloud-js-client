@@ -9,7 +9,7 @@ var SettingsList = React.createClass({
 			var classes = this.props.selectedCategory === category ? "selected " : "";
 			var selectCategory = settingsActions.selectCategory.bind(null, category);
 
-			return <p className={classes + "setting-button"} onClick={selectCategory}>{category}</p>
+			return <p className={classes + "setting-button"} onClick={selectCategory}>{category}</p>;
 		}.bind(this));
 		return <div className="settings-menu">{categories}</div>;
 	}

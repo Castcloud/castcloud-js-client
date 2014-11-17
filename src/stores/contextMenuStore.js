@@ -32,7 +32,7 @@ var contextMenuStore = Reflux.createStore({
 		this.trigger(state);
 	},
 
-	getDefaultData: function() {
+	getState: function() {
 		return state;
 	}
 });
