@@ -62,9 +62,13 @@ var episodeStore = Reflux.createStore({
     eventsChanged: function(events) {
         _.each(events, function(event) {
             var episode = state.episodes[event.episodeid];
-            if (event.episodeid in state.episodes &&
-                (!episode.lastevent || event.clientts > episode.lastevent.clientts)) {
-                episode.lastevent = event;
+            if (event.episodeid in state.episodes) {
+                if (!episode.lastevent || 
+                    event.clientts > episode.lastevent.clientts ||
+                    (event.clientts === episode.lastevent.clientts && 
+                    event.concurrentorder > episode.lastevent.concurrentorder)) {
+                    episode.lastevent = event;
+                }
             }
         });
         this.trigger(state);

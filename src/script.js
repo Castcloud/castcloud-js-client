@@ -236,10 +236,10 @@ $(document).ready(function() {
 
 	root = CLIENT_ROOT;
 	apiRoot = localStorage[uniqueName("apiTarget")] || window.location.protocol + "//" + window.location.host + root.replace("client", "api");
-	
+	API.setRoot(apiRoot);
+
 	var storedToken = localStorage.token;
 	if (storedToken) {
-		API.setRoot(apiRoot);
 		API.setToken(storedToken);
 		userActions.loginDone(true, username, true);
 	}
