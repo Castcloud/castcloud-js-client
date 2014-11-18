@@ -22,7 +22,7 @@ var settingsStore = Reflux.createStore({
 			localforage.getItem("settings", function(err, data) {
 				if (data) {
 					console.log("Settings loaded");
-					settings = $.extend(true, {}, DefaultSettings, data);
+					settings = _.extend({}, DefaultSettings, data);
 					this.trigger(settings);
 
 					$(".thumb").width(settings.__client.ThumbWidth.value);
@@ -40,16 +40,15 @@ var settingsStore = Reflux.createStore({
 		settings = DefaultSettings;
 		this.trigger(settings);
 
-		for (var category in settings) {
-			for (var name in settings[category]) {
-				var setting = settings[category][name];
+		_.each(Object.keys(settings), function(category) {
+			_.each(settings[category], function(setting, name) {
 				API.saveSetting(name, setting.value, category);
-			}
-		}
+			});
+		});
 	},
 
 	fetchDone: function(fetchedSettings) {
-		settings = $.extend(true, {}, DefaultSettings, fetchedSettings);
+		settings = _.extend({}, DefaultSettings, fetchedSettings);
 		this.trigger(settings);
 	},
 

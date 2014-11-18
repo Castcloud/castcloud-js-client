@@ -43,7 +43,7 @@ var DefaultSettings = {
 	Advanced: {
 		SyncInterval: {
 			type: SettingType.Text,
-			value: 10
+			value: 60
 		}
 	},
 	__client: {

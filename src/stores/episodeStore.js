@@ -31,19 +31,19 @@ var episodeStore = Reflux.createStore({
         }
     },
 
-    select: function(id) {
-        state.selectedEpisode = id;
-        this.trigger(state);
-    },
-
     delete: function(id) {
         delete state.episodes[id];
         this.trigger(state);
     },
 
+    select: function(id) {
+        state.selectedEpisode = id;
+        this.trigger(state);
+    },
+
     fetchDone: function(fetchedEpisodes) {
         if (fetchedEpisodes.length > 0) {
-            fetchedEpisodes.forEach(function(episode) {
+            _.each(fetchedEpisodes, function(episode) {
                 state.episodes[episode.id] = episode;
             });
             this.trigger(state);
@@ -51,16 +51,16 @@ var episodeStore = Reflux.createStore({
     },
 
     castRemoved: function(castid) {
-        for (var id in state.episodes) {
-            if (state.episodes[id].castid === castid) {
+        _.each(state.episodes, function(episode, id) {
+            if (episode.castid === castid) {
                 delete state.episodes[id];
             }
-        }
+        });
         this.trigger(state);
     },
 
     eventsChanged: function(events) {
-        events.forEach(function(event) {
+        _.each(events, function(event) {
             var episode = state.episodes[event.episodeid];
             if (event.episodeid in state.episodes &&
                 (!episode.lastevent || event.clientts > episode.lastevent.clientts)) {

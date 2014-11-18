@@ -9,8 +9,13 @@ var episodeActions = Reflux.createActions([
     "fetchDone"
 ]);
 
-episodeActions.fetch.preEmit = function() {
-    API.getNewEpisodes(episodeActions.fetchDone);
+episodeActions.fetch.preEmit = function(castid) {
+	if (castid) {
+		API.getEpisodes(castid, episodeActions.fetchDone);
+	}
+	else {
+		API.getNewEpisodes(episodeActions.fetchDone);
+	}
 };
 
 module.exports = episodeActions;

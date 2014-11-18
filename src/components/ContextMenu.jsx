@@ -17,7 +17,7 @@ var ContextMenu = React.createClass({
 	},
 
 	render: function() {
-		var menuItems = this.state.menu.map(function(item) {
+		var menuItems = _.map(this.state.menu, function(item) {
 			return <div onClick={this.handleClick.bind(null, item.action)}>{item.content}</div>
 		}.bind(this));
 

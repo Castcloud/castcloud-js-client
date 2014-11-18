@@ -5,10 +5,10 @@ var count = {};
 
 function updateCount(episodes) {
 	count = {};
-	for (var id in episodes) {
-		var castid = episodes[id].castid;
+	_.each(episodes, function(episode) {
+		var castid = episode.castid;
 		count[castid] = castid in count ? count[castid] + 1 : 1;
-	}
+	});
 }
 
 var episodeCountStore = Reflux.createStore({

@@ -59,7 +59,7 @@ var eventStore = Reflux.createStore({
 
 	fetchDone: function(fetchedEvents) {
 		if (fetchedEvents.length > 0) {
-			fetchedEvents.forEach(function(event) {
+			_.each(fetchedEvents, function(event) {
 				event.name = Event[event.type];
 				events.push(event);
 			});

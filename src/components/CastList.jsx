@@ -27,19 +27,22 @@ var CastList = React.createClass({
 
 	renderCast: function(id) {
 		var cast = this.state.casts[id];
-		var selected = cast.id === this.state.selectedCast;
-		return <Cast key={"cast" + id}
-			cast={cast}
-			name={cast.name}
-			count={this.state.count[cast.id]}
-			selected={selected} />;
+		if (cast) {
+			var selected = cast.id === this.state.selectedCast;
+			return <Cast key={"cast" + id}
+				cast={cast}
+				name={cast.name}
+				count={this.state.count[cast.id]}
+				selected={selected} />;
+		}
+		return null;
 	},
 
 	render: function() {
 		var items = _.map(this.state.labels, function(item) {
 			if (item.type === "label") {
 				return (
-					<Label id={item.id} name={item.name}>
+					<Label key={"label" + item.id} id={item.id} name={item.name} expanded={item.expanded}>
 						{_.map(item.casts, this.renderCast)}
 					</Label>
 				);

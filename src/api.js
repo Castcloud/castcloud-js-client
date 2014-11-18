@@ -52,23 +52,24 @@ var API = {
 			.set("Authorization", token)
 			.end(function(res) {
 				if (res.ok) {
-					var casts = {};
-					res.body.forEach(function(cast) {
-						casts[cast.id] = cast;
-					});
-					cb(casts);
+					cb(_.indexBy(res.body, "id"));
 				}
 			});
 	},
 
-	addCast: function(feedurl, cb) {
+	addCast: function(feedurl, success, fail) {
 		request
 			.post(url("library/casts"))
 			.type("form")
 			.set("Authorization", token)
 			.send({ feedurl: feedurl })
 			.end(function(res) {
-				cb(res.body);
+				if (res.ok) {
+					success(res.body);
+				}
+				else {
+					fail(feedurl);
+				}
 			});
 	},
 
@@ -121,7 +122,7 @@ var API = {
 					var labels = [];
 					var root = _.find(res.body, "root");
 
-					root.content.split(",").forEach(function(item) {
+					_.each(root.content.split(","), function(item) {
 						var split = item.split("/");
 						var type = split[0];
 						var id = split[1];
@@ -136,7 +137,7 @@ var API = {
 							var label = _.find(res.body, { id: id });
 							var casts = [];
 							if (label.content) {
-								casts = label.content.split(",").map(function(item) {
+								casts = _.map(label.content.split(","), function(item) {
 									return item.split("/")[1];
 								});
 							}
@@ -155,18 +156,27 @@ var API = {
 			});
 	},
 
-	addLabel: function(name, cb) {
+	addLabel: function(name, success, fail) {
 		request
 			.post(url("library/labels"))
 			.type("form")
 			.set("Authorization", token)
 			.send({ name: name })
 			.end(function(res) {
-				cb();
+				if (res.ok) {
+					success(res.body);
+				}
+				else {
+					fail(name);
+				}
 			});
 	},
 
 	updateLabel: function(id, data, cb) {
+		if (data.casts) {
+			data.content = "herp";
+			delete data.casts;
+		}
 		request
 			.put(url("library/labels/" + id))
 			.type("form")
@@ -231,7 +241,7 @@ var API = {
 				.end(function(res) {
 					if (res.ok) {
 						localforage.setItem("since_events", res.body.timestamp);
-						res.body.events.forEach(function(event) {
+						_.each(res.body.events, function(event) {
 							var position = new Date(event.positionts * 1000);
 							position.setHours(position.getHours() - 1);
 							event.position = "";
@@ -275,7 +285,7 @@ var API = {
 			.end(function(res) {
 				if (res.ok) {
 					var settings = {};
-					res.body.forEach(function(setting) {
+					_.each(res.body, function(setting) {
 						var category = setting.setting.split("/")[0];
 						var name = setting.setting.split("/")[1];
 						if (name === undefined) {

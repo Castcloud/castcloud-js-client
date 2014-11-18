@@ -2,6 +2,7 @@ var Reflux = require('reflux');
 var actions = require('../actions/castActions.js');
 var userActions = require('../actions/userActions.js');
 var appActions = require('../actions/appActions.js');
+var episodeActions = require('../actions/episodeActions.js');
 
 var state = {
     casts: {},
@@ -28,7 +29,25 @@ var castStore = Reflux.createStore({
         }
     },
 
-    addDone: appActions.sync,
+    add: function(url, name) {
+        state.casts[url] = {
+            id: url,
+            name: name || url
+        };
+    },
+
+    addDone: function(cast) {
+        delete state.casts[cast.url];
+        state.casts[cast.id] = cast;
+        this.trigger(state);
+
+        episodeActions.fetch(cast.id);
+    },
+
+    addFailed: function(url) {
+        delete state.casts[url];
+        this.trigger(state);
+    },
 
     rename: function(id, name) {
         state.casts[id].name = name;

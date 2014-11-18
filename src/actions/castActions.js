@@ -4,6 +4,7 @@ var API = require('../api.js');
 var castActions = Reflux.createActions([
     "add",
     "addDone",
+    "addFailed",
     "beginRename",
     "rename",
     "remove",
@@ -13,7 +14,7 @@ var castActions = Reflux.createActions([
 ]);
 
 castActions.add.preEmit = function(feedurl) {
-    API.addCast(feedurl, castActions.addDone);
+    API.addCast(feedurl, castActions.addDone, castActions.addFailed);
 };
 
 castActions.rename.preEmit = function(id, name) {
