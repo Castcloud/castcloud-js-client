@@ -188,7 +188,7 @@ var API = {
 	},
 
 	renameLabel: function(id, name, cb) {
-		updateLabel(id, { name: name }, cb);
+		this.updateLabel(id, { name: name }, cb);
 	},
 
 	removeLabel: function(id, cb) {

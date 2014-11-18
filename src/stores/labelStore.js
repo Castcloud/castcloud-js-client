@@ -87,7 +87,6 @@ var labelStore = Reflux.createStore({
     },
 
     castAdded: function(cast) {
-    	console.log(labels);
     	var label = _.find(labels, { id: cast.url });
     	label.id = cast.id;
     	this.trigger(labels);

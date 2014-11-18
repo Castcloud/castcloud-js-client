@@ -10,7 +10,8 @@ var Cast = React.createClass({
 
 	getInitialState: function() {
 		return {
-			editing: false
+			editing: false,
+			doneEditing: false
 		};
 	},
 
@@ -22,9 +23,9 @@ var Cast = React.createClass({
 		}
 	},
 
-	componentWillReceiveProps: function(nextProps) {
-		if (this.props.name !== nextProps.name) {
-			this.setState({ editing: false });
+	componentWillReceiveProps: function() {
+		if (this.state.doneEditing) {
+			this.setState({ editing: false, doneEditing: false });
 		}
 	},
 
@@ -45,6 +46,8 @@ var Cast = React.createClass({
 
 	handleKey: function(e) {
 		if (e.which === 13) {
+			this.setState({ doneEditing: true });
+			
 			var name = this.refs.nameInput.getDOMNode().value;
 			castActions.rename(this.props.cast.id, name);
 		}
