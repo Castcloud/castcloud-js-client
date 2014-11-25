@@ -28,6 +28,7 @@ var settingsStore = require('./stores/settingsStore.js');
 var CastList = require('./components/CastList.jsx');
 var EpisodeList = require('./components/EpisodeList.jsx');
 var EpisodeInfo = require('./components/EpisodeInfo.jsx');
+var EventList = require('./components/EventList.jsx');
 var Settings = require('./components/Settings.jsx');
 var ContextMenu = require('./components/ContextMenu.jsx');
 
@@ -41,9 +42,6 @@ appStore.listen(function(newApp) {
 var events = [];
 eventStore.listen(function(_events) {
 	events = _events;
-	if (selectedEpisodeId !== null) {
-		renderEvents(selectedEpisodeId);
-	}
 });
 
 var casts = {};
@@ -56,7 +54,6 @@ episodeStore.listen(function(state) {
 	episodes = state.episodes;
 	if (state.selectedEpisode) {
 		selectedEpisodeId = state.selectedEpisode;
-		renderEvents(state.selectedEpisode);
 	}
 });
 
@@ -89,18 +86,25 @@ episodeActions.select.listen(function() {
 	router.navigate("p2", { trigger: true });
 });
 
-eventActions.show.listen(function() {
-	if (small) {
-		$("#events").velocity({ left: "0%" });
-	}
-	else {
-		$("#events").velocity({ left: "66.666666%" });
+eventActions.fire.listen(function(event) {
+	if (event.episodeid === currentEpisodeId) {
+		var video = el("vid");
+
+		video.currentTime = event.positionts;
+		Chromecast.seek(event.positionts);
+		if (event.type == Event.Start || event.type == Event.Play) {
+			video.play();
+		}
+		else {
+			video.pause();
+		}
 	}
 });
 
 React.render(<CastList />, document.getElementById("podcasts"));
 React.render(<EpisodeList />, document.getElementById("episode-list"));
 React.render(<EpisodeInfo />, document.getElementById("episodeinfo"));
+React.render(<EventList />, document.getElementById("events"));
 React.render(<Settings />, document.getElementById("tab-settings"));
 React.render(<ContextMenu />, document.getElementById("context-menu"));
 
@@ -109,7 +113,7 @@ var loggedIn = false;
 var root;
 var apiRoot;
 
-var tempEpisodes = {};
+//var tempEpisodes = {};
 
 var poppedOut;
 var mediaType;
@@ -121,7 +125,7 @@ var ended = false;
 var playbackQueue = [];
 var currentQueuePosition = 0;
 
-var episodeFeedScroll;
+//var episodeFeedScroll;
 
 var currentEpisodeId = null;
 var currentEpisodeDuration;
@@ -130,7 +134,7 @@ var videoLoading = false;
 
 var router;
 var page = 0;
-var small;
+window.small = null;
 var prevSmall = false;
 
 Chromecast.init("3EC703A8");
@@ -164,19 +168,19 @@ Chromecast.timeUpdate(function(time) {
 
 function Menu(el) {
 	this.visible = false;
-	this.el = $(el);
+	this.el = document.getElementById(el);
 }
 
 Menu.prototype.show = function() {
 	if (!this.visible) {
-		this.el.velocity("slideDown");
+		Velocity(this.el, "slideDown");
 		this.visible = true;
 	}
 }
 
 Menu.prototype.hide = function() {
 	if (this.visible) {
-		this.el.velocity("slideUp");
+		Velocity(this.el, "slideUp");
 		this.visible = false;
 	}
 }
@@ -190,13 +194,13 @@ Menu.prototype.toggle = function() {
 	}
 }
 
-$.Velocity.defaults.duration = 200;
+Velocity.defaults.duration = 200;
 
 $(document).ready(function() {
 	//DragDrop.init("#podcasts", ".drag");
 	//DragDrop.ended(saveLabels);
 
-	var menu = new Menu("#menu-container");
+	var menu = new Menu("menu-container");
 
 	var Router = createRouter();
 	router = new Router();
@@ -230,10 +234,10 @@ $(document).ready(function() {
 		$("#input-target").val(apiRoot);
 	}
 
-	small = $(".col").css("width") === "100%";
+	window.small = $(".col").css("width") === "100%";
 
 	$(window).resize(function() {
-		small = window.innerWidth < 665;
+		window.small = window.innerWidth < 665;
 		if (!prevSmall && small) {
 			$(".col").hide();
 			$(".col:eq(" + page + ")").show();
@@ -480,7 +484,6 @@ $(document).ready(function() {
 		}
 
 		if (lastevent !== null && videoLoading && lastevent.type != Event.EndOfTrack) {
-			console.log(lastevent.positionts);
 			video.currentTime = lastevent.positionts;
 
 			if (lastevent.type == Event.Play) {
@@ -815,26 +818,6 @@ $(document).ready(function() {
 				$("#input-target-container i").hide();
 			}
 		});
-	});
-
-	$("#events").on("click", "#events-close", function() {
-		$("#events").velocity({ left: "100%" });
-	});
-
-	$("#events").on("click", "div", function() {
-		$("#events").velocity({ left: "100%" });
-
-		var type = $(this).attr("event-type");
-		var video = el("vid");
-
-		video.currentTime = $(this).attr("event-position");
-		Chromecast.seek($(this).attr("event-position"));
-		if (type == Event.Start || type == Event.Play) {
-			video.play();
-		}
-		else {
-			video.pause();
-		}
 	});
 
 	$(".cc").click(function() {
@@ -1248,7 +1231,7 @@ function sync(onDemand) {
 		$("#episodes").empty().append('<div class="episodes-empty"><h2>There are no episodes left</h2><button id="show-all-episodes" class="button">Show me everything!</button></div>');
 	}*/
 
-function renderEpisodeFeed() {
+/*function renderEpisodeFeed() {
 	var e = [];
 	for (var id in episodes) {
 		if (!(episodes[id].lastevent && episodes[id].lastevent.type == Event.Delete) && episodes[id].feed) {
@@ -1286,7 +1269,7 @@ function renderEpisodeFeed() {
 			click: true
 		});
 	}
-}
+}*/
 
 function showAllEpisodes(castid) {
 	API.getEpisodes(castid, function(episodes) {
@@ -1320,20 +1303,6 @@ function setKeybinds() {
 	Mousetrap.bind(settings.Keybinds.Previous.value, previousEpisode);
 	Mousetrap.bind(settings.Keybinds.SkipForward.value, skipForward);
 	Mousetrap.bind(settings.Keybinds.SkipBack.value, skipBack);
-}
-
-function renderEvents(id) {
-	var e = [];
-	for (var i = 0; i < events.length; i++) {
-		if (events[i].episodeid == id) {
-			e.push(events[i]);
-			if (e.length === 10) {
-				break;
-			}
-		}
-	}
-	var template = _.template($("script.events").html());
-	$("#events").empty().append(template({ events: e }));
 }
 
 function playPauseToggle() {

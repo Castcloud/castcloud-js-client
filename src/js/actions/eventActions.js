@@ -4,6 +4,7 @@ var buildEvent = require('../event.js').buildEvent;
 
 var eventActions = Reflux.createActions([
 	"send",
+	"fire",
 	"show",
 	"hide",
 	"fetch",

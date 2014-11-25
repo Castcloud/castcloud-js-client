@@ -612,7 +612,7 @@ button.vmenu-toggle:hover {
 	float: right;
 }
 
-#episodeinfo p, #events p {
+#episodeinfo p, .events p {
 	margin: 5px 0;
 	line-height: 1.5;
 }
@@ -650,7 +650,7 @@ button.vmenu-toggle:hover {
 	color: #0066cc;
 }
 
-#events {
+.events {
 	position: absolute;
 	left: 100%;
 	top: 0;
@@ -660,44 +660,44 @@ button.vmenu-toggle:hover {
 	z-index: 1;
 }
 
-#events-close {
+.events .button {
 	position: absolute;
 	right: 0;
 	top: 0;
 }
 
-#events h1 {
+.events h1 {
 	margin: 10px 15px;
 }
 
-#events div {
+.events div {
 	color: #AAA;
 	padding: 5px 15px;
 	cursor: pointer;
 }
 
-#events div:hover {
+.events div:hover {
 	background: #333;
 }
 
-#events div:active {
+.events div:active {
 	background: #444;
 }
 
-#events .what {
+.events .what {
 	color: #0099cc;
 }
 
-#events .who {
+.events .who {
 	font-size: 11px;
 }
 
-#events .when {
+.events .when {
 	float: right;
 	font-size: 11px;
 }
 
-#events .secondline {
+.events .secondline {
 	line-height: 1;
 	clear: both;
 }
