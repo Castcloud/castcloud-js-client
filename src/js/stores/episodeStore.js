@@ -9,6 +9,20 @@ var state = {
     selectedEpisode: null
 };
 
+function updateLastEvent(events) {
+    _.each(events, function(event) {
+        var episode = state.episodes[event.episodeid];
+        if (event.episodeid in state.episodes) {
+            if (!episode.lastevent || 
+                event.clientts > episode.lastevent.clientts ||
+                (event.clientts === episode.lastevent.clientts && 
+                event.concurrentorder > episode.lastevent.concurrentorder)) {
+                episode.lastevent = event;
+            }
+        }
+    });
+}
+
 var episodeStore = Reflux.createStore({
     init: function() {
         this.listenTo(userActions.loginDone, this.loadLocalData);
@@ -25,6 +39,7 @@ var episodeStore = Reflux.createStore({
                 if (data) {
                     console.log("Episodes loaded");
                     state.episodes = data;
+                    updateLastEvent(eventStore.getState());
                     this.trigger(state);
                 }
             }.bind(this));
@@ -60,17 +75,7 @@ var episodeStore = Reflux.createStore({
     },
 
     eventsChanged: function(events) {
-        _.each(events, function(event) {
-            var episode = state.episodes[event.episodeid];
-            if (event.episodeid in state.episodes) {
-                if (!episode.lastevent || 
-                    event.clientts > episode.lastevent.clientts ||
-                    (event.clientts === episode.lastevent.clientts && 
-                    event.concurrentorder > episode.lastevent.concurrentorder)) {
-                    episode.lastevent = event;
-                }
-            }
-        });
+        updateLastEvent(events);
         this.trigger(state);
     },
 

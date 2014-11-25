@@ -1,23 +1,8 @@
 var Reflux = require('reflux');
 var actions = require('../actions/eventActions.js');
 var userActions = require('../actions/userActions.js');
-
-var Event = {
-	Start: 10,
-	Pause: 20,
-	Play: 30,
-	SleepStart: 40,
-	SleepEnd: 50,
-	EndOfTrack: 60,
-	Delete: 70,
-	10: "Start",
-	20: "Pause",
-	30: "Play",
-	40: "Sleep Started",
-	50: "Sleep Ended",
-	60: "End Of Track",
-	70: "Delete"
-};
+var buildEvent = require('../event.js').buildEvent;
+var Event = require('../event.js').Event;
 
 var events = [];
 
@@ -33,20 +18,14 @@ var eventStore = Reflux.createStore({
 				if (data) {
 					console.log("Events loaded");
 					events = data;
-					this.trigger(events);
 
-					/*if (window.name !== "popout") {
-						if (localStorage.beforeunloadevent) {
-							var ev = JSON.parse(localStorage.beforeunloadevent);
-							pushEvent(ev.type, ev.id, ev.time);
-							localStorage.removeItem("beforeunloadevent");
-						}
-						if (localStorage.unloadevent) {
-							var ev = JSON.parse(localStorage.unloadevent);
-							pushEvent(ev.type, ev.id, ev.time);
-							localStorage.removeItem("unloadevent");
-						}
-					}*/
+					var unloadevent = localStorage.unloadevent;
+					if (unloadevent) {
+						var ev = JSON.parse(unloadevent);
+						events.unshift(buildEvent(ev.type, ev.id, ev.time));
+						localStorage.removeItem("unloadevent");
+					}
+					this.trigger(events);
 				}
 			}.bind(this));
 		}

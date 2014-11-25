@@ -22,7 +22,7 @@ var settingsStore = Reflux.createStore({
 			localforage.getItem("settings", function(err, data) {
 				if (data) {
 					console.log("Settings loaded");
-					settings = _.extend({}, DefaultSettings, data);
+					settings = _.merge({}, DefaultSettings, data);
 					this.trigger(settings);
 
 					$(".thumb").width(settings.__client.ThumbWidth.value);
@@ -48,7 +48,7 @@ var settingsStore = Reflux.createStore({
 	},
 
 	fetchDone: function(fetchedSettings) {
-		settings = _.extend({}, DefaultSettings, fetchedSettings);
+		settings = _.merge({}, DefaultSettings, fetchedSettings);
 		this.trigger(settings);
 	},
 

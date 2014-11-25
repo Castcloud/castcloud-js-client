@@ -18,7 +18,6 @@ var episodeActions = require('./actions/episodeActions.js');
 var episodeStore = require('./stores/episodeStore.js');
 
 var mediaActions = require('./actions/mediaActions.js');
-var mediaStore = require('./stores/mediaStore.js');
 
 var eventActions = require('./actions/eventActions.js');
 var eventStore = require('./stores/eventStore.js');
@@ -31,6 +30,8 @@ var EpisodeList = require('./components/EpisodeList.jsx');
 var EpisodeInfo = require('./components/EpisodeInfo.jsx');
 var Settings = require('./components/Settings.jsx');
 var ContextMenu = require('./components/ContextMenu.jsx');
+
+var Event = require('./event.js').Event;
 
 var app = appStore.getState();
 appStore.listen(function(newApp) {
@@ -78,7 +79,7 @@ mediaActions.playEpisode.listen(function(id) {
 
 episodeActions.resetPlayback.listen(resetPlayback);
 episodeActions.delete.listen(function(id) {
-	pushEvent(Event.Delete, id);
+	eventActions.send(Event.Delete, id);
 });
 
 castActions.select.listen(function() {
@@ -117,8 +118,6 @@ var autoplay = false;
 var currentTime;
 var paused = false;
 var ended = false;
-var lastEventTS = null;
-var currentOrder = 0;
 var playbackQueue = [];
 var currentQueuePosition = 0;
 
@@ -133,23 +132,6 @@ var router;
 var page = 0;
 var small;
 var prevSmall = false;
-
-var Event = {
-	Start: 10,
-	Pause: 20,
-	Play: 30,
-	SleepStart: 40,
-	SleepEnd: 50,
-	EndOfTrack: 60,
-	Delete: 70,
-	10: "Start",
-	20: "Pause",
-	30: "Play",
-	40: "Sleep Started",
-	50: "Sleep Ended",
-	60: "End Of Track",
-	70: "Delete"
-};
 
 Chromecast.init("3EC703A8");
 Chromecast.session(function() {
@@ -300,10 +282,10 @@ $(document).ready(function() {
 	$("#vid-thumb-bar .popout").click(function() {
 		var video = el("vid");
 		if (paused) {
-			pushEvent(Event.Pause);
+			eventActions.send(Event.Pause, currentEpisodeId);
 		}
 		else {
-			pushEvent(Event.Play);
+			eventActions.send(Event.Play, currentEpisodeId);
 		}
 		video.setAttribute("src", "#");
 		video.load();
@@ -325,7 +307,7 @@ $(document).ready(function() {
 		$(poppedOut).on("unload", function() {
 			if (localStorage.beforeunloadevent) {
 				var ev = JSON.parse(localStorage.beforeunloadevent);
-				pushEvent(ev.type, ev.id, ev.time);
+				eventActions.send(ev.type, ev.id, ev.time);
 				localStorage.removeItem("unloadevent");
 				localStorage.removeItem("beforeunloadevent");
 			}
@@ -441,19 +423,7 @@ $(document).ready(function() {
 		}
 	});
 
-	$(window).on("beforeunload", function() {
-		if (currentEpisodeId !== null) {
-			if (!paused && !ended) {
-				localStorage.beforeunloadevent = JSON.stringify({
-					type: Event.Play,
-					id: currentEpisodeId,
-					time: el("vid").currentTime | 0
-				});
-			}
-		}
-	});
-
-	$(window).on("unload", function() {
+	function shoveUnloadEvent() {
 		if (currentEpisodeId !== null) {
 			if (!paused && !ended) {
 				localStorage.unloadevent = JSON.stringify({
@@ -463,7 +433,10 @@ $(document).ready(function() {
 				});
 			}
 		}
-	});
+	}
+
+	$(window).on("beforeunload", shoveUnloadEvent);
+	$(window).on("unload", shoveUnloadEvent);
 
 	$(".button-skipback").click(function() {
 		skipBack();
@@ -507,6 +480,7 @@ $(document).ready(function() {
 		}
 
 		if (lastevent !== null && videoLoading && lastevent.type != Event.EndOfTrack) {
+			console.log(lastevent.positionts);
 			video.currentTime = lastevent.positionts;
 
 			if (lastevent.type == Event.Play) {
@@ -526,7 +500,7 @@ $(document).ready(function() {
 	});
 
 	$("#vid").on("ended", function() {
-		pushEvent(Event.EndOfTrack);
+		eventActions.send(Event.EndOfTrack, currentEpisodeId);
 		$("#vid-container").hide();
 		ended = true;
 		nextEpisode();
@@ -534,13 +508,13 @@ $(document).ready(function() {
 
 	var seeking = false;
 	$("#seekbar").mousedown(function(e) {
-		pushEvent(Event.Pause);
+		eventActions.send(Event.Pause, currentEpisodeId);
 		seek(1 / $("#seekbar").width() * (e.pageX - $("#seekbar").position().left) * currentEpisodeDuration);
 		seeking = true;
 	});
 
 	$("#badeball").mousedown(function(e) {
-		pushEvent(Event.Pause);
+		eventActions.send(Event.Pause, currentEpisodeId);
 		seek(1 / $("#seekbar").width() * (e.pageX - $("#seekbar").position().left) * currentEpisodeDuration);
 		seeking = true;
 	});
@@ -583,9 +557,9 @@ $(document).ready(function() {
 			$("#seekbar").css("height", "5px");
 			$("#badeball").css("height", "0px").css("width", "0px").css("top", "5px");
 			seeking = false;
-			pushEvent(Event.Play);
+			eventActions.send(Event.Play, currentEpisodeId);
 			if (el("vid").paused) {
-				pushEvent(Event.Pause);
+				eventActions.send(Event.Pause, currentEpisodeId);
 			}
 		}
 		if (volumizing) {
@@ -1146,7 +1120,7 @@ function playEpisode(id) {
 	if (currentEpisodeId !== id) {
 		if (currentEpisodeId !== null) {
 			if (!el("vid").paused) {
-				pushEvent(Event.Play);
+				eventActions.send(Event.Play, currentEpisodeId);
 			}
 		}
 
@@ -1162,7 +1136,7 @@ function playEpisode(id) {
 			currentEpisodeId = id;
 
 			if (episodes[id].lastevent === null) {
-				pushEvent(Event.Start, id, 0);
+				eventActions.send(Event.Start, id, 0);
 			}
 
             var desc = "";
@@ -1270,47 +1244,6 @@ function sync(onDemand) {
 	}
 }
 
-function pushEvent(type, id, time) {
-	if (poppedOut) {
-		return;
-	}
-
-	var eventTS = unix();
-	if (lastEventTS === eventTS) {
-		currentOrder++;
-	}
-	else {
-		currentOrder = 0;
-	}
-	lastEventTS = eventTS;
-
-	id = id || currentEpisodeId;
-
-	var event = {
-		clientdescription: util.userAgent(),
-		clientname: "Castcloud",
-		clientts: eventTS,
-		episodeid: id,
-		name: Event[type],
-		positionts: time === undefined ? el("vid").currentTime | 0 : time,
-		type: type,
-		concurrentorder: currentOrder
-	};
-
-	var position = new Date(event.positionts * 1000);
-	position.setHours(position.getHours() - 1);
-	event.position = "";
-	if (position.getHours() > 0) {
-		event.position += position.getHours() + "h ";
-	}
-	event.position += position.getMinutes() + "m " + position.getSeconds() + "s";
-	var date = new Date(event.clientts * 1000);
-	date.setHours(date.getHours() - 1);
-	event.date = date.toLocaleString();
-
-	eventActions.send(event);
-}
-
 /*	else {
 		$("#episodes").empty().append('<div class="episodes-empty"><h2>There are no episodes left</h2><button id="show-all-episodes" class="button">Show me everything!</button></div>');
 	}*/
@@ -1376,7 +1309,7 @@ function resetPlayback(id) {
 			episodes[id] = tempEpisodes[id]
 			delete tempEpisodes[id];
 		}*/
-		pushEvent(Event.Pause, id, 0);
+		eventActions.send(Event.Pause, id, 0);
 	}
 }
 
@@ -1427,7 +1360,7 @@ function play() {
 	ended = false;
 	paused = false;
 	mediaActions.play();
-	pushEvent(Event.Play);
+	eventActions.send(Event.Play, currentEpisodeId);
 	$(".button-play i").addClass("fa-pause");
 	$(".button-play i").removeClass("fa-play");
 }
@@ -1441,7 +1374,7 @@ function pause() {
 	}
 	paused = true;
 	mediaActions.pause();
-	pushEvent(Event.Pause);
+	eventActions.send(Event.Pause, currentEpisodeId);
 	$(".button-play i").addClass("fa-play");
 	$(".button-play i").removeClass("fa-pause");
 }
@@ -1478,11 +1411,11 @@ function skipBack() {
 			Chromecast.seek(currentTime);
 		}
 		var video = el("vid");
-		pushEvent(Event.Pause);
+		eventActions.send(Event.Pause, currentEpisodeId);
 		video.currentTime = video.currentTime - 15;
-		pushEvent(Event.Play);
+		eventActions.send(Event.Play, currentEpisodeId);
 		if (video.paused) {
-			pushEvent(Event.Pause);
+			eventActions.send(Event.Pause, currentEpisodeId);
 		}
 	}
 }
@@ -1499,11 +1432,11 @@ function skipForward() {
 			Chromecast.seek(currentTime);
 		}
 		var video = el("vid");
-		pushEvent(Event.Pause);
+		eventActions.send(Event.Pause, currentEpisodeId);
 		video.currentTime = video.currentTime + 15;
-		pushEvent(Event.Play);
+		eventActions.send(Event.Play, currentEpisodeId);
 		if (video.paused) {
-			pushEvent(Event.Pause);
+			eventActions.send(Event.Pause, currentEpisodeId);
 		}
 	}
 }
@@ -1642,10 +1575,6 @@ function padCastOverlay() {
 
 function el(id) {
 	return $("#" + id)[0];
-}
-
-function unix() {
-	return $.now() / 1000 | 0;
 }
 
 function uniqueName(name) {

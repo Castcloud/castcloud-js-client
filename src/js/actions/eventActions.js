@@ -1,5 +1,6 @@
 var Reflux = require('reflux');
 var API = require('../api.js');
+var buildEvent = require('../event.js').buildEvent;
 
 var eventActions = Reflux.createActions([
 	"send",
@@ -9,8 +10,11 @@ var eventActions = Reflux.createActions([
 	"fetchDone"
 ]);
 
-eventActions.send.preEmit = function(event) {
+eventActions.send.sync = true;
+eventActions.send.preEmit = function(type, id) {
+	var event = buildEvent(type, id);
 	API.sendEvent(event);
+	return event;
 };
 
 eventActions.fetch.preEmit = function() {

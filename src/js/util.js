@@ -36,3 +36,7 @@ exports.userAgent = function() {
 	}
 	return s;
 };
+
+exports.unix = function() {
+	return $.now() / 1000 | 0;
+};

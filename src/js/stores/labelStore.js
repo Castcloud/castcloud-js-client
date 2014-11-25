@@ -40,12 +40,12 @@ var labelStore = Reflux.createStore({
     addDone: function(addedLabel) {
     	var label = _.find(labels, { id: undefined, name: addedLabel.name });
     	label.id = addedLabel.id;
-    	this.trigger(state);
+    	this.trigger(labels);
 	},
 
 	addFailed: function(name) {
 		_.remove(labels, { id: undefined, name: name });
-		this.trigger(state);
+		this.trigger(labels);
 	},
 
     update: function(id, data) {
@@ -94,7 +94,7 @@ var labelStore = Reflux.createStore({
 
     addCastFailed: function(url) {
     	_.remove(labels, { id: url });
-    	this.trigger(state);
+    	this.trigger(labels);
     },
 
     getState: function() {

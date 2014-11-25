@@ -34,6 +34,7 @@ var castStore = Reflux.createStore({
             id: url,
             name: name || url
         };
+        this.trigger(state);
     },
 
     addDone: function(cast) {

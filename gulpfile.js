@@ -46,7 +46,7 @@ gulp.task('js', function() {
 
 function js(watch) {
     var bundler, rebundle;
-    bundler = browserify('./src/script.js', {
+    bundler = browserify('./src/js/script.js', {
         debug: !argv.production,
         cache: {},
         packageCache: {},
