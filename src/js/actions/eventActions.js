@@ -11,8 +11,8 @@ var eventActions = Reflux.createActions([
 ]);
 
 eventActions.send.sync = true;
-eventActions.send.preEmit = function(type, id) {
-	var event = buildEvent(type, id);
+eventActions.send.preEmit = function(type, id, time) {
+	var event = buildEvent(type, id, time);
 	API.sendEvent(event);
 	return event;
 };
