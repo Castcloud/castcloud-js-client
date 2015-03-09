@@ -10,6 +10,7 @@ var media = {
 	currentTime: 0,
 	currentEpisode: null,
 	volume: 1.0,
+	muted: false,
 	playbackRate: 1.0
 };
 

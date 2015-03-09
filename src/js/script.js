@@ -25,14 +25,23 @@ var eventStore = require('./stores/eventStore.js');
 var settingsActions = require('./actions/settingsActions.js');
 var settingsStore = require('./stores/settingsStore.js');
 
+var playbarActions = require('./actions/playbarActions.js');
+
 var CastList = require('./components/CastList.jsx');
 var EpisodeList = require('./components/EpisodeList.jsx');
 var EpisodeInfo = require('./components/EpisodeInfo.jsx');
 var EventList = require('./components/EventList.jsx');
 var Settings = require('./components/Settings.jsx');
+var Playbar = require('./components/Playbar.jsx');
 var ContextMenu = require('./components/ContextMenu.jsx');
 
 var Event = require('./event.js').Event;
+
+window.mediaGlue = {
+	seek: seek,
+	setVolume: volume,
+	toggleMute: muteToggle
+};
 
 var app = appStore.getState();
 appStore.listen(function(newApp) {
@@ -74,6 +83,10 @@ mediaActions.playEpisode.listen(function(id) {
 	playEpisode(id);
 });
 
+mediaActions.setPlaybackRate.listen(function(rate) {
+	el('vid').playbackRate = rate;
+});
+
 episodeActions.resetPlayback.listen(resetPlayback);
 episodeActions.delete.listen(function(id) {
 	eventActions.send(Event.Delete, id);
@@ -101,13 +114,6 @@ eventActions.fire.listen(function(event) {
 	}
 });
 
-React.render(<CastList />, document.getElementById("podcasts"));
-React.render(<EpisodeList />, document.getElementById("episode-list"));
-React.render(<EpisodeInfo />, document.getElementById("episodeinfo"));
-React.render(<EventList />, document.getElementById("events"));
-React.render(<Settings />, document.getElementById("tab-settings"));
-React.render(<ContextMenu />, document.getElementById("context-menu"));
-
 var username;
 var loggedIn = false;
 var root;
@@ -128,7 +134,7 @@ var currentQueuePosition = 0;
 //var episodeFeedScroll;
 
 var currentEpisodeId = null;
-var currentEpisodeDuration;
+window.currentEpisodeDuration = 0;
 var selectedEpisodeId = null;
 var videoLoading = false;
 
@@ -136,6 +142,14 @@ var router;
 var page = 0;
 window.small = null;
 var prevSmall = false;
+
+React.render(<CastList />, document.getElementById("podcasts"));
+React.render(<EpisodeList />, document.getElementById("episode-list"));
+React.render(<EpisodeInfo />, document.getElementById("episodeinfo"));
+React.render(<EventList />, document.getElementById("events"));
+React.render(<Settings />, document.getElementById("tab-settings"));
+React.render(<Playbar />, document.getElementById("playbar"));
+React.render(<ContextMenu />, document.getElementById("context-menu"));
 
 Chromecast.init("3EC703A8");
 Chromecast.session(function() {
@@ -162,7 +176,7 @@ Chromecast.mediaLoaded(function() {
 });
 
 Chromecast.timeUpdate(function(time) {
-	updateTime(time);
+	mediaActions.updateTime(time);
 	currentTime = time;
 });
 
@@ -211,7 +225,6 @@ $(document).ready(function() {
 		}
 		positionThumb();
 		padCastOverlay();
-		$("#overlay-info").hide();
 	});
 
 	var storedUsername = localStorage.username;
@@ -272,6 +285,7 @@ $(document).ready(function() {
 
 	$("#vid").on("timeupdate", function() {
 		var video = el("vid");
+		mediaActions.updateTime(video.currentTime);
 		updateTime(video.currentTime);
 	});
 
@@ -280,7 +294,7 @@ $(document).ready(function() {
 	});
 
 	$("#vid").dblclick(function() {
-		toggleFullscreen();
+		util.toggleFullscreen();
 	});
 
 	$("#vid-thumb-bar .popout").click(function() {
@@ -305,7 +319,7 @@ $(document).ready(function() {
 		});
 
 		$(poppedOut).on("timeupdate", function(e) {
-			updateTime(e.originalEvent.data.time);
+			mediaActions.updateTime(e.originalEvent.data.time);
 		});
 
 		$(poppedOut).on("unload", function() {
@@ -356,75 +370,21 @@ $(document).ready(function() {
 	$(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function() {
 		$("#vid-wrap").toggleClass("fs");
 		if ($("#vid-wrap").hasClass("fs")) {
+			playbarActions.show(1000);
 			$("#vid-container").removeClass("thumb");
 		}
 		else {
 			if (Backbone.history.fragment !== "now-playing") {
 				$("#vid-container").addClass("thumb");
 			}
-			if (timer !== null) {
-				clearTimeout(timer);
-			}
-			$("#overlay-info").velocity("stop").hide();
+
+			playbarActions.show();
+			$('#overlay-info').hide();
 		}
 	});
 
-	var timer = null;
 	$("#vid-wrap").mousemove(function() {
-		if (!bar) {
-			var overlay = $("#overlay-info");
-			if ($(this).hasClass("fs")) {
-				$("#playbar").show();
-				if (overlay.css("display") === "none") {
-					overlay.velocity("fadeIn");
-				}
-				if (timer !== null) {
-					clearTimeout(timer);
-				}
-				timer = setTimeout(function() {
-					$("#playbar").hide();
-					overlay.velocity("fadeOut");
-				}, 1000);
-			}
-			else if ($("#vid-container").css("right") == "0px") {
-				if (overlay.css("display") === "none") {
-					overlay.velocity("fadeIn");
-				}
-				if (timer !== null) {
-					clearTimeout(timer);
-				}
-				timer = setTimeout(function() {
-					overlay.velocity("fadeOut");
-				}, 1000);
-			}
-		}
-	});
-
-	var bar = false;
-
-	$("#playbar").mouseover(function() {
-		bar = true;
-		if ($(this).parent().hasClass("fs")) {
-			if (timer !== null) {
-				clearTimeout(timer);
-			}
-		}
-		$("#badeball").css("height", "20px").css("width", "20px").css("top", "-5px").css("margin-left", "0px");
-		$("#seekbar").css("height", "10px");
-	});
-
-	$("#playbar").mouseout(function() {
-		bar = false;
-		if ($(this).parent().hasClass("fs")) {
-			timer = setTimeout(function() {
-				$("#playbar").hide();
-				$("#overlay-info").velocity("fadeOut");
-			}, 1000);
-		}
-		if (!seeking) {
-			$("#seekbar").css("height", "5px");
-			$("#badeball").css("height", "0px").css("width", "0px").css("top", "2.5px").css("margin-left", "10px");
-		}
+		playbarActions.show(1000);
 	});
 
 	function shoveUnloadEvent() {
@@ -473,7 +433,7 @@ $(document).ready(function() {
 		}
 		padCastOverlay();
 
-		currentEpisodeDuration = video.duration;
+		window.currentEpisodeDuration = video.duration;
 
 		var lastevent = episodes[currentEpisodeId].lastevent;
 
@@ -509,68 +469,8 @@ $(document).ready(function() {
 		nextEpisode();
 	});
 
-	var seeking = false;
-	$("#seekbar").mousedown(function(e) {
-		eventActions.send(Event.Pause, currentEpisodeId);
-		seek(1 / $("#seekbar").width() * (e.pageX - $("#seekbar").position().left) * currentEpisodeDuration);
-		seeking = true;
-	});
-
-	$("#badeball").mousedown(function(e) {
-		eventActions.send(Event.Pause, currentEpisodeId);
-		seek(1 / $("#seekbar").width() * (e.pageX - $("#seekbar").position().left) * currentEpisodeDuration);
-		seeking = true;
-	});
-
-	$("#seekbar").mouseover(function() {
-		//$("#seektime").show();
-	});
-
-	$("#seekbar").mouseout(function() {
-		if (!seeking) {
-			$("#seektime").hide();
-		}
-	});
-
-	function updateSeektime(x) {
-		var currentTime = 1 / $("#seekbar").width() * (x - $("#seekbar").position().left) * currentEpisodeDuration;
-
-		var date = new Date(currentTime * 1000);
-
-		date.setHours(date.getHours() - 1);
-
-		var time = "";
-		if (date.getHours() > 0) {
-			time += date.getHours().pad() + ":";
-		}
-		time += date.getMinutes().pad() + ":" + date.getSeconds().pad();
-
-		$("#seektime").css("left", (x - $("#seektime").outerWidth() / 2) + "px");
-		$("#seektime").html(time);
-	}
-
-	$("#seekbar").mousemove(function(e) {
-		updateSeektime(e.pageX);
-	});
-
 	$(document).mouseup(function() {
 		x = false;
-		if (seeking) {
-			$("#seektime").hide();
-			$("#seekbar").css("height", "5px");
-			$("#badeball").css("height", "0px").css("width", "0px").css("top", "5px");
-			seeking = false;
-			eventActions.send(Event.Play, currentEpisodeId);
-			if (el("vid").paused) {
-				eventActions.send(Event.Pause, currentEpisodeId);
-			}
-		}
-		if (volumizing) {
-			volumizing = false;
-			if (!volumeMousedOver) {
-				$("#volume .bar").hide();
-			}
-		}
 	});
 
 	$(document).mousemove(function(e) {
@@ -580,27 +480,6 @@ $(document).ready(function() {
 			thumb.css("width", width + "px");
 			settingsActions.set("ThumbWidth", width, "__client");
 		}
-		if (seeking) {
-			seek(1 / $("#seekbar").width() * (e.pageX - $("#seekbar").position().left) * currentEpisodeDuration);
-			updateSeektime(e.pageX);
-		}
-		if (volumizing) {
-			volume(1 / 60 * (e.pageX - $("#volume .bar .inner").position().left));
-		}
-	});
-
-	$("#playbar-gear").click(function() {
-		$("#playbar-gear-menu").toggle();
-	});
-
-	$("#playbar-fullscreen").click(toggleFullscreen);
-
-	$(".playback-rate").click(function() {
-		var rate = $(this).attr("rate");
-		$(".playback-rate").removeClass("selected");
-		$(this).addClass("selected");
-		el("vid").playbackRate = rate;
-		settingsActions.set("PlaybackRate", rate, "Playback");
 	});
 
 	$("#button-login").click(login);
@@ -720,29 +599,6 @@ $(document).ready(function() {
 	positionThumb();
 	$(window).resize(function() {
 		positionThumb();
-	});
-
-	$("#volume i").click(function() {
-		muteToggle();
-	});
-
-	var volumeMousedOver = false;
-	$("#volume").mouseover(function() {
-		$("#volume .bar").show();
-		volumeMousedOver = true;
-	});
-
-	$("#volume").mouseout(function() {
-		if (!volumizing) {
-			$("#volume .bar").hide();
-		}
-		volumeMousedOver = false;
-	});
-
-	var volumizing = false;
-	$("#volume .bar").mousedown(function(e) {
-		volume(1 / 60 * (e.pageX - $("#volume .bar .inner").position().left));
-		volumizing = true;
 	});
 
 	/*$("#podcasts").on("mouseover", ".cast", function() {
@@ -1069,6 +925,7 @@ function createRouter() {
 			$("#vid-container").removeClass("thumb");
 			$("#vid-wrap").addClass("fs");
 			$("#vid-container").addClass("fs");
+			playbarActions.show(1000);
 		}
 	});
 }
@@ -1090,15 +947,6 @@ function addLabel(name) {
 	$("#button-vmenu-label").toggle();
 }
 
-function loadEpisodeInfo(id) {
-	var episode = id in episodes ? episodes[id] : tempEpisodes[id];
-	if (episode) {
-		$("#overlay-info h2").html(episode.feed.title);
-		$("#overlay-info h5").html(casts[episode.castid].feed.title);
-	}
-	positionThumb();
-}
-
 function playEpisode(id) {
 	if (currentEpisodeId !== id) {
 		if (currentEpisodeId !== null) {
@@ -1115,6 +963,9 @@ function playEpisode(id) {
 
 		if (id in episodes) {
 			sessionStorage.lastepisode = JSON.stringify({ id: id, castid: episodes[id].castid });
+
+			$("#overlay-info h2").html(episodes[id].feed.title);
+			$("#overlay-info h5").html(casts[episodes[id].castid].feed.title);
 
 			currentEpisodeId = id;
 
@@ -1363,9 +1214,6 @@ function seek(time) {
 			el("vid").currentTime = time;
 		}
 	}
-	var progress = 1 / currentEpisodeDuration * time;
-	$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
-	$("#badeball").css("left", $("#seekbar").width() * progress - 10 + "px");
 }
 
 function skipBack() {
@@ -1411,6 +1259,7 @@ function skipForward() {
 }
 
 function muteToggle() {
+	mediaActions.toggleMute();
 	if (poppedOut) {
 		popoutMessage({
 			action: "muteToggle"
@@ -1419,19 +1268,10 @@ function muteToggle() {
 	var video = el("vid");
 	video.muted = !video.muted;
 	Chromecast.mute(video.muted);
-	if (video.muted) {
-		$("#volume i").removeClass("fa-volume-up");
-		$("#volume i").addClass("fa-volume-off");
-		$("#volume .bar .inner").css("width", 0);
-	}
-	else {
-		$("#volume i").removeClass("fa-volume-off");
-		$("#volume i").addClass("fa-volume-up");
-		$("#volume .bar .inner").css("width", (60 * video.volume) + "px");
-	}
 }
 
 function volume(vol) {
+	mediaActions.setVolume(vol);
 	if (vol < 0) {
 		vol = 0;
 	}
@@ -1447,17 +1287,6 @@ function volume(vol) {
 	Chromecast.volume(vol);
 	var video = el("vid");
 	video.volume = vol;
-	$("#volume .bar .inner").css("width", (60 * video.volume) + "px");
-
-	if (vol === 0) {
-		$("#volume i").removeClass("fa-volume-up");
-		$("#volume i").addClass("fa-volume-off");
-	}
-	else {
-		video.muted = false;
-		$("#volume i").removeClass("fa-volume-off");
-		$("#volume i").addClass("fa-volume-up");
-	}
 }
 
 function nextEpisode() {
@@ -1474,54 +1303,11 @@ function previousEpisode() {
 	console.log("previousEpisode called");
 }
 
-function toggleFullscreen() {
-	var video = el("vid-wrap");
-	if ($("#vid-wrap").hasClass("fs")) {
-		document.webkitExitFullscreen();
-		$("#playbar-fullscreen").removeClass("fa-compress").addClass("fa-expand");
-	}
-	else {
-		if (video.requestFullscreen) {
-			video.requestFullscreen();
-		} else if (video.msRequestFullscreen){
-			video.msRequestFullscreen();
-		} else if (video.mozRequestFullScreen){
-			video.mozRequestFullScreen();
-		} else if (video.webkitRequestFullscreen){
-			video.webkitRequestFullscreen();
-		}
-		$("#playbar-fullscreen").removeClass("fa-expand").addClass("fa-compress");
-	}
-}
-
 function updateTime(currentTime) {
-	var date = new Date(currentTime * 1000);
-	var dateTotal = new Date(currentEpisodeDuration * 1000);
-	var progress = 1 / currentEpisodeDuration * currentTime;
-
-	date.setHours(date.getHours() - 1);
-	dateTotal.setHours(dateTotal.getHours() - 1);
-
-	var time = "";
-	if (date.getHours() > 0) {
-		time += date.getHours().pad() + ":";
-	}
-	time += date.getMinutes().pad() + ":" + date.getSeconds().pad() + "/";
-	if (dateTotal.getHours() > 0) {
-		time += dateTotal.getHours().pad() + ":";
-	}
-	time += dateTotal.getMinutes().pad() + ":" + dateTotal.getSeconds().pad();
-
 	if (window.name === "popout" && currentTime > 0) {
 		var ev = new window.Event('timeupdate');
 		ev.data = { time: currentTime };
 		window.dispatchEvent(ev);
-	}
-
-	$("#time").html(time);
-	if ($("#seekbar").is(":visible")) {
-		$("#seekbar div").css("width", $("#seekbar").width() * progress + "px");
-		$("#badeball").css("left", $("#seekbar").width() * progress - 10 + "px");
 	}
 }
 
@@ -1543,19 +1329,11 @@ function padCastOverlay() {
 }
 
 function el(id) {
-	return $("#" + id)[0];
+	return document.getElementById(id);
 }
 
 function uniqueName(name) {
 	return username + "-" + name;
-}
-
-Number.prototype.pad = function() {
-	var str = this.toString();
-	while (str.length < 2) {
-		str = "0" + str;
-	}
-	return str;
 }
 
 if (window.location.host === "castcloud.khlieng.com") {

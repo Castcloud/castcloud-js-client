@@ -5,7 +5,7 @@ var episodeActions = require('./actions/episodeActions.js');
 
 exports.cast = [{
 	content: "Show all episodes",
-	action: function() {} //showAllEpisodes
+	action: function() {}
 }, {
 	content: "Rename",
 	action: castActions.beginRename
@@ -14,28 +14,12 @@ exports.cast = [{
 	action: castActions.remove
 }, {
 	content: "Add to label",
-	action: function() {
-		//$("#add-to-label").show()
-	}
+	action: function() {}
 }];
 
 exports.label = [{
 	content: "Rename",
-	action: function(id) {
-		labelActions.beginRename(id);
-		/*var label = $("#label-" + id + " .name span");
-		var name = label.html();
-		label.html('<input type="text">');
-		$(".label input").focus();
-		$(".label input").val(name);
-		$(".label input").keydown(function(e) {
-			if (e.which === 13) {
-				var name = $(this).val();
-				label.html(name);
-				API.renameLabel(id, name);
-			}
-		});*/
-	}
+	action: labelActions.beginRename
 }, {
 	content: "Delete",
 	action: labelActions.remove

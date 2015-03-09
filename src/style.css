@@ -702,8 +702,8 @@ button.vmenu-toggle:hover {
 	clear: both;
 }
 
-#playbar {
-	display: none;
+.playbar {
+	/*display: none;*/
 	background: #111;
 	height: 55px;
 	bottom: 0;
@@ -714,7 +714,7 @@ button.vmenu-toggle:hover {
 	z-index: 1000;
 }
 
-#playbar .button {
+.playbar .button {
 	float: left;
 	background: none;
 	width: 40px;
@@ -725,38 +725,38 @@ button.vmenu-toggle:hover {
 	color: #666;
 }
 
-#playbar .button:first-child {
+.playbar .button:first-child {
 	padding-left: 10px;
 	width: 50px;
 }
 
-#playbar .button:hover {
+.playbar .button:hover {
 	color: #0099cc;
 }
 
-#playbar-gear {
+.playbar-gear {
 	float: right;
 	line-height: 60px;
 	margin-right: 20px;
 	cursor: pointer;
 }
 
-#playbar-gear:hover {
+.playbar-gear:hover {
 	color: #0099cc;
 }
 
-#playbar-fullscreen {
+.playbar-fullscreen {
 	float:right;
 	line-height: 60px;
 	margin-right: 20px;
 	cursor: pointer;
 }
 
-#playbar-fullscreen:hover {
+.playbar-fullscreen:hover {
 	color: #0099cc;
 }
 
-#playbar-gear-menu {
+.playbar-gear-menu {
 	display: none;
 	position: fixed;
 	bottom: 55px;
@@ -767,15 +767,15 @@ button.vmenu-toggle:hover {
 	color: #666;
 }
 
-#playbar-gear-menu * {
+.playbar-gear-menu * {
 	margin-bottom: 5px;
 }
 
-#playbar-gear-menu p {
+.playbar-gear-menu p {
 	margin: 10px;
 }
 
-#playbar-gear-menu .button {
+.playbar-gear-menu .button {
 	width: 60px !important;
 	margin-top: -10px;
 	border-radius: 0px;
@@ -783,19 +783,19 @@ button.vmenu-toggle:hover {
 	color: #FFF;
 }
 
-#playbar-gear-menu .button.selected {
+.playbar-gear-menu .button.selected {
 	color: #0099cc;
 }
 
-#playbar-gear-menu .button:hover {
+.playbar-gear-menu .button:hover {
 	color: #0099cc;
 }
 
-#playbar-gear-menu .button:active {
+.playbar-gear-menu .button:active {
 	background: none;
 }
 
-#volume {
+.volume {
 	float: left;
 	height: 40px;
 	margin: 10px 15px;
@@ -804,19 +804,19 @@ button.vmenu-toggle:hover {
 	color: #666;
 }
 
-#volume i {
+.volume i {
 	width: 20px;
 }
 
-#volume i:hover {
+.volume i:hover {
 	color: #0099cc;
 }
 
-#volume i, #volume .bar {
+.volume i, #volume .bar {
 	cursor: pointer;
 }
 
-#volume .bar {
+.volume .bar {
 	display: none;
 	float: right;
 	background: #FFF;
@@ -827,48 +827,48 @@ button.vmenu-toggle:hover {
 	border-radius: 3px;
 }
 
-#volume .bar .inner {
+.volume .bar .inner {
 	background: #0099cc;
 	width: 60px;
 	height: 6px;
 	border-radius: 3px;
 }
 
-#playbar-info {
+.playbar-info {
 	display: none;
 	float: left;
 	line-height: 75px;
 	margin: 0px 20px;
 }
 
-#time {
+.time {
 	margin: 0 20px;
 	line-height: 60px;
 	float: right;
 	font-weight: 400;
 }
 
-#seekbar {
+.seekbar {
 	position: absolute;
 	left: 0px;
 	right: 0px;
 	top: 0px;
 	height: 5px;
 	background: #333;
-	transition: height 0.1s;
+	/*transition: height 0.1s;*/
 }
 
-#seekbar:hover {
+.seekbar:hover {
 	cursor: pointer;
 }
 
-#seekbar div {
+.seekbar div {
 	background: #0099cc;
 	height: 100%;
 	width: 0px;
 }
 
-#badeball {
+.badeball {
 	position: absolute;
 	background: #FFF;
 	top: 2.5px;
@@ -879,10 +879,10 @@ button.vmenu-toggle:hover {
 	border-radius: 50%;
 	cursor: pointer;
 	margin-left: 10px;
-	transition: width 0.1s, height 0.1s, top 0.1s, margin 0.1s;
+	/*transition: width 0.1s, height 0.1s, top 0.1s, margin 0.1s;*/
 }
 
-#badeball div {
+.badeball div {
 	width: 50%;
 	height: 50%;
 	margin: 25%;
@@ -890,7 +890,7 @@ button.vmenu-toggle:hover {
 	border-radius: 50%;
 }
 
-#seektime {
+.seektime {
 	position: fixed;
 	display: none;
 	color: #FFF;

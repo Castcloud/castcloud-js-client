@@ -10,7 +10,7 @@ var mediaActions = Reflux.createActions([
 	"loadDone",
 	"seek",
 	"setVolume",
-	"mute",
+	"toggleMute",
 	"setPlaybackRate"
 ]);
 

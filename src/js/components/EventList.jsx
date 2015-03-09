@@ -42,6 +42,7 @@ var EventList = React.createClass({
 		var events = _.filter(this.state.events, { 
 			episodeid: this.state.selectedEpisode 
 		});
+
 		events = _.map(_.first(events, 10), function(event) {
 			return <Event key={event.id} event={event} />
 		});

@@ -40,3 +40,43 @@ exports.userAgent = function() {
 exports.unix = function() {
 	return $.now() / 1000 | 0;
 };
+
+function pad(str, char, len) {
+	str += "";
+	while (str.length < len) {
+		str = char + str;
+	}
+	return str;
+};
+
+exports.formatSeconds = function(seconds) {
+	var date = new Date(seconds * 1000);
+	date.setHours(date.getHours() - 1);
+
+	var result = "";
+	if (date.getHours() > 0) {
+		result += pad(date.getHours(), "0", 2) + ":";
+	}
+	result += pad(date.getMinutes(), "0", 2) + ":" + pad(date.getSeconds(), "0", 2);
+	return result;
+};
+
+exports.toggleFullscreen = function() {
+	var video = document.getElementById("vid-wrap");
+	if ($("#vid-wrap").hasClass("fs")) {
+		document.webkitExitFullscreen();
+		//$("#playbar-fullscreen").removeClass("fa-compress").addClass("fa-expand");
+	}
+	else {
+		if (video.requestFullscreen) {
+			video.requestFullscreen();
+		} else if (video.msRequestFullscreen){
+			video.msRequestFullscreen();
+		} else if (video.mozRequestFullScreen){
+			video.mozRequestFullScreen();
+		} else if (video.webkitRequestFullscreen){
+			video.webkitRequestFullscreen();
+		}
+		//$("#playbar-fullscreen").removeClass("fa-expand").addClass("fa-compress");
+	}
+};

@@ -5,8 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Castcloud</title>
 	<link href="//fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
-	<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="{{root}}style.css">
+	<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="{{root}}style.css" rel="stylesheet">
 </head>
 <body>
 	<textarea id="clip"></textarea>
@@ -84,39 +84,19 @@
 				<figure style="text-align:center"><img id="vid-art" style="max-height: 100%"></figure>
 				<div id="overlay-loading"><i class="fa fa-spinner fa-spin fa-5x"></i><h3>Buffering...</h3></div>
 			</div>
-			<div id="playbar">
-				<div id="playbar-controls">
-					<button class="button button-skipback"><i class="fa fa-step-backward"></i></button>
-					<button class="button button-play"><i class="fa fa-play"></i></button>
-					<button class="button button-skipforward"><i class="fa fa-step-forward"></i></button>
-					<div id="volume"><i class="fa fa-volume-up"></i><div class="bar"><div class="inner"></div></div></div>
-					<div id="badeball"><div></div></div>
-					<div id="seekbar"><div></div></div>
-					<div id="seektime"></div>
-					<div class="cc"><img src="img/cast_off.png"></div>
-					<i class="fa fa-expand fa-lg" id="playbar-fullscreen"></i>
-					<i class="fa fa-gear fa-lg" id="playbar-gear"></i>
-					<h3 id="time">00:00/00:00</h3>
-				</div>
-				<div id="playbar-gear-menu">
-					<p>Playback rate</p>
-					<button class="button playback-rate" rate="0.5">0.5x</button>
-					<button class="button playback-rate selected" rate="1.0">1.0x</button>
-					<button class="button playback-rate" rate="1.5">1.5x</button>
-				</div>
-			</div>
+			<div id="playbar"></div>
 		</div>
 	</div>
 
-	<script src="//cdnjs.cloudflare.com/ajax/libs/react/0.12.0/react.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.4.0/lodash.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/localforage/1.1.1/localforage.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/localforage/1.2.2/localforage.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/iScroll/5.1.1/iscroll-min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.1.0/velocity.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.2.2/velocity.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/mousetrap/1.4.6/mousetrap.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/UAParser.js/0.6.2/ua-parser.min.js"></script>	
+	<script src="//cdnjs.cloudflare.com/ajax/libs/UAParser.js/0.7.3/ua-parser.min.js"></script>	
 	<script src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
 	<script>window.CLIENT_ROOT="{{root}}";window.Velocity=$.Velocity;</script>
 	<script src="{{root}}script.js"></script>

@@ -49,6 +49,7 @@ var settingsStore = Reflux.createStore({
 
 	fetchDone: function(fetchedSettings) {
 		settings = _.merge({}, DefaultSettings, fetchedSettings);
+		settings.Playback.PlaybackRate.value = parseFloat(settings.Playback.PlaybackRate.value);
 		this.trigger(settings);
 	},
 
