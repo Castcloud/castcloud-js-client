@@ -702,8 +702,11 @@ button.vmenu-toggle:hover {
 	clear: both;
 }
 
+#playbar {
+	display: none;
+}
+
 .playbar {
-	/*display: none;*/
 	background: #111;
 	height: 55px;
 	bottom: 0;
