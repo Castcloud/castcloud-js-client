@@ -318,13 +318,11 @@ button.vmenu-toggle:hover {
 }
 
 .cast, .episode, .label .name {
+	display: flex;
+	box-sizing: border-box;
+	width: 100%;
 	padding-right: 15px;
 	cursor: pointer;
-
-	display: table;
-	table-layout: fixed;
-	width: 100%;
-    box-sizing: border-box;
 }
 
 .name, #add-to-label p {
@@ -332,17 +330,15 @@ button.vmenu-toggle:hover {
 }
 
 .cast .name, .episode .name {
-	display: table-cell;
-
+	flex: 1;
+	padding-right: 0;
 	overflow: hidden;
     white-space: nowrap;
 	text-overflow: ellipsis;
-
-	padding-right: 0;
 }
 
 .label i {
-	float: right;
+	margin-left: auto;
 	font-size: 20px;
 }
 
@@ -383,10 +379,10 @@ button.vmenu-toggle:hover {
 }
 
 .cast .n {
-	display: table-cell;
+	margin: auto 0;
+	margin-left: 8px;
 	text-align: right;
 	color: #AAA;
-	width: 30px;
 }
 
 #add-to-label {
@@ -410,8 +406,8 @@ button.vmenu-toggle:hover {
 }
 
 .episode i {
-	width: 16px;
-	display: table-cell;
+	margin: auto 0;
+	margin-left: 8px;
 	text-align: center;
 }
 
