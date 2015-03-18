@@ -337,8 +337,12 @@ button.vmenu-toggle:hover {
 	text-overflow: ellipsis;
 }
 
+.label span {
+	flex: 1;
+}
+
 .label i {
-	margin-left: auto;
+	margin-left: 8px;
 	font-size: 20px;
 }
 
@@ -381,7 +385,6 @@ button.vmenu-toggle:hover {
 .cast .n {
 	margin: auto 0;
 	margin-left: 8px;
-	text-align: right;
 	color: #AAA;
 }
 
@@ -408,7 +411,6 @@ button.vmenu-toggle:hover {
 .episode i {
 	margin: auto 0;
 	margin-left: 8px;
-	text-align: center;
 }
 
 .episode .progress {
