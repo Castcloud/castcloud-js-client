@@ -549,7 +549,7 @@ $(document).ready(function() {
 			var term = $(this).val();
 			searchTimerId = setTimeout(function() {
 				$.ajax({
-					url: "http://itunes.apple.com/search",
+					url: "//itunes.apple.com/search",
 					jsonp: "callback",
 					dataType: "jsonp",
 					data: {
@@ -1053,13 +1053,13 @@ userActions.loginDone.listen(function(loggedIn, username, local) {
 			$("#playbar").velocity("slideDown");
 			$("#topbar nav").velocity("fadeIn");
 			$("#userinfo").velocity("fadeIn");
-		}		
+		}
 	}
 });
 
 function finishLogin() {
 	loggedIn = true;
-	
+
 	$("#userinfo span").html(username);
 	$(".tab").hide();
 	$("#main-container").css("bottom", "55px");
