@@ -30,7 +30,7 @@ var API = {
 				clientversion: "0.1",
 				uuid: uuid
 			})
-			.end(function(res) {
+			.end(function(err, res) {
 				if (res.ok) {
 					token = res.body.token;
 					cb(true, username);
@@ -50,7 +50,7 @@ var API = {
 		request
 			.get(url("library/casts"))
 			.set("Authorization", token)
-			.end(function(res) {
+			.end(function(err, res) {
 				if (res.ok) {
 					cb(_.indexBy(res.body, "id"));
 				}
@@ -63,7 +63,7 @@ var API = {
 			.type("form")
 			.set("Authorization", token)
 			.send({ feedurl: feedurl })
-			.end(function(res) {
+			.end(function(err, res) {
 				if (res.ok) {
 					success(res.body);
 				}
@@ -79,7 +79,7 @@ var API = {
 			.type("form")
 			.set("Authorization", token)
 			.send({ name: name })
-			.end(function(res) {
+			.end(function(err, res) {
 				cb();
 			});
 	},
@@ -88,7 +88,7 @@ var API = {
 		request
 			.del(url("library/casts/" + id))
 			.set("Authorization", token)
-			.end(function(res) {
+			.end(function(err, res) {
 				cb();
 			});
 	},
@@ -97,7 +97,7 @@ var API = {
 		request
 			.get(url("library/casts.opml"))
 			.set("Authorization", token)
-			.end(function(res) {
+			.end(function(err, res) {
 				cb(res.text);
 			});
 	},
@@ -108,7 +108,7 @@ var API = {
 			.type("form")
 			.set("Authorization", token)
 			.send({ opml: opml })
-			.end(function(res) {
+			.end(function(err, res) {
 				cb();
 			});
 	},
@@ -117,7 +117,7 @@ var API = {
 		request
 			.get(url("library/labels"))
 			.set("Authorization", token)
-			.end(function(res) {
+			.end(function(err, res) {
 				if (res.ok) {
 					var labels = [];
 					var root = _.find(res.body, "root");
@@ -126,7 +126,7 @@ var API = {
 						var split = item.split("/");
 						var type = split[0];
 						var id = split[1];
-						
+
 						if (type === "cast") {
 							labels.push({
 								id: id,
@@ -162,7 +162,7 @@ var API = {
 			.type("form")
 			.set("Authorization", token)
 			.send({ name: name })
-			.end(function(res) {
+			.end(function(err, res) {
 				if (res.ok) {
 					success(res.body);
 				}
@@ -182,7 +182,7 @@ var API = {
 			.type("form")
 			.set("Authorization", token)
 			.send(data)
-			.end(function(res) {
+			.end(function(err, res) {
 				cb();
 			});
 	},
@@ -195,7 +195,7 @@ var API = {
 		request
 			.del(url("library/labels/" + id))
 			.set("Authorization", token)
-			.end(function(res) {
+			.end(function(err, res) {
 				cb();
 			});
 	},
@@ -208,7 +208,7 @@ var API = {
 				.get(url("library/newepisodes"))
 				.set("Authorization", token)
 				.query({ since: since })
-				.end(function(res) {
+				.end(function(err, res) {
 					if (res.ok) {
 						localforage.setItem("since_episodes", res.body.timestamp);
 						cb(res.body.episodes);
@@ -222,7 +222,7 @@ var API = {
 		request
 			.get(url("library/episodes/" + castid))
 			.set("Authorization", token)
-			.end(function(res) {
+			.end(function(err, res) {
 				cb(res.body);
 			});
 	},
@@ -238,7 +238,7 @@ var API = {
 					since: since,
 					exclude_self: true
 				})
-				.end(function(res) {
+				.end(function(err, res) {
 					if (res.ok) {
 						localforage.setItem("since_events", res.body.timestamp);
 						_.each(res.body.events, function(event) {
@@ -269,7 +269,7 @@ var API = {
 			.type("form")
 			.set("Authorization", token)
 			.send({ json: JSON.stringify(buffer.events) })
-			.end(function(res) {
+			.end(function(err, res) {
 				if (res.ok) {
 					buffer.events = [];
 					localforage.removeItem("buffer_events");
@@ -282,7 +282,7 @@ var API = {
 		request
 			.get(url("account/settings"))
 			.set("Authorization", token)
-			.end(function(res) {
+			.end(function(err, res) {
 				if (res.ok) {
 					var settings = {};
 					_.each(res.body, function(setting) {
@@ -322,7 +322,7 @@ var API = {
 			.type("form")
 			.set("Authorization", token)
 			.send({ json: JSON.stringify(buffer.settings) })
-			.end(function(res) {
+			.end(function(err, res) {
 				if (res.ok) {
 					buffer.settings = [];
 					localforage.removeItem("buffer_settings");
